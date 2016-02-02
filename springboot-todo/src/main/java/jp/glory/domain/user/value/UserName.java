@@ -31,7 +31,7 @@ public class UserName extends InputText {
     /**
      * 空の値オブジェクトを返却する.
      * 
-     * @return ログインID
+     * @return ユーザ名
      */
     public static UserName empty() {
 
