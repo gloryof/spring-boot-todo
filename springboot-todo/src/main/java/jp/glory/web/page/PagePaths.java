@@ -19,4 +19,18 @@ public final class PagePaths {
         /** パス. */
         public static final String PATH = "/login";
     }
+
+    /**
+     * TODOページ.
+     * 
+     * @author Junki Yamada
+     *
+     */
+    public static class Todo {
+
+        /**
+         * TODOページのパス.
+         */
+        public static final String PATH = "/todos";
+    }
 }
