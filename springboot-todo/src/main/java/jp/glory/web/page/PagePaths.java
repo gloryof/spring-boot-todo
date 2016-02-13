@@ -33,4 +33,16 @@ public final class PagePaths {
          */
         public static final String PATH = "/todos";
     }
+
+    /**
+     * ログインページ.
+     * 
+     * @author Junki Yamada
+     *
+     */
+    public static class Join {
+
+        /** パス. */
+        public static final String PATH = "/join";
+    }
 }
