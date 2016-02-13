@@ -14,7 +14,7 @@ import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.entity.User;
-import jp.glory.domain.user.repository.UserRepositoryStub;
+import jp.glory.domain.user.repository.UserRepositoryMock;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
@@ -34,7 +34,7 @@ public class UserEditValidateRuleTest {
             final User user = new User(new UserId(1L), new LoginId("test"), new UserName("テストユーザ"),
                     new Password("19CB2A070DDBE8157E17C5DDA0EA38E8AA16FAE1725C1F7AC22747D870368579"));
 
-            sut = new UserEditValidateRule(user, new UserRepositoryStub());
+            sut = new UserEditValidateRule(user, new UserRepositoryMock());
         }
 
         @Test
@@ -55,7 +55,7 @@ public class UserEditValidateRuleTest {
 
             sut = new UserEditValidateRule(
                     new User(UserId.notNumberingValue(), LoginId.empty(), UserName.empty(), Password.empty()),
-                    new UserRepositoryStub());
+                    new UserRepositoryMock());
         }
 
         @Test

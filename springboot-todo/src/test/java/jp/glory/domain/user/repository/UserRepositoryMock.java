@@ -10,7 +10,7 @@ import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.UserId;
 
-public class UserRepositoryStub implements UserRepository {
+public class UserRepositoryMock implements UserRepository {
 
     private final Map<Long, User> userMap = new HashMap<>();
 
