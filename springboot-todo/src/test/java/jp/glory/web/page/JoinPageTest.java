@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +53,12 @@ public class JoinPageTest {
         public void postアクセスでMethodNotAllowedエラーになる() throws Exception {
 
             this.mockMvc.perform(post(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
+        }
+
+        @Test
+        public void putアクセスでMethodNotAllowedエラーになる() throws Exception {
+
+            this.mockMvc.perform(put(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
