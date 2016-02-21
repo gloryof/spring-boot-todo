@@ -1,5 +1,6 @@
 package jp.glory.usecase.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,6 +36,7 @@ public class CreateNewAccount {
      * @param repository
      *            ユーザリポジトリ
      */
+    @Autowired
     public CreateNewAccount(final UserRepository repository) {
 
         this.repository = repository;
@@ -72,7 +74,7 @@ public class CreateNewAccount {
      * @author Junki Yamada
      *
      */
-    public class Result {
+    public static class Result {
 
         /**
          * 入力チェック結果.
@@ -86,7 +88,7 @@ public class CreateNewAccount {
          * @param errors
          *            入力チェック結果
          */
-        private Result(final ValidateErrors errors) {
+        protected Result(final ValidateErrors errors) {
 
             this.errors = errors;
         }
