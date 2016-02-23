@@ -43,7 +43,6 @@ import jp.glory.usecase.user.CreateNewAccount;
 import jp.glory.usecase.user.CreateNewAccount.Result;
 import jp.glory.web.api.ApiPaths;
 import jp.glory.web.api.account.request.NewAccountRequest;
-import jp.glory.web.page.PagePaths;
 
 @RunWith(Enclosed.class)
 public class AccountTest {
@@ -139,12 +138,6 @@ public class AccountTest {
             public void getアクセス() throws Exception {
 
                 this.mockMvc.perform(get(ApiPaths.Account.PATH)).andExpect(status().isMethodNotAllowed());
-            }
-
-            @Test
-            public void postアクセスでMethodNotAllowedエラーになる() throws Exception {
-
-                this.mockMvc.perform(post(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
