@@ -1,4 +1,5 @@
 package jp.glory.domain.todo.entity;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.domain.user.value.UserId;
 
 @RunWith(Enclosed.class)
 public class TodoTest {
@@ -21,7 +23,7 @@ public class TodoTest {
         @Before
         public void setUp() {
 
-            sut = new Todo(new TodoId(1000l), new Summary("概要テスト"), new Memo("新しいメモ"), false);
+            sut = new Todo(new TodoId(1000l), new UserId(1l), new Summary("概要テスト"), new Memo("新しいメモ"), false);
         }
 
         @Test

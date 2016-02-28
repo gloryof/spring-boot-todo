@@ -3,6 +3,7 @@ package jp.glory.domain.todo.entity;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.domain.user.value.UserId;
 import lombok.Getter;
 
 /**
@@ -18,6 +19,12 @@ public class Todo {
      */
     @Getter
     private final TodoId id;
+
+    /**
+     * ユーザID.
+     */
+    @Getter
+    private final UserId userId;
 
     /**
      * 概要.
@@ -43,6 +50,8 @@ public class Todo {
      * 
      * @param id
      *            TODOのID
+     * @param userid
+     *            ユーザID
      * @param summary
      *            概要
      * @param memo
@@ -50,9 +59,10 @@ public class Todo {
      * @param completed
      *            完了フラグ
      */
-    public Todo(final TodoId id, final Summary summary, final Memo memo, final boolean completed) {
+    public Todo(final TodoId id, final UserId userId, final Summary summary, final Memo memo, final boolean completed) {
 
         this.id = id;
+        this.userId = userId;
         this.summary = summary;
         this.memo = memo;
         this.completed = completed;
