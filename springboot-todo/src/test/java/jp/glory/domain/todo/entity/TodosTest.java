@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +16,7 @@ import jp.glory.domain.todo.entity.Todos.Statistics;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.domain.user.value.UserId;
 
 @RunWith(Enclosed.class)
 public class TodosTest {
@@ -120,7 +121,7 @@ public class TodosTest {
         public void setUp() {
 
             final List<Todo> list = new ArrayList<>();
-            list.add(new Todo(new TodoId(1l), Summary.empty(), Memo.empty(), false));
+            list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), false));
 
             sut = new Todos(list);
         }
@@ -169,7 +170,7 @@ public class TodosTest {
         public void setUp() {
 
             final List<Todo> list = new ArrayList<>();
-            list.add(new Todo(new TodoId(1l), Summary.empty(), Memo.empty(), true));
+            list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), true));
 
             sut = new Todos(list);
         }
@@ -219,11 +220,11 @@ public class TodosTest {
 
             final List<Todo> list = new ArrayList<>();
 
-            IntStream.rangeClosed(1, 3)
-                    .forEach(v -> list.add(new Todo(new TodoId((long) v), Summary.empty(), Memo.empty(), false)));
+            LongStream.rangeClosed(1, 3).forEach(
+                    v -> list.add(new Todo(new TodoId(v), new UserId(v), Summary.empty(), Memo.empty(), false)));
 
-            IntStream.rangeClosed(1, 2)
-                    .forEach(v -> list.add(new Todo(new TodoId((long) v), Summary.empty(), Memo.empty(), true)));
+            LongStream.rangeClosed(1, 2).forEach(
+                    v -> list.add(new Todo(new TodoId(v), new UserId(v), Summary.empty(), Memo.empty(), true)));
 
             sut = new Todos(list);
         }
