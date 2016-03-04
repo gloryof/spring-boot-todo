@@ -24,12 +24,17 @@ public class WebSecuritySetting extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(final WebSecurity web) {
 
-        web.ignoring().antMatchers("/css/**", "/lib/**");
+        web.ignoring().antMatchers("/css/**", "/lib/**", "/webjars/**", "/configuration/**", "/swagger-resources/**",
+                "/v2/api-docs");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 
-        http.authorizeRequests().antMatchers(PagePaths.Login.PATH).permitAll().anyRequest().authenticated();
+        http.authorizeRequests().antMatchers(PagePaths.Login.PATH, "/swagger-ui.html").permitAll().anyRequest()
+                .authenticated();
     }
 }
