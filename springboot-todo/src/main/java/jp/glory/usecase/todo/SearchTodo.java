@@ -32,7 +32,7 @@ public class SearchTodo {
      *            ユーザID
      * @return Todoリスト
      */
-    protected Todos searchByUser(UserId userId) {
+    public Todos searchByUser(UserId userId) {
 
         return repository.findBy(userId);
     }

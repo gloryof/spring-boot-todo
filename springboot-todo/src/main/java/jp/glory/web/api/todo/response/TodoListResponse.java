@@ -1,0 +1,40 @@
+package jp.glory.web.api.todo.response;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import jp.glory.domain.todo.entity.Todos;
+import lombok.Getter;
+
+/**
+ * TODO一覧のレスポンス.
+ * 
+ * @author Junki Yamada
+ *
+ */
+public class TodoListResponse {
+
+    /**
+     * TODOのリスト.
+     */
+    @Getter
+    private final List<TodoDetail> details;
+
+    /**
+     * 統計.
+     */
+    @Getter
+    private final TodoStatictis statictis;
+
+    /**
+     * コンストラクタ.
+     * 
+     * @param todos
+     *            TODOリスト
+     */
+    public TodoListResponse(final Todos todos) {
+
+        details = todos.asList().stream().map(TodoDetail::new).collect(Collectors.toList());
+        statictis = new TodoStatictis(todos);
+    }
+}

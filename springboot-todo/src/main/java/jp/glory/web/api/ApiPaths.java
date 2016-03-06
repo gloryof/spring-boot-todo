@@ -26,4 +26,18 @@ public final class ApiPaths {
          */
         public static final String PATH = ROOT + "/account";
     }
+
+    /**
+     * TODOのAPI.
+     * 
+     * @author Junki Yamada
+     *
+     */
+    public static class Todo {
+
+        /**
+         * ベースパス.
+         */
+        public static final String PATH = ROOT + "/todos";
+    }
 }
