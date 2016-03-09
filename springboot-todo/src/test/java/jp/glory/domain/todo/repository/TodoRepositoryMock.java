@@ -3,6 +3,7 @@ package jp.glory.domain.todo.repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jp.glory.domain.todo.entity.Todo;
@@ -48,5 +49,15 @@ public class TodoRepositoryMock implements TodoRepository {
     public long getCurrentSequence() {
 
         return sequence;
+    }
+
+    public void setSequence(final long value) {
+
+        sequence = value;
+    }
+
+    public Optional<Todo> getResult(final long id) {
+
+        return Optional.ofNullable(todoMap.get(id));
     }
 }
