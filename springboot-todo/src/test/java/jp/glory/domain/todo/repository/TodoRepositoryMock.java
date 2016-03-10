@@ -18,7 +18,7 @@ public class TodoRepositoryMock implements TodoRepository {
     private long sequence = 1;
 
     @Override
-    public Todos findBy(UserId userId) {
+    public Todos findTodosBy(UserId userId) {
 
         final List<Todo> todoList = todoMap.entrySet().stream().filter(e -> e.getValue().getUserId().isSame(userId))
                 .sorted((v1, v2) -> v1.getKey() < v2.getKey() ? -1 : 1).map(v -> v.getValue())
@@ -59,5 +59,11 @@ public class TodoRepositoryMock implements TodoRepository {
     public Optional<Todo> getResult(final long id) {
 
         return Optional.ofNullable(todoMap.get(id));
+    }
+
+    @Override
+    public Optional<Todo> findBy(TodoId todoId) {
+
+        return Optional.ofNullable(todoMap.get(todoId.getValue()));
     }
 }

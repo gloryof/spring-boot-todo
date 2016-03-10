@@ -1,7 +1,11 @@
 package jp.glory.usecase.todo;
 
+import java.util.Optional;
+
+import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.repository.TodoRepository;
+import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 
 /**
@@ -12,6 +16,9 @@ import jp.glory.domain.user.value.UserId;
  */
 public class SearchTodo {
 
+    /**
+     * リポジトリ.
+     */
     private final TodoRepository repository;
 
     /**
@@ -26,6 +33,16 @@ public class SearchTodo {
     }
 
     /**
+     * TODOのIDをキーに検索する
+     * @param todoId TODOのID
+     * @return TODO情報
+     */
+    public Optional<Todo> searchById(TodoId todoId) {
+
+        return repository.findBy(todoId);
+    }
+
+    /**
      * ユーザIDをキーに検索する.
      * 
      * @param userId
@@ -34,7 +51,7 @@ public class SearchTodo {
      */
     public Todos searchByUser(UserId userId) {
 
-        return repository.findBy(userId);
+        return repository.findTodosBy(userId);
     }
 
 }

@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -22,6 +23,36 @@ import jp.glory.domain.user.value.UserId;
 
 @RunWith(Enclosed.class)
 public class SearchTodosTest {
+
+    public static class searchById {
+
+
+        private SearchTodo sut = null;
+        private TodoRepositoryMock mock = null;
+
+        @Before
+        public void setUp() {
+
+            mock = new TodoRepositoryMock();
+
+            LongStream.rangeClosed(1, 100).mapToObj(v -> {
+
+                return new Todo(new TodoId(v), UserId.notNumberingValue(), Summary.empty(), Memo.empty(), true);
+            }).forEach(mock::save);
+            sut = new SearchTodo(mock);
+        }
+
+        @Test
+        public void 指定したIDに紐づくTodoが返る() {
+
+            final TodoId expectedTodoId = new TodoId(20l);
+
+            final Optional<Todo> actual = sut.searchById(expectedTodoId);
+
+            assertThat(actual.isPresent(), is(true));
+            assertThat(actual.get().getId().isSame(expectedTodoId), is(true));
+        }
+    }
 
     public static class searchByUser {
 
