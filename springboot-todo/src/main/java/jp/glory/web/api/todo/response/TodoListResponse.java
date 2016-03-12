@@ -18,7 +18,7 @@ public class TodoListResponse {
      * TODOのリスト.
      */
     @Getter
-    private final List<TodoDetail> details;
+    private final List<TodoDetailResponse> details;
 
     /**
      * 統計.
@@ -34,7 +34,7 @@ public class TodoListResponse {
      */
     public TodoListResponse(final Todos todos) {
 
-        details = todos.asList().stream().map(TodoDetail::new).collect(Collectors.toList());
+        details = todos.asList().stream().map(TodoDetailResponse::new).collect(Collectors.toList());
         statictis = new TodoStatictis(todos);
     }
 }

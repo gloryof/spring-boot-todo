@@ -49,7 +49,7 @@ public class SearchTodo {
      *            ユーザID
      * @return Todoリスト
      */
-    public Todos searchByUser(UserId userId) {
+    public Todos searchTodosByUser(UserId userId) {
 
         return repository.findTodosBy(userId);
     }

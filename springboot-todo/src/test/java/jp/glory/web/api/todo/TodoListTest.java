@@ -80,7 +80,7 @@ public class TodoListTest {
                     Mockito.when(mockUser.getUserId()).thenReturn(userId);
 
                     Mockito
-                        .when(mockSearch.searchByUser(UserIdArgMatcher.arg(userId.getValue())))
+                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(new Todos(new ArrayList<>()));
 
                     this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
@@ -131,7 +131,7 @@ public class TodoListTest {
 
                     final Todos exepcetdTodos = new Todos(todoList);
                     Mockito
-                        .when(mockSearch.searchByUser(UserIdArgMatcher.arg(userId.getValue())))
+                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
                     this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
@@ -194,7 +194,7 @@ public class TodoListTest {
 
                     final Todos exepcetdTodos = new Todos(todoList);
                     Mockito
-                        .when(mockSearch.searchByUser(UserIdArgMatcher.arg(userId.getValue())))
+                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
                     this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
@@ -264,7 +264,7 @@ public class TodoListTest {
 
                     final Todos exepcetdTodos = new Todos(todoList);
                     Mockito
-                        .when(mockSearch.searchByUser(UserIdArgMatcher.arg(userId.getValue())))
+                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
                     this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();

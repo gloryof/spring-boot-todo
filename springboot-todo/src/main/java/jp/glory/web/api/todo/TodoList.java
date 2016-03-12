@@ -58,7 +58,7 @@ public class TodoList {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<TodoListResponse> list() {
 
-        final TodoListResponse response = new TodoListResponse(searchTodo.searchByUser(userInfo.getUserId()));
+        final TodoListResponse response = new TodoListResponse(searchTodo.searchTodosByUser(userInfo.getUserId()));
 
         return new ResponseEntity<TodoListResponse>(response, HttpStatus.OK);
     }

@@ -77,7 +77,7 @@ public class SearchTodosTest {
 
             final UserId expectedUserId = new UserId(3l);
 
-            final Todos actual = sut.searchByUser(expectedUserId);
+            final Todos actual = sut.searchTodosByUser(expectedUserId);
             final Todos.Statistics actualStatistics = actual.getStatistics();
 
             assertThat(actualStatistics.getTotal(), is(10));

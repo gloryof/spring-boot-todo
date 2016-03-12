@@ -4,12 +4,12 @@ import jp.glory.domain.todo.entity.Todo;
 import lombok.Getter;
 
 /**
- * TODOの詳細.
+ * TODO詳細のレスポンス.
  * 
  * @author Junki Yamada
  *
  */
-public class TodoDetail {
+public class TodoDetailResponse {
 
     /**
      * TODOのID.
@@ -41,7 +41,7 @@ public class TodoDetail {
      * @param todo
      *            TODOエンティティ
      */
-    public TodoDetail(final Todo todo) {
+    public TodoDetailResponse(final Todo todo) {
 
         this.id = todo.getId().getValue();
         this.summary = todo.getSummary().getValue();
