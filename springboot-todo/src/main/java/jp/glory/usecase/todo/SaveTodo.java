@@ -3,9 +3,11 @@ package jp.glory.usecase.todo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jp.glory.domain.common.error.ValidateErrors;
+import jp.glory.domain.common.validate.ValidateRule;
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.repository.TodoRepository;
-import jp.glory.domain.todo.validate.TodoValidateRule;
+import jp.glory.domain.todo.validate.TodoSaveCommonValidateRule;
+import jp.glory.domain.todo.validate.TodoSaveUpdateValidteRule;
 import jp.glory.domain.todo.value.TodoId;
 import lombok.Getter;
 
@@ -38,8 +40,7 @@ public class SaveTodo {
      */
     public Result save(final Todo todo) {
 
-        final TodoValidateRule rule = new TodoValidateRule(todo);
-        final ValidateErrors errors = rule.validate();
+        final ValidateErrors errors = validate(todo);
 
         if (errors.hasError()) {
 
@@ -49,6 +50,25 @@ public class SaveTodo {
         final TodoId savedTodoId = repository.save(todo); 
 
         return new Result(savedTodoId);
+    }
+
+    /**
+     * 入力チェックを行う.
+     * @param todo TODO情報
+     * @return 入力チェックエラー
+     */
+    private ValidateErrors validate(final Todo todo) {
+
+        final ValidateRule rule;
+        if (todo.isRegistered()) {
+
+            rule = new TodoSaveUpdateValidteRule(repository, todo);
+        } else {
+
+            rule = new TodoSaveCommonValidateRule(todo);
+        }
+
+        return rule.validate();
     }
 
     /**
