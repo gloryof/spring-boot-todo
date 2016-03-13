@@ -15,6 +15,11 @@ import lombok.Getter;
 public class Todo {
 
     /**
+     * ラベル.
+     */
+    public static final String LABEL = "TODO";
+
+    /**
      * ID.
      */
     @Getter

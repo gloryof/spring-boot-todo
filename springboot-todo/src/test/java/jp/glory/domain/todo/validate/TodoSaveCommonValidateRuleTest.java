@@ -24,17 +24,17 @@ import jp.glory.test.util.TestUtil;
 import jp.glory.test.validate.ValidateErrorsHelper;
 
 @RunWith(Enclosed.class)
-public class TodoValidateRuleTest {
+public class TodoSaveCommonValidateRuleTest {
 
     public static class 正常な値が入力されている場合 {
 
-        private TodoValidateRule sut = null;
+        private TodoSaveCommonValidateRule sut = null;
 
         @Before
         public void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"), new Memo("メモ"), false);
-            sut = new TodoValidateRule(todo);
+            sut = new TodoSaveCommonValidateRule(todo);
         }
 
         @Test
@@ -48,14 +48,14 @@ public class TodoValidateRuleTest {
 
     public static class ユーザID未設定の場合 {
 
-        private TodoValidateRule sut = null;
+        private TodoSaveCommonValidateRule sut = null;
 
         @Before
         public void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), UserId.notNumberingValue(), new Summary("概要"), new Memo("メモ"),
                     false);
-            sut = new TodoValidateRule(todo);
+            sut = new TodoSaveCommonValidateRule(todo);
         }
 
         @Test
@@ -76,13 +76,13 @@ public class TodoValidateRuleTest {
 
     public static class 概要に入力不備がある場合 {
 
-        private TodoValidateRule sut = null;
+        private TodoSaveCommonValidateRule sut = null;
 
         @Before
         public void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary(""), new Memo("メモ"), false);
-            sut = new TodoValidateRule(todo);
+            sut = new TodoSaveCommonValidateRule(todo);
         }
 
         @Test
@@ -103,14 +103,14 @@ public class TodoValidateRuleTest {
 
     public static class メモに入力不備がある場合 {
 
-        private TodoValidateRule sut = null;
+        private TodoSaveCommonValidateRule sut = null;
 
         @Before
         public void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"),
                     new Memo(TestUtil.repeat("a", 1001)), false);
-            sut = new TodoValidateRule(todo);
+            sut = new TodoSaveCommonValidateRule(todo);
         }
 
         @Test

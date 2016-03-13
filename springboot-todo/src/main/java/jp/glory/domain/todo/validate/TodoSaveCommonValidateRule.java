@@ -8,19 +8,19 @@ import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.user.entity.User;
 
 /**
- * TODOの入力チェックルール.
+ * TODO保存の共通入力チェックルール.
  * 
  * @author Junki Yamada
  *
  */
-public class TodoValidateRule implements ValidateRule {
+public class TodoSaveCommonValidateRule implements ValidateRule {
 
     /**
      * チェック対象のTODO.
      */
     private final Todo todo;
 
-    public TodoValidateRule(final Todo todo) {
+    public TodoSaveCommonValidateRule(final Todo todo) {
 
         this.todo = todo;
     }

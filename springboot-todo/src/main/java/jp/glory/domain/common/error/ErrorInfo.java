@@ -27,7 +27,12 @@ public enum ErrorInfo {
     /**
      * ログインID重複エラー.
      */
-    LoginIdDuplicated("既に使用されているログインIDです。");
+    LoginIdDuplicated("既に使用されているログインIDです。"),
+
+    /**
+     * 他ユーザへのTODO登録エラー.
+     */
+    SavedToOtherUser("他ユーザのTODOには保存はできません。");
 
     /** メッセージ. */
     public final String message;
