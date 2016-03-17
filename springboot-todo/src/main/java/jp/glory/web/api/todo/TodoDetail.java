@@ -100,6 +100,17 @@ public class TodoDetail {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        return executeSaving(id, request);
+    }
+
+    /**
+     * 保存の実行をする.
+     * @param id TODOのID
+     * @param request 保存リクエスト
+     * @return レスポンス
+     */
+    private ResponseEntity<TodoDetailSaveErrorResponse> executeSaving(final long id, final TodoDetailSaveRequest request) {
+
         final SaveTodo.Result result = saveTodo.save(new Todo(new TodoId(id), userInfo.getUserId(),
                 new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted()));
 
@@ -108,6 +119,16 @@ public class TodoDetail {
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        return createErrorResponse(errors);
+    }
+
+    /**
+     * 入力チェック時のエラーレスポンスを作成する.
+     * @param errors 入力チェックエラー
+     * @return エラーレスポンス
+     */
+    private ResponseEntity<TodoDetailSaveErrorResponse> createErrorResponse(final ValidateErrors errors) {
 
         final TodoDetailSaveErrorResponse response = new TodoDetailSaveErrorResponse();
         final List<String> errorMessages = 
@@ -118,7 +139,7 @@ public class TodoDetail {
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    
+
     /**
      * 対象となるTODOが存在するかをチェックする.
      * @param id ID
