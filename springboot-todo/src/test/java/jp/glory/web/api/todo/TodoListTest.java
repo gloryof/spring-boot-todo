@@ -30,11 +30,15 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import jp.glory.SpringbootTodoApplication;
+import jp.glory.domain.common.error.ErrorInfo;
+import jp.glory.domain.common.error.ValidateError;
+import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.value.Memo;
@@ -42,8 +46,11 @@ import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserIdArgMatcher;
+import jp.glory.test.util.TestUtil;
+import jp.glory.usecase.todo.SaveTodo;
 import jp.glory.usecase.todo.SearchTodo;
 import jp.glory.web.api.ApiPaths;
+import jp.glory.web.api.todo.request.TodoCreateRequest;
 import jp.glory.web.session.UserInfo;
 
 @RunWith(Enclosed.class)
@@ -298,8 +305,120 @@ public class TodoListTest {
                             .andExpect(TestTool.isUnexecuted(2));
                 }
             }
+            
         }
 
+        @RunWith(Enclosed.class)
+        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+        @WebAppConfiguration
+        public static class POST_is_TODOの作成 {
+
+            public static class 入力内容に不備がない場合 {
+
+                @Rule
+                public final MockitoRule rule = MockitoJUnit.rule();
+
+                @InjectMocks
+                private TodoList sut = null;
+
+                @Mock
+                private SaveTodo mockSaveTodo;
+
+                @Mock
+                private SaveTodo.Result mockUseCaseResult;
+
+                @Mock
+                private UserInfo mockUser;
+
+                private MockMvc mockMvc;
+
+                private TodoCreateRequest request = null;
+                private TodoId expectedTodoId = null;
+
+                @Before
+                public void setUp() {
+
+                    expectedTodoId = new TodoId(1000l);
+                    final UserId userId = new UserId(2000l);
+
+                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
+                    Mockito.when(mockUseCaseResult.getSavedTodoId()).thenReturn(expectedTodoId);
+                    Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
+                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
+
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+
+                    request = new TodoCreateRequest();
+                    request.setSummary("新規タイトル");
+                    request.setMemo("新メモ");
+                    request.setCompleted(false);
+                }
+
+                @Test
+                public void Createdが返る() throws Exception {
+
+                    this.mockMvc.perform(TestTool.postSaveApi(TARGET_PATH, request))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("id", is(expectedTodoId.getValue().intValue())));
+                }
+            }
+
+
+            public static class 入力内容に不備がある場合 {
+
+                @Rule
+                public final MockitoRule rule = MockitoJUnit.rule();
+
+                @InjectMocks
+                private TodoList sut = null;
+
+                @Mock
+                private SaveTodo mockSaveTodo;
+
+                @Mock
+                private SaveTodo.Result mockUseCaseResult;
+
+                @Mock
+                private UserInfo mockUser;
+
+                private MockMvc mockMvc;
+
+                private TodoCreateRequest request = null;
+                private ValidateErrors expectedErrors = null;
+
+                @Before
+                public void setUp() {
+
+                    final UserId userId = new UserId(2000l);
+
+                    expectedErrors = new ValidateErrors();
+                    expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
+                    expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
+
+                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
+                    Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
+                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
+
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+
+                    request = new TodoCreateRequest();
+                    request.setSummary("");
+                    request.setMemo(TestUtil.repeat("a", 1001));
+                    request.setCompleted(false);
+                }
+
+                @Test
+                public void BadRequestが返る() throws Exception {
+
+                    this.mockMvc.perform(TestTool.postSaveApi(TARGET_PATH, request))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.errors[0]", is(expectedErrors.toList().get(0).getMessage())))
+                        .andExpect(jsonPath("$.errors[1]", is(expectedErrors.toList().get(1).getMessage())));
+                }
+            }
+        }
+
+        
         @RunWith(SpringJUnit4ClassRunner.class)
         @SpringApplicationConfiguration(SpringbootTodoApplication.class)
         @WebAppConfiguration
@@ -314,12 +433,6 @@ public class TodoListTest {
             public void setUp() {
 
                 this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-            }
-
-            @Test
-            public void postアクセス() throws Exception {
-
-                this.mockMvc.perform(post(TARGET_PATH)).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
@@ -362,6 +475,13 @@ public class TodoListTest {
         private static ResultMatcher isUnexecuted(int count) {
             
             return jsonPath("$.statictis.unexecuted", is(count));
+        }
+
+        public static RequestBuilder postSaveApi(final String path, final TodoCreateRequest request) {
+            return post(path)
+                    .param("summary", request.getSummary())
+                    .param("memo", request.getMemo())
+                    .param("completed", String.valueOf(request.isCompleted()));
         }
     }
 }
