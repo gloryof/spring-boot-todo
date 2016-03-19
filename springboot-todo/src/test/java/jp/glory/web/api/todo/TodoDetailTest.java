@@ -269,16 +269,6 @@ public class TodoDetailTest {
                         .andExpect(jsonPath("$.errors[0]", is(expectedErrors.toList().get(0).getMessage())))
                         .andExpect(jsonPath("$.errors[1]", is(expectedErrors.toList().get(1).getMessage())));
                 }
-
-                @Test
-                public void 元の内容に変更はない() throws Exception {
-
-                    this.mockMvc.perform(get(TARGET_PATH))
-                        .andExpect(TestTool.isId(expectedTodo.getId()))
-                        .andExpect(TestTool.isSummary(expectedTodo.getSummary()))
-                        .andExpect(TestTool.isMemo(expectedTodo.getMemo()))
-                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()));
-                }
             }
 
             public static class 対象のデータが存在しない場合 {
