@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import jp.glory.SpringbootTodoApplication;
 import jp.glory.domain.common.error.ErrorInfo;
@@ -58,10 +59,11 @@ public class TodoDetailTest {
         private static final String TARGET_PATH = ApiPaths.Todo.PATH + "/" + TARGET_ID;
 
         @RunWith(Enclosed.class)
-        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-        @WebAppConfiguration
         public static class GET {
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 対象のデータが存在する場合 {
 
                 @Rule
@@ -99,6 +101,10 @@ public class TodoDetailTest {
                         .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()));
                 }
             }
+
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 対象のデータが存在しない場合 {
 
                 @Rule
@@ -132,10 +138,11 @@ public class TodoDetailTest {
         }
 
         @RunWith(Enclosed.class)
-        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-        @WebAppConfiguration
         public static class PUT {
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 対象のデータが存在して_入力内容に不備がない場合 {
 
                 @Rule
@@ -204,7 +211,9 @@ public class TodoDetailTest {
                 }
             }
 
-
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 対象のデータが存在して_入力内容に不備がある場合 {
 
                 @Rule
@@ -221,6 +230,9 @@ public class TodoDetailTest {
 
                 @Mock
                 private SaveTodo.Result mockUseCaseResult;
+                
+                @Autowired
+                private HandlerExceptionResolver handlerExceptionResolver;
 
                 @Mock
                 private UserInfo mockUser;
@@ -253,7 +265,8 @@ public class TodoDetailTest {
                     Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
                     Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setHandlerExceptionResolvers(handlerExceptionResolver).build();
 
                     request = new TodoDetailSaveRequest();
                     request.setSummary(invalidTodo.getSummary().getValue());
@@ -271,6 +284,9 @@ public class TodoDetailTest {
                 }
             }
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 対象のデータが存在しない場合 {
 
                 @Rule
