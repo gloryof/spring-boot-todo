@@ -13,12 +13,12 @@ import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserName;
+import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.infra.encryption.Encryption;
 import jp.glory.usecase.user.CreateNewAccount;
 import jp.glory.usecase.user.CreateNewAccount.Result;
 import jp.glory.web.api.ApiPaths;
 import jp.glory.web.api.account.request.NewAccountRequest;
-import jp.glory.web.api.account.response.NewAccountResponse;
 
 /**
  * アカウントAPI.
@@ -62,17 +62,13 @@ public class Account {
      * @return 正常に登録できた場合:Created、入力不備がある場合：Bad Reauest
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<NewAccountResponse> create(final NewAccountRequest requst) {
+    public ResponseEntity<Object> create(final NewAccountRequest requst) {
 
         final ValidateErrors errors = executeCreating(requst);
 
         if (errors.hasError()) {
 
-            final NewAccountResponse resoponse = new NewAccountResponse();
-
-            errors.toList().stream().map(v -> v.getMessage()).forEach(v -> resoponse.getErrors().add(v));
-
-            return new ResponseEntity<NewAccountResponse>(resoponse, HttpStatus.BAD_REQUEST);
+            throw new InvalidRequestException(errors);
         }
 
         return new ResponseEntity<>(HttpStatus.CREATED);

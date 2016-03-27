@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import jp.glory.SpringbootTodoApplication;
 import jp.glory.domain.common.error.ErrorInfo;
@@ -51,7 +52,7 @@ public class AccountTest {
     public static class アカウント作成 {
 
         @RunWith(SpringJUnit4ClassRunner.class)
-        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+        @SpringApplicationConfiguration({SpringbootTodoApplication.class})
         @WebAppConfiguration
         public static class postアクセス {
 
@@ -63,6 +64,9 @@ public class AccountTest {
 
             @Mock
             private CreateNewAccount createNewAccount;
+            
+            @Autowired
+            private HandlerExceptionResolver handlerExceptionResolver;
 
             @Mock
             private Encryption encryption;
@@ -72,7 +76,8 @@ public class AccountTest {
             @Before
             public void setUp() {
 
-                this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                        .setHandlerExceptionResolvers(handlerExceptionResolver).build();
             }
 
             @Test
