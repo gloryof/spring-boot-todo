@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import jp.glory.SpringbootTodoApplication;
 import jp.glory.domain.common.error.ErrorInfo;
@@ -64,6 +65,9 @@ public class TodoListTest {
         @RunWith(Enclosed.class)
         public static class GET_is_一覧の取得 {
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 件数が0件の場合 {
 
                 @Rule
@@ -110,6 +114,9 @@ public class TodoListTest {
                 }
             }
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 実行済みのみの場合 {
 
                 @Rule
@@ -173,6 +180,9 @@ public class TodoListTest {
                 }
             }
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 未行済のみの場合 {
 
                 @Rule
@@ -236,6 +246,9 @@ public class TodoListTest {
                 }
             }
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 実行済み3件_未実行2件の場合 {
 
                 @Rule
@@ -309,10 +322,11 @@ public class TodoListTest {
         }
 
         @RunWith(Enclosed.class)
-        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-        @WebAppConfiguration
         public static class POST_is_TODOの作成 {
 
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 入力内容に不備がない場合 {
 
                 @Rule
@@ -363,7 +377,9 @@ public class TodoListTest {
                 }
             }
 
-
+            @RunWith(SpringJUnit4ClassRunner.class)
+            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
+            @WebAppConfiguration
             public static class 入力内容に不備がある場合 {
 
                 @Rule
@@ -380,6 +396,9 @@ public class TodoListTest {
 
                 @Mock
                 private UserInfo mockUser;
+                
+                @Autowired
+                private HandlerExceptionResolver handlerExceptionResolver;
 
                 private MockMvc mockMvc;
 
@@ -399,7 +418,8 @@ public class TodoListTest {
                     Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
                     Mockito.when(mockUser.getUserId()).thenReturn(userId);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setHandlerExceptionResolvers(handlerExceptionResolver).build();
 
                     request = new TodoCreateRequest();
                     request.setSummary("");
