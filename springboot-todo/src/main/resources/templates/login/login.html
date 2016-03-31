@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8" />
-<title>ログインページ</title>
-</head>
-<body>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ログインページ</title>
+  </head>
+  <body>
+    <form th:action="@{/executeLogin}" method="POST">
+      <p class="error-message" th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null" th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
+        メッセージ
+      </p>
+      <dl>
+      	<dt>ログインID</dt>
+      	<dd><input type="text" name="username" /></dd>
+      	<dt>パスワード</dt>
+      	<dd><input type="password" name="password" /></dd>
+      </dl>
+      <button>ログイン</button>
+    </form>
+  </body>
 </html>
