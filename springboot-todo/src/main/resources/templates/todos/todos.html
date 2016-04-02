@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8" />
-<title>TODO一覧</title>
-</head>
-<body>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TODO一覧</title>
+  </head>
+  <body>
+    <article id="todos">
+      <router-view></router-view>
+    </article>
+    <div class="common-libs-component" th:replace="/common/libs :: libs"></div>
+    <div class="todo-list-component" th:replace="/todos/fragments/todo-list :: todoList"></div>
+    <script th:src="@{/libs/todos/todos.js}"></script>
+  </body>
 </html>

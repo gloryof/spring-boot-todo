@@ -1,6 +1,9 @@
 package jp.glory.usecase.todo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.common.validate.ValidateRule;
@@ -16,6 +19,8 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
+@Service
+@Scope(value = WebApplicationContext.SCOPE_REQUEST)
 public class SaveTodo {
 
     /**

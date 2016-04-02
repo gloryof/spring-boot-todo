@@ -9,7 +9,7 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
-public class TodoStatictis {
+public class TodoStatistics {
 
     /**
      * 合計件数.
@@ -35,7 +35,7 @@ public class TodoStatictis {
      * @param todos
      *            TODOリスト
      */
-    public TodoStatictis(final Todos todos) {
+    public TodoStatistics(final Todos todos) {
 
         this.total = todos.getStatistics().getTotal();
         this.executed = todos.getStatistics().getExecuted();
