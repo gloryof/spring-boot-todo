@@ -1,11 +1,15 @@
 package jp.glory.web.session;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jp.glory.domain.user.entity.User;
+import jp.glory.domain.user.value.LoginId;
+import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
 import lombok.Getter;
@@ -16,9 +20,12 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
-@Component
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = WebApplicationContext.SCOPE_SESSION)
-public class UserInfo {
+public class UserInfo implements UserDetails {
+
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = -8274405920991317550L;
 
     /**
      * ユーザID.
@@ -33,32 +40,89 @@ public class UserInfo {
     private UserName name = null;
 
     /**
-     * 有効フラグ. <br>
-     * 有効な場合：true、無効な場合：false
+     * ログインID
      */
     @Getter
-    private boolean activate = false;
+    private LoginId loginId = null;
 
     /**
-     * セッションの有効化.
-     * 
-     * @param user
-     *            ユーザ情報
+     * パスワード.
      */
-    public void activate(final User user) {
+    private Password password = null;
 
-        this.activate = true;
+
+    /**
+     * コンストラクタ.
+     * @param user ユーザ
+     */
+    public UserInfo(final User user) {
+
         this.userId = user.getUserId();
         this.name = user.getUserName();
+        this.loginId = user.getLoginId();
+        this.password = user.getPassword();
     }
 
     /**
-     * セッションの無効化.
+     * {@inheritDoc}
      */
-    public void inactivate() {
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        this.activate = false;
-        this.userId = null;
-        this.name = null;
+        return Arrays.asList(new GrantedAuthority[] { new SimpleGrantedAuthority("USER") });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPassword() {
+
+        return password.getValue();
+    }
+
+    /**
+     * ログインIDを返す.<br>
+     * Spring Security上では認証情報のキーとなるものをusernameとしているため、<br>
+     * ログインIDひ紐付けている。
+     * {@link UserDetails#getUsername()}を参照。
+     */
+    @Override
+    public String getUsername() {
+
+        return loginId.getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+
+        return true;
     }
 }

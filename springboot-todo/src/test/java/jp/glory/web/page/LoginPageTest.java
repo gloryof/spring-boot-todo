@@ -1,6 +1,8 @@
 package jp.glory.web.page;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -39,38 +41,38 @@ public class LoginPageTest {
         @Before
         public void setUp() {
 
-            this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+            this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
         }
 
         @Test
         public void getアクセスでページが表示される() throws Exception {
 
-            this.mockMvc.perform(get(PagePaths.Login.PATH)).andExpect(status().isOk())
+            this.mockMvc.perform(get(PagePaths.Login.PATH).with(csrf())).andExpect(status().isOk())
                     .andExpect(content().string(containsString("<title>ログインページ")));
         }
 
         @Test
         public void postアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(post(PagePaths.Login.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(post(PagePaths.Login.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void putアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(put(PagePaths.Login.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(put(PagePaths.Login.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void deleteアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(delete(PagePaths.Login.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(delete(PagePaths.Login.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void patchアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(patch(PagePaths.Login.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(patch(PagePaths.Login.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
     }
 }

@@ -2,6 +2,8 @@ package jp.glory.web.api.todo;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -27,6 +29,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,8 +49,11 @@ import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserIdArgMatcher;
+import jp.glory.test.framework.security.MockLoginUser;
+import jp.glory.test.framework.security.MockUserFactory;
 import jp.glory.test.util.TestUtil;
 import jp.glory.usecase.todo.SaveTodo;
 import jp.glory.usecase.todo.SearchTodo;
@@ -68,10 +75,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 件数が0件の場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -79,22 +90,20 @@ public class TodoListTest {
                 @Mock
                 private SearchTodo mockSearch;
 
-                @Mock
-                private UserInfo mockUser;
-
                 private MockMvc mockMvc;
 
                 @Before
                 public void setUp() {
 
-                    final UserId userId = new UserId(100l);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
-
+                    final User mockUser = MockUserFactory.defaultUser();
                     Mockito
-                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
+                        .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(mockUser.getUserId().getValue())))
                         .thenReturn(new Todos(new ArrayList<>()));
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .build();
                 }
 
                 @Test
@@ -117,10 +126,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 実行済みのみの場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -136,8 +149,8 @@ public class TodoListTest {
                 @Before
                 public void setUp() {
 
-                    final UserId userId = new UserId(100l);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
+                    final User mockUser = MockUserFactory.defaultUser();
+                    final UserId userId = mockUser.getUserId();
 
                     final List<Todo> todoList = LongStream.rangeClosed(1, 1)
                         .mapToObj(v -> new Todo(new TodoId(v), userId, Summary.empty(), Memo.empty(), true))
@@ -148,7 +161,10 @@ public class TodoListTest {
                         .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .build();
                 }
 
                 @Test
@@ -183,10 +199,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 未行済のみの場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -196,14 +216,12 @@ public class TodoListTest {
                 @Mock
                 private SearchTodo mockSearch;
 
-                @Mock
-                private UserInfo mockUser;
-
                 @Before
                 public void setUp() {
 
-                    final UserId userId = new UserId(100l);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
+
+                    final User mockUser = MockUserFactory.defaultUser();
+                    final UserId userId = mockUser.getUserId();
 
                     final List<Todo> todoList = LongStream.rangeClosed(1, 1)
                         .mapToObj(v -> new Todo(new TodoId(v), userId, Summary.empty(), Memo.empty(), false))
@@ -214,7 +232,10 @@ public class TodoListTest {
                         .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .build();
                 }
 
                 @Test
@@ -249,10 +270,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 実行済み3件_未実行2件の場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -262,14 +287,11 @@ public class TodoListTest {
                 @Mock
                 private SearchTodo mockSearch;
 
-                @Mock
-                private UserInfo mockUser;
-
                 @Before
                 public void setUp() {
 
-                    final UserId userId = new UserId(100l);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
+                    final User mockUser = MockUserFactory.defaultUser();
+                    final UserId userId = mockUser.getUserId();
 
                     final List<Todo> executedList = LongStream.rangeClosed(1, 3)
                             .mapToObj(v -> new Todo(new TodoId(v), userId, Summary.empty(), Memo.empty(), true))
@@ -287,7 +309,10 @@ public class TodoListTest {
                         .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userId.getValue())))
                         .thenReturn(exepcetdTodos);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .build();
                 }
 
                 @Test
@@ -327,10 +352,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 入力内容に不備がない場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -341,9 +370,6 @@ public class TodoListTest {
                 @Mock
                 private SaveTodo.Result mockUseCaseResult;
 
-                @Mock
-                private UserInfo mockUser;
-
                 private MockMvc mockMvc;
 
                 private TodoCreateRequest request = null;
@@ -353,14 +379,15 @@ public class TodoListTest {
                 public void setUp() {
 
                     expectedTodoId = new TodoId(1000l);
-                    final UserId userId = new UserId(2000l);
 
                     Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
                     Mockito.when(mockUseCaseResult.getSavedTodoId()).thenReturn(expectedTodoId);
                     Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
 
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut).build();
+                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .build();
 
                     request = new TodoCreateRequest();
                     request.setSummary("新規タイトル");
@@ -380,10 +407,14 @@ public class TodoListTest {
             @RunWith(SpringJUnit4ClassRunner.class)
             @SpringApplicationConfiguration(SpringbootTodoApplication.class)
             @WebAppConfiguration
+            @MockLoginUser
             public static class 入力内容に不備がある場合 {
 
                 @Rule
                 public final MockitoRule rule = MockitoJUnit.rule();
+
+                @Autowired
+                private FilterChainProxy springSecurityFilterChain;
 
                 @InjectMocks
                 private TodoList sut = null;
@@ -393,9 +424,6 @@ public class TodoListTest {
 
                 @Mock
                 private SaveTodo.Result mockUseCaseResult;
-
-                @Mock
-                private UserInfo mockUser;
                 
                 @Autowired
                 private HandlerExceptionResolver handlerExceptionResolver;
@@ -408,18 +436,18 @@ public class TodoListTest {
                 @Before
                 public void setUp() {
 
-                    final UserId userId = new UserId(2000l);
-
                     expectedErrors = new ValidateErrors();
                     expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
                     expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
 
                     Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
                     Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
 
                     this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setHandlerExceptionResolvers(handlerExceptionResolver).build();
+                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                            .apply(springSecurity(springSecurityFilterChain))
+                            .setHandlerExceptionResolvers(handlerExceptionResolver)
+                            .build();
 
                     request = new TodoCreateRequest();
                     request.setSummary("");
@@ -442,6 +470,7 @@ public class TodoListTest {
         @RunWith(SpringJUnit4ClassRunner.class)
         @SpringApplicationConfiguration(SpringbootTodoApplication.class)
         @WebAppConfiguration
+        @MockLoginUser
         public static class 許可されないアクセス {
 
             @Autowired
@@ -452,25 +481,25 @@ public class TodoListTest {
             @Before
             public void setUp() {
 
-                this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+                this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
             }
 
             @Test
             public void putアクセス() throws Exception {
 
-                this.mockMvc.perform(put(TARGET_PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(put(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
             public void deleteアクセス() throws Exception {
 
-                this.mockMvc.perform(delete(TARGET_PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(delete(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
             public void patchアクセス() throws Exception {
 
-                this.mockMvc.perform(patch(TARGET_PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(patch(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
         }
     }
@@ -484,21 +513,22 @@ public class TodoListTest {
 
         private static ResultMatcher isTotal(int count) {
             
-            return jsonPath("$.statictis.total", is(count));
+            return jsonPath("$.statistics.total", is(count));
         }
 
         private static ResultMatcher isExecuted(int count) {
             
-            return jsonPath("$.statictis.executed", is(count));
+            return jsonPath("$.statistics.executed", is(count));
         }
 
         private static ResultMatcher isUnexecuted(int count) {
             
-            return jsonPath("$.statictis.unexecuted", is(count));
+            return jsonPath("$.statistics.unexecuted", is(count));
         }
 
         public static RequestBuilder postSaveApi(final String path, final TodoCreateRequest request) {
             return post(path)
+                    .with(csrf())
                     .param("summary", request.getSummary())
                     .param("memo", request.getMemo())
                     .param("completed", String.valueOf(request.isCompleted()));

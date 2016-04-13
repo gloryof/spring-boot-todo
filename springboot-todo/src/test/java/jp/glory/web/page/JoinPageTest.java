@@ -1,6 +1,8 @@
 package jp.glory.web.page;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -39,7 +41,7 @@ public class JoinPageTest {
         @Before
         public void setUp() {
 
-            this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+            this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
         }
 
         @Test
@@ -52,25 +54,25 @@ public class JoinPageTest {
         @Test
         public void postアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(post(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(post(PagePaths.Join.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void putアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(put(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(put(PagePaths.Join.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void deleteアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(delete(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(delete(PagePaths.Join.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
 
         @Test
         public void patchアクセスでMethodNotAllowedエラーになる() throws Exception {
 
-            this.mockMvc.perform(patch(PagePaths.Join.PATH)).andExpect(status().isMethodNotAllowed());
+            this.mockMvc.perform(patch(PagePaths.Join.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
         }
     }
 }

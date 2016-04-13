@@ -1,6 +1,8 @@
 package jp.glory.web.api.account;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -21,6 +23,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -68,6 +71,10 @@ public class AccountTest {
             @Autowired
             private HandlerExceptionResolver handlerExceptionResolver;
 
+            @Autowired
+            private FilterChainProxy springSecurityFilterChain;
+
+
             @Mock
             private Encryption encryption;
 
@@ -77,6 +84,7 @@ public class AccountTest {
             public void setUp() {
 
                 this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
+                        .apply(springSecurity(springSecurityFilterChain))
                         .setHandlerExceptionResolvers(handlerExceptionResolver).build();
             }
 
@@ -136,7 +144,7 @@ public class AccountTest {
             @Before
             public void setUp() {
 
-                this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+                this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
             }
 
             @Test
@@ -148,19 +156,19 @@ public class AccountTest {
             @Test
             public void putアクセス() throws Exception {
 
-                this.mockMvc.perform(put(ApiPaths.Account.PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(put(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
             public void deleteアクセス() throws Exception {
 
-                this.mockMvc.perform(delete(ApiPaths.Account.PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(delete(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
 
             @Test
             public void patchアクセス() throws Exception {
 
-                this.mockMvc.perform(patch(ApiPaths.Account.PATH)).andExpect(status().isMethodNotAllowed());
+                this.mockMvc.perform(patch(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
             }
         }
     }
@@ -170,7 +178,7 @@ public class AccountTest {
         private static RequestBuilder postApi(final NewAccountRequest request) {
 
             return post(ApiPaths.Account.PATH).param("loginId", request.getLoginId())
-                    .param("userName", request.getUserName()).param("password", request.getPassword());
+                    .param("userName", request.getUserName()).param("password", request.getPassword()).with(csrf());
         }
     }
 

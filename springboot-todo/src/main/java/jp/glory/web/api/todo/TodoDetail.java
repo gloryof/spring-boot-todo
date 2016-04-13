@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,21 +47,15 @@ public class TodoDetail {
     private final SaveTodo saveTodo;
 
     /**
-     * ユーザ情報.
-     */
-    private final UserInfo userInfo;
-
-    /**
      * コンストラクタ.
      * @param searchTodo TODO検索
-     * @param userInfo ユーザ情報
+     * @param saveTodo TODO保存
      */
     @Autowired
-    public TodoDetail(final SearchTodo searchTodo, final SaveTodo saveTodo, final UserInfo userInfo) {
+    public TodoDetail(final SearchTodo searchTodo, final SaveTodo saveTodo) {
 
         this.searchTodo = searchTodo;
         this.saveTodo = saveTodo;
-        this.userInfo = userInfo;
     }
 
     /**
@@ -87,26 +82,29 @@ public class TodoDetail {
      * TODOを保存する.
      * @param id TODOのID
      * @param request TODO保存リクエスト
+     * @param userInfo ユーザ情報
      * @return 保存レスポンス
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<Object> save(@PathVariable final long id, final TodoDetailSaveRequest request) {
+    public ResponseEntity<Object> save(@PathVariable final long id, final TodoDetailSaveRequest request,
+            @AuthenticationPrincipal final UserInfo userInfo) {
 
         if (!isExists(id)) {
 
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return executeSaving(id, request);
+        return executeSaving(id, request, userInfo);
     }
 
     /**
      * 保存の実行をする.
      * @param id TODOのID
      * @param request 保存リクエスト
+     * @param userInfo ユーザ情報
      * @return レスポンス
      */
-    private ResponseEntity<Object> executeSaving(final long id, final TodoDetailSaveRequest request) {
+    private ResponseEntity<Object> executeSaving(final long id, final TodoDetailSaveRequest request,  final UserInfo userInfo) {
 
         final SaveTodo.Result result = saveTodo.save(new Todo(new TodoId(id), userInfo.getUserId(),
                 new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted()));

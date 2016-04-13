@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import jp.glory.web.api.ApiPaths;
 import jp.glory.web.page.PagePaths;
 
 /**
@@ -34,7 +35,7 @@ public class WebSecuritySetting extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-            .antMatchers(PagePaths.Login.PATH).permitAll()
+            .antMatchers(PagePaths.Login.PATH, PagePaths.Join.PATH, ApiPaths.Account.PATH).permitAll()
             .anyRequest().authenticated()
             .and()
             .formLogin()

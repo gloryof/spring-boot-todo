@@ -1,7 +1,7 @@
 package jp.glory.web.page;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import jp.glory.web.session.UserInfo;
 
 /**
- * コンストラクタ.
+ * TODOページ.
  * 
  * @author Junki Yamada
  *
@@ -22,29 +22,12 @@ import jp.glory.web.session.UserInfo;
 public class TodoPage {
 
     /**
-     * ユーザ情報.
-     */
-    private final UserInfo userInfo;
-
-    /**
-     * コンストラクタ.
-     * 
-     * @param userInfo
-     *            ユーザ情報
-     */
-    @Autowired
-    public TodoPage(final UserInfo userInfo) {
-
-        this.userInfo = userInfo;
-    }
-
-    /**
      * ページ表示処理.
      * 
      * @return TODOページ.
      */
     @RequestMapping
-    public ModelAndView view() {
+    public ModelAndView view(@AuthenticationPrincipal final UserInfo userInfo) {
 
         return new ModelAndView("/todos/todos");
     }
