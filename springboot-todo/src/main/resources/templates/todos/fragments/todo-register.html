@@ -10,7 +10,7 @@
         <article class="todo-register">
           <a v-link="{ path:'/' }">&lt;&lt;キャンセル</a>
           <form>
-            <errors v-ref:register-errors=""></errors>
+            <errors v-ref:register-errors="register-errors"></errors>
             <input type="hidden" v-model="id"  />
             <dl>
             	<dt>概要</dt>
