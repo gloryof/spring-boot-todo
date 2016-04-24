@@ -5,10 +5,11 @@
     <title>TODO一覧</title>
   </head>
   <body>
-    <div th:fragment="todoList">
+    <div th:fragment="todoList" th:remove="tag">
       <template id="todo-list">
         <article class="todo-list">
           <section>
+            <button v-link="{name: 'register'}">新規登録</button>
             <dl>
             	<dt>合計</dt>
             	<dd v-text="statistics.total"></dd>
@@ -21,13 +22,13 @@
           <section class="todo-details">
             <ul v-for="detail in details">
           	 <li>
-                <a v-link="{ name : 'detail', params: { id: detail.id }'" v-text="detail.summary">TODO内容</a>
+                <a v-link="{ name : 'detail', params: { id: detail.id }}" v-text="detail.summary">TODO内容</a>
               </li>
             </ul>
           </section>
         </article>
       </template>
-      <script th:src="@{/libs/todos/todo-list.js}"></script>
+      <script th:src="@{/libs/todos/component/todo-list.js}"></script>
     </div>
   </body>
 </html>

@@ -1,9 +1,15 @@
+/**
+ * TODO一覧コンポーネント.
+ */
 var TodoList = Vue.extend({
 	template: "#todo-list",
 	data: function() {
 
 		return {
+			/** TODO一覧. */
 			details: [],
+
+			/** TODOの統計. */
 			statistics: null
 		}
 	},

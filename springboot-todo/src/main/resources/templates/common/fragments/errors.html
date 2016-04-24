@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>エラーリスト</title>
+  </head>
+  <body>
+    <div th:fragment="errors" th:remove="tag">
+      <template id="common-errors">
+        <section class="bs-errors">
+          <ul>
+          	<li v-for="error in details" v-text="error"></li>
+          </ul>
+        </section>
+      </template>
+      <script th:src="@{/libs/common/component/errors.js}"></script>
+    </div>
+  </body>
+</html>

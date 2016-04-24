@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TODO登録</title>
+  </head>
+  <body>
+    <div th:fragment="todoRegister" th:remove="tag">
+      <template id="todo-register">
+        <article class="todo-register">
+          <a v-link="{ path:'/' }">&lt;&lt;キャンセル</a>
+          <form>
+            <errors v-ref:register-errors=""></errors>
+            <input type="hidden" v-model="id"  />
+            <dl>
+            	<dt>概要</dt>
+            	<dd>
+                  <input type="text" v-model="todo.summary" />
+                </dd>
+            	<dt>メモ</dt>
+            	<dd>
+                  <textarea v-model="todo.memo"></textarea>
+                </dd>
+            	<dt>実行済み</dt>
+            	<dd>
+                  <input type="checkbox" v-model="todo.completed" />
+                </dd>
+            </dl>
+            <button v-on:click="save">保存</button>
+          </form>
+        </article>
+      </template>
+      <script th:src="@{/libs/todos/component/todo-register.js}"></script>
+    </div>
+  </body>
+</html>

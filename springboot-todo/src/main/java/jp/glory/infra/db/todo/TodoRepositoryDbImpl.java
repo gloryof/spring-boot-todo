@@ -24,7 +24,7 @@ public class TodoRepositoryDbImpl implements TodoRepository {
 
     private static final Map<Long, Todo> todos = new HashMap<>();
 
-    private static long sequence;
+    private static long sequence = 1;
 
     @Override
     public Optional<Todo> findBy(TodoId todoId) {
@@ -48,17 +48,20 @@ public class TodoRepositoryDbImpl implements TodoRepository {
     @Override
     public TodoId save(Todo todo) {
 
-        final long todoIdValue;
+        final TodoId todoId;
         if (!todo.getId().isSetValue()) {
 
-            todoIdValue = sequence;
+            todoId = new TodoId(sequence);
             sequence++;
+
         } else {
 
-            todoIdValue = todo.getId().getValue();
+            todoId = todo.getId();
         }
 
-        return new TodoId(todoIdValue);
+        final Todo newTodo = new Todo(todoId, todo.getUserId(), todo.getSummary(), todo.getMemo(), todo.isCompleted());
+        todos.put(todoId.getValue(), newTodo);
+        return todoId;
     }
 
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TODO詳細</title>
+  </head>
+  <body>
+    <div th:fragment="todoDetail" th:remove="tag">
+      <template id="todo-detail">
+        <article class="todo-detail">
+          <a v-link="{ path:'/' }">&lt;&lt;キャンセル</a>
+          <dl>
+          	<dt>概要</dt>
+          	<dd v-text="todo.summary"></dd>
+          	<dt>メモ</dt>
+          	<dd v-text="todo.memo" class="bs-readonly-text"></dd>
+          	<dt>実行済み</dt>
+          	<dd>
+                <span v-if="todo.completed == true">v</span>
+            </dd>
+          </dl>
+          <button v-link="{name: 'edit', params : { id: todo.id }}">編集</button>
+
+        </article>
+      </template>
+      <script th:src="@{/libs/todos/component/todo-detail.js}"></script>
+    </div>
+  </body>
+</html>

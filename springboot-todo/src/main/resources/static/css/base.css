@@ -1,0 +1,5 @@
+@CHARSET "UTF-8";
+
+.bs-readonly-text {
+	white-space: pre-wrap;
+}
