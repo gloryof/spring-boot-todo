@@ -1,5 +1,6 @@
 package jp.glory.framework.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import jp.glory.domain.user.repository.UserRepository;
 import jp.glory.framework.security.auth.AuthenticationUserService;
 
 /**
@@ -18,6 +20,11 @@ import jp.glory.framework.security.auth.AuthenticationUserService;
 @Configuration
 public class SecuritySetting extends GlobalAuthenticationConfigurerAdapter {
 
+    /**
+     * ユーザ検索.
+     */
+    @Autowired
+    private UserRepository repository;
 
     @Override
     public void init(final AuthenticationManagerBuilder builder) throws Exception {
@@ -34,7 +41,7 @@ public class SecuritySetting extends GlobalAuthenticationConfigurerAdapter {
         final DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
         final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        final AuthenticationUserService service = new AuthenticationUserService(encoder);
+        final AuthenticationUserService service = new AuthenticationUserService(repository);
 
         provider.setPasswordEncoder(encoder);
         provider.setUserDetailsService(service);

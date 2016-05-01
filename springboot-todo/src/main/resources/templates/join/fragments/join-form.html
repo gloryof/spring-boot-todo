@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>アカウント登録フォーム</title>
+  </head>
+  <body>
+    <div th:fragment="joinForm" th:remove="tag">
+      <template id="join-form">      
+        <article class="join-form">
+          <errors v-ref:register-errors="register-errors"></errors>
+          <dl>
+            <dt>ログインID</dt>
+            <dd>
+              <input type="text" v-model="user.loginId" />
+            </dd>
+            <dt>ユーザ名</dt>
+            <dd>
+              <input type="text" v-model="user.userName" />
+            </dd>
+            <dt>パスワード</dt>
+            <dd>
+              <input type="password" v-model="user.password" />
+            </dd>
+          </dl>
+          <button v-on:click="join">アカウント作成</button>
+        </article>
+      </template>
+      <script th:src="@{/libs/join/component/join-form.js}"></script>
+    </div>
+  </body>
+</html>

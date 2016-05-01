@@ -1,15 +1,14 @@
 package jp.glory.framework.security.auth;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jp.glory.domain.user.entity.User;
+import jp.glory.domain.user.repository.UserRepository;
 import jp.glory.domain.user.value.LoginId;
-import jp.glory.domain.user.value.Password;
-import jp.glory.domain.user.value.UserId;
-import jp.glory.domain.user.value.UserName;
 import jp.glory.web.session.UserInfo;
 
 /**
@@ -20,17 +19,17 @@ import jp.glory.web.session.UserInfo;
 public class AuthenticationUserService implements UserDetailsService {
 
     /**
-     * パスワードエンコーダ.
+     * ユーザリポジトリ.
      */
-    private final PasswordEncoder encoder;
+    private final UserRepository repository;
 
     /**
      * コンストラクタ.
-     * @param encoder エンコーダ
+     * @param repository ユーザリポジトリ
      */
-    public AuthenticationUserService(final PasswordEncoder encoder) {
+    public AuthenticationUserService(final UserRepository repository) {
 
-        this.encoder = encoder;
+        this.repository = repository;
     }
 
     /**
@@ -39,14 +38,10 @@ public class AuthenticationUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
 
-        if (!"test-user".equals(username)) {
+        final LoginId loginId = new LoginId(username);
+        final Optional<User> userOpt = repository.findBy(loginId);
 
-            throw new UsernameNotFoundException("username is [" + username + "]");
-        }
-
-        final Password password = new Password(encoder.encode("password"));
-        final User user = new User(new UserId(1l), new LoginId("test-user"), new UserName("テストユーザ"), password);
-
+        final User user = userOpt.orElseThrow(() -> new UsernameNotFoundException("username is [" + username + "]"));
         final UserInfo authenticatedInfo = new UserInfo(user);
 
         return authenticatedInfo;

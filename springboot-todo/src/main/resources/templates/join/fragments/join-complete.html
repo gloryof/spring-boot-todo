@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>アカウント登録完了</title>
+  </head>
+  <body>
+    <div th:fragment="joinComplete" th:remove="tag">
+      <template id="join-complete">
+        <article class="join-complete">
+          <dl>
+            <dt>ログインID</dt>
+            <dd v-text="user.loginId" ></dd>
+          </dl>
+          <p>上記のユーザで登録しました</p>
+          <a th:href="@{/login}">ログイン画面に戻る</a>
+        </article>
+      </template>
+      <script th:src="@{/libs/join/component/join-complete.js}"></script>
+    </div>
+  </body>
+</html>
