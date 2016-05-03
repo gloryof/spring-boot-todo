@@ -3,4 +3,6 @@
 /.mvn/
 /.settings/
 /.classpath
+/.factorypath
 /.project
+/.apt_generated/
