@@ -3,15 +3,13 @@ package jp.glory.usecase.todo;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.repository.TodoRepository;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
+import jp.glory.framework.layer.annotation.Usercase;
 
 /**
  * TODOの検索.
@@ -19,8 +17,7 @@ import jp.glory.domain.user.value.UserId;
  * @author Junki Yamada
  *
  */
-@Service
-@Scope(value = WebApplicationContext.SCOPE_REQUEST)
+@Usercase
 public class SearchTodo {
 
     /**

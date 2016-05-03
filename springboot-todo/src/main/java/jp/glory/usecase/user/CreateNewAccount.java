@@ -1,9 +1,6 @@
 package jp.glory.usecase.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.entity.User;
@@ -13,6 +10,7 @@ import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
+import jp.glory.framework.layer.annotation.Usercase;
 import lombok.Getter;
 
 /**
@@ -21,8 +19,7 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
-@Service
-@Scope(value = WebApplicationContext.SCOPE_REQUEST)
+@Usercase
 public class CreateNewAccount {
 
     /**
