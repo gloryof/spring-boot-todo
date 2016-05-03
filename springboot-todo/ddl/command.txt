@@ -1,0 +1,5 @@
+$ createuser todo-user -P
+$ createdb -E utf8 -O todo-user boot-todo
+
+$ psql -d boot-todo -U todo-user -f 01-create-table-users.sql
+$ psql -d boot-todo -U todo-user -f 02-create-table-todo.sql
