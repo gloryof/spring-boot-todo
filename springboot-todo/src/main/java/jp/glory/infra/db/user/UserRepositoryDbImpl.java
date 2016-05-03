@@ -1,17 +1,20 @@
 package jp.glory.infra.db.user;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.repository.UserRepository;
 import jp.glory.domain.user.value.LoginId;
+import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
+import jp.glory.domain.user.value.UserName;
+import jp.glory.infra.db.user.dao.UsersDao;
+import jp.glory.infra.db.user.entity.UsersTable;
 
 /**
  * ユーザリポジトリ.
@@ -22,9 +25,20 @@ import jp.glory.domain.user.value.UserId;
 @Repository
 public class UserRepositoryDbImpl implements UserRepository {
 
-    private static final Map<Long, User> users = new HashMap<>();
+    /**
+     * usersテーブルDAO.
+     */
+    private final UsersDao dao;
 
-    private static long sequence = 1;
+    /**
+     * コンストラクタ.
+     * @param dao usersテーブルDAO.
+     */
+    @Autowired
+    public UserRepositoryDbImpl(final UsersDao dao) {
+
+        this.dao = dao;
+    }
 
     /**
      * {@inheritDoc}
@@ -32,9 +46,9 @@ public class UserRepositoryDbImpl implements UserRepository {
     @Override
     public List<User> findAll() {
 
-        return users.entrySet().stream()
-            .map(e -> e.getValue())
-            .collect(Collectors.toList());
+        return dao.selectAll().stream()
+                .map(this::convertToEntity)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -43,19 +57,20 @@ public class UserRepositoryDbImpl implements UserRepository {
     @Override
     public UserId save(final User user) {
 
-        final long userIdValue;
-        if (!user.getUserId().isSetValue()) {
+        final UserId savedUserId;
+        if (!user.isRegistered()) {
 
-            userIdValue = sequence;
-            sequence++;
+            savedUserId = new UserId(dao.selectUserId());
+
+            dao.insert(convertToRecord(savedUserId, user));
         } else {
 
-            userIdValue = user.getUserId().getValue();
+            savedUserId = user.getUserId();
+
+            dao.update(convertToRecord(savedUserId, user));
         }
 
-        users.put(userIdValue, user);
-
-        return new UserId(sequence);
+        return savedUserId;
     }
 
     /**
@@ -64,10 +79,9 @@ public class UserRepositoryDbImpl implements UserRepository {
     @Override
     public Optional<User> findBy(UserId userId) {
 
-        return users.entrySet().stream()
-            .filter(e -> e.getKey().equals(userId.getValue()))
-            .map(e -> e.getValue())
-            .findAny();
+        return dao.selectById(userId.getValue())
+            .map(v -> Optional.of(convertToEntity(v)))
+            .orElse(Optional.empty());
     }
 
     /**
@@ -76,10 +90,37 @@ public class UserRepositoryDbImpl implements UserRepository {
     @Override
     public Optional<User> findBy(LoginId loginId) {
 
-        return users.entrySet().stream()
-                .filter(e -> e.getValue().getLoginId().getValue().equals(loginId.getValue()))
-                .map(e -> e.getValue())
-                .findAny();
+        return dao.selectByLoginId(loginId.getValue())
+            .map(v -> Optional.of(convertToEntity(v)))
+            .orElse(Optional.empty());
     }
 
+    /**
+     * usersテーブルからエンティティに変換する.
+     * @param record usersテーブルレコード
+     * @return エンティティ
+     */
+    private User convertToEntity(final UsersTable record) {
+
+        return new User(new UserId(record.getUserId()), new LoginId(record.getLoginId()),
+                new UserName(record.getUserName()), new Password(record.getPassword()));
+    }
+
+    /**
+     * エンティティからusersテーブルのレコードに変換する.
+     * @param newUserId 新しいユーザID
+     * @param user ユーザ
+     * @return usersテーブルレコード
+     */
+    private UsersTable convertToRecord(final UserId newUserId, final User user) {
+
+        final UsersTable record = new UsersTable();
+
+        record.setUserId(newUserId.getValue());
+        record.setLoginId(user.getLoginId().getValue());
+        record.setUserName(user.getUserName().getValue());
+        record.setPassword(user.getPassword().getValue());
+
+        return record;
+    }
 }
