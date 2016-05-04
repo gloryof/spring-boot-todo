@@ -1,9 +1,16 @@
-security.basic.enabled: false
+security: 
+  basic:
+    enabled: false
 
-
+doma:
+  dialect: postgres
+  query-timeout: 60
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/boot-todo
     username: todo-user
     password: todo-user
+    maximum-pool-size: 90
+    auto-commit: false
+    connection-timeout: 300000
