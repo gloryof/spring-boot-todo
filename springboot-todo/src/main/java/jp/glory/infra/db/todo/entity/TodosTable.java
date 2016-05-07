@@ -1,6 +1,5 @@
 package jp.glory.infra.db.todo.entity;
 
-import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
 import org.seasar.doma.Table;
@@ -22,7 +21,6 @@ public class TodosTable {
      */
     @Getter
     @Setter
-    @Column(name = "todo_id")
     @Id
     private long todoId;
 
@@ -31,7 +29,6 @@ public class TodosTable {
      */
     @Getter
     @Setter
-    @Column(name = "user_id")
     private long userId;
 
     /**
@@ -39,7 +36,6 @@ public class TodosTable {
      */
     @Getter
     @Setter
-    @Column
     private String summary;
 
     /**
@@ -47,6 +43,5 @@ public class TodosTable {
      */
     @Getter
     @Setter
-    @Column
     private boolean completed;
 }

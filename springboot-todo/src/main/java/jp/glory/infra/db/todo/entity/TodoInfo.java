@@ -1,6 +1,5 @@
 package jp.glory.infra.db.todo.entity;
 
-import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 
 import lombok.Getter;
@@ -19,7 +18,6 @@ public class TodoInfo {
      */
     @Getter
     @Setter
-    @Column(name = "todo_id")
     private long todoId;
 
     /**
@@ -27,7 +25,6 @@ public class TodoInfo {
      */
     @Getter
     @Setter
-    @Column(name = "user_id")
     private long userId;
 
     /**
@@ -35,7 +32,6 @@ public class TodoInfo {
      */
     @Getter
     @Setter
-    @Column
     private String summary;
 
     /**
@@ -43,7 +39,6 @@ public class TodoInfo {
      */
     @Getter
     @Setter
-    @Column
     private String memo;
 
     /**
@@ -51,6 +46,5 @@ public class TodoInfo {
      */
     @Getter
     @Setter
-    @Column
     private boolean completed;
 }

@@ -1,6 +1,5 @@
 package jp.glory.infra.db.user.entity;
 
-import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
 import org.seasar.doma.Table;
@@ -23,7 +22,6 @@ public class UsersTable {
     @Getter
     @Setter
     @Id
-    @Column(name = "user_id")
     private long userId = 0l;
 
     /**
@@ -31,7 +29,6 @@ public class UsersTable {
      */
     @Getter
     @Setter
-    @Column(name = "login_id")
     private String loginId = null;
 
     /**
@@ -39,7 +36,6 @@ public class UsersTable {
      */
     @Getter
     @Setter
-    @Column(name = "user_name")
     private String userName = null;
 
     /**

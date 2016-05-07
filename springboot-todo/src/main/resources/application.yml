@@ -5,6 +5,7 @@ security:
 doma:
   dialect: postgres
   query-timeout: 60
+  naming: snake-lower-case
 
 spring:
   datasource:
