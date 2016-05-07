@@ -15,6 +15,6 @@ import org.springframework.web.context.WebApplicationContext;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Transactional
-public @interface Usercase {
+public @interface Usecase {
 
 }

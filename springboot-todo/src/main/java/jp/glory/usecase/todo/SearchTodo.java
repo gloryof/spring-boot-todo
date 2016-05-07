@@ -9,7 +9,7 @@ import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.repository.TodoRepository;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
-import jp.glory.framework.layer.annotation.Usercase;
+import jp.glory.framework.layer.annotation.Usecase;
 
 /**
  * TODOの検索.
@@ -17,7 +17,7 @@ import jp.glory.framework.layer.annotation.Usercase;
  * @author Junki Yamada
  *
  */
-@Usercase
+@Usecase
 public class SearchTodo {
 
     /**

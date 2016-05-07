@@ -9,7 +9,7 @@ import jp.glory.domain.todo.repository.TodoRepository;
 import jp.glory.domain.todo.validate.TodoSaveCommonValidateRule;
 import jp.glory.domain.todo.validate.TodoSaveUpdateValidteRule;
 import jp.glory.domain.todo.value.TodoId;
-import jp.glory.framework.layer.annotation.Usercase;
+import jp.glory.framework.layer.annotation.Usecase;
 import lombok.Getter;
 
 /**
@@ -17,7 +17,7 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
-@Usercase
+@Usecase
 public class SaveTodo {
 
     /**
