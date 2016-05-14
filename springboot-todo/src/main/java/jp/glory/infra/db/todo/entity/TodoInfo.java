@@ -47,4 +47,11 @@ public class TodoInfo {
     @Getter
     @Setter
     private boolean completed;
+
+    /**
+     * バージョン.
+     */
+    @Getter
+    @Setter
+    private long version;
 }

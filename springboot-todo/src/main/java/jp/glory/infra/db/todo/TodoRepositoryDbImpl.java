@@ -157,6 +157,7 @@ public class TodoRepositoryDbImpl implements TodoRepository {
 
         final Todo todo = new Todo(new TodoId(record.getTodoId()), new UserId(record.getUserId()),
                 new Summary(record.getSummary()), new Memo(record.getMemo()), record.isCompleted());
+        todo.version(record.getVersion());
 
         return todo;
     }
@@ -175,6 +176,7 @@ public class TodoRepositoryDbImpl implements TodoRepository {
         record.setUserId(todo.getUserId().getValue());
         record.setSummary(todo.getSummary().getValue());
         record.setCompleted(todo.isCompleted());
+        record.setVersion(todo.getEntityVersion());
 
         return record;
     }

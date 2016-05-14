@@ -1,5 +1,6 @@
 package jp.glory.framework.web.exception.handler;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,18 @@ import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
  */
 @ControllerAdvice
 public class WebapplicationExceptionHandler extends ResponseEntityExceptionHandler {
+
+    /**
+     * 排他ロックエラー.<br>
+     * CONFLICTで返す。
+     * @param ex 例外
+     * @return 409 CONFILCT
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    protected ResponseEntity<Object> handleOptimisticLockingFailureException(final OptimisticLockingFailureException ex) {
+
+        return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+    }
 
     /**
      * リクエスト不正例外のハンドラ<br>

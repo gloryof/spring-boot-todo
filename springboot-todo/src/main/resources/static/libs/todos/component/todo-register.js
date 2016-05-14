@@ -25,6 +25,9 @@ var TodoRegister = Vue.extend({
 				/** メモ */
 				memo: "",
 
+				/** version */
+				version: null,
+
 				/** 完了フラグ. */
 				completed: false
 			},
@@ -83,6 +86,11 @@ var TodoRegister = Vue.extend({
 					if (res.status == 400) {
 
 						that.$refs.registerErrors.add(res.body.errors);
+					}
+
+					if (res.status == 409) {
+
+						that.$refs.registerErrors.conflict("TODOの状態が最新ではありません。", "リフレッシュ");
 					}
 				});
 		},

@@ -93,6 +93,7 @@ public class TodoDetailTest {
                 public void setUp() {
 
                     expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"), new Memo("メモ"), true);
+                    expectedTodo.version(20l);
                     Mockito
                         .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
                         .thenReturn(Optional.of(expectedTodo));
@@ -111,7 +112,8 @@ public class TodoDetailTest {
                         .andExpect(TestTool.isId(expectedTodo.getId()))
                         .andExpect(TestTool.isSummary(expectedTodo.getSummary()))
                         .andExpect(TestTool.isMemo(expectedTodo.getMemo()))
-                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()));
+                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()))
+                        .andExpect(TestTool.isVesion(expectedTodo.getEntityVersion()));
                 }
             }
 
@@ -199,8 +201,11 @@ public class TodoDetailTest {
                     final UserId userId = new UserId(200l);
                     beforeTodo = new Todo(new TodoId(TARGET_ID), userId, new Summary("タイトルー"), new Memo("メモ"),
                             true);
+                    beforeTodo.version(10l);
+
                     expectedTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("変更後タイトル"),
                             new Memo("新メモ"), false);
+                    expectedTodo.version(beforeTodo.getEntityVersion() + 1);
                     Mockito
                         .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
                         .thenReturn(Optional.of(expectedTodo));
@@ -218,6 +223,7 @@ public class TodoDetailTest {
                     request.setSummary(expectedTodo.getSummary().getValue());
                     request.setMemo(expectedTodo.getMemo().getValue());
                     request.setCompleted(expectedTodo.isCompleted());
+                    request.setVersion(expectedTodo.getEntityVersion());
                 }
 
                 @Test
@@ -234,7 +240,8 @@ public class TodoDetailTest {
                         .andExpect(TestTool.isId(expectedTodo.getId()))
                         .andExpect(TestTool.isSummary(expectedTodo.getSummary()))
                         .andExpect(TestTool.isMemo(expectedTodo.getMemo()))
-                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()));
+                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()))
+                        .andExpect(TestTool.isVesion(expectedTodo.getEntityVersion()));
                 }
             }
 
@@ -429,9 +436,15 @@ public class TodoDetailTest {
             return jsonPath("$.completed", is(completed));
         }
 
+        public static ResultMatcher isVesion(final long version) {
+
+            return jsonPath("$.version", is((int) version));
+        }
+
         public static RequestBuilder putSaveApi(final String path, final TodoDetailSaveRequest request) {
             return put(path)
                     .with(csrf())
+                    .param("version", String.valueOf(request.getVersion()))
                     .param("summary", request.getSummary())
                     .param("memo", request.getMemo())
                     .param("completed", String.valueOf(request.isCompleted()));

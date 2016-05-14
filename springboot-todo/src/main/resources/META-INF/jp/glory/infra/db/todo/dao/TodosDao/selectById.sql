@@ -3,6 +3,7 @@ SELECT
 	todos.user_id,
 	todos.summary,
 	detail.memo,
+	todos.version,
 	todos.completed
 FROM
 	todos 

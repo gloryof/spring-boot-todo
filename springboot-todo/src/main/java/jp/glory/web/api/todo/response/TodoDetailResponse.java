@@ -36,6 +36,12 @@ public class TodoDetailResponse {
     private final boolean completed;
 
     /**
+     * バージョン.
+     */
+    @Getter
+    private final long version;
+
+    /**
      * コンストラクタ.
      * 
      * @param todo
@@ -47,5 +53,6 @@ public class TodoDetailResponse {
         this.summary = todo.getSummary().getValue();
         this.memo = todo.getMemo().getValue();
         this.completed = todo.isCompleted();
+        this.version = todo.getEntityVersion();
     }
 }

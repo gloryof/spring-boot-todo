@@ -30,4 +30,11 @@ public class TodoDetailSaveRequest {
     @Setter
     @Getter
     private boolean completed;
+
+    /**
+     * バージョン.
+     */
+    @Setter
+    @Getter
+    private long version;
 }

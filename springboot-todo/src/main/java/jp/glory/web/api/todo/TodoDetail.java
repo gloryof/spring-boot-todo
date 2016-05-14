@@ -106,8 +106,10 @@ public class TodoDetail {
      */
     private ResponseEntity<Object> executeSaving(final long id, final TodoDetailSaveRequest request,  final UserInfo userInfo) {
 
-        final SaveTodo.Result result = saveTodo.save(new Todo(new TodoId(id), userInfo.getUserId(),
-                new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted()));
+        final Todo saveTargetTodo = new Todo(new TodoId(id), userInfo.getUserId(),
+                new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted());
+        saveTargetTodo.version(request.getVersion());
+        final SaveTodo.Result result = saveTodo.save(saveTargetTodo);
 
         final ValidateErrors errors = result.getErrors();
         if (errors.hasError()) {

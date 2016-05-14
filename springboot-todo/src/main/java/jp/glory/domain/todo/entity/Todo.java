@@ -44,6 +44,12 @@ public class Todo {
     private final Memo memo;
 
     /**
+     * バージョン.
+     */
+    @Getter
+    private long entityVersion = 1l;
+
+    /**
      * 完了フラグ.<br>
      * 完了している場合：true、完了していない場合：false
      */
@@ -64,6 +70,7 @@ public class Todo {
      * @param completed
      *            完了フラグ
      */
+    // TODO memo - completedはエンティティを構成する上での必須パラメータではないのでコンストラクタから外したい
     public Todo(final TodoId id, final UserId userId, final Summary summary, final Memo memo, final boolean completed) {
 
         this.id = id;
@@ -97,5 +104,15 @@ public class Todo {
     public void unmarkFromComplete() {
 
         this.completed = false;
+    }
+
+    /**
+     * バージョンを設定したエンティティを作成する.
+     * @param version バージョン
+     * @return エンティティ
+     */
+    public void version(long version) {
+
+        this.entityVersion = version;
     }
 }

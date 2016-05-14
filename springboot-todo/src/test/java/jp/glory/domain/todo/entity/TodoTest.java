@@ -27,6 +27,18 @@ public class TodoTest {
         }
 
         @Test
+        public void versionでバージョンが設定されたエンティティが帰る() {
+
+            final long expectedVersion = 10l;
+
+            assertThat(sut.getEntityVersion(), is(1l));
+
+            sut.version(expectedVersion);
+
+            assertThat(sut.getEntityVersion(), is(expectedVersion));
+        }
+
+        @Test
         public void isRegisteredにtrueが設定されている() {
 
             assertThat(sut.isRegistered(), is(true));

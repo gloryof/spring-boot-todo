@@ -9,7 +9,13 @@
       <template id="common-errors">
         <section class="bs-errors">
           <ul>
-          	<li v-for="error in details" v-text="error"></li>
+            <li v-if="conflictError.isError == true">
+              <p>
+                <span v-text="conflictError.message"></span>
+                <a href="javascript:void(0)" v-on:click="reload" v-text="conflictError.linkLabel"></a>
+              </p>
+            </li>
+          	<li v-for="error in generalError.details" v-text="error"></li>
           </ul>
         </section>
       </template>

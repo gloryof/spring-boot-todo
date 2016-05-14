@@ -3,6 +3,7 @@ package jp.glory.infra.db.todo.entity;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
 import org.seasar.doma.Table;
+import org.seasar.doma.Version;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,4 +45,12 @@ public class TodosTable {
     @Getter
     @Setter
     private boolean completed;
+
+    /**
+     * バージョン.
+     */
+    @Getter
+    @Setter
+    @Version
+    private long version;
 }
