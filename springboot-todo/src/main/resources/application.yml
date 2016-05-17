@@ -7,6 +7,9 @@ doma:
   query-timeout: 60
   naming: snake-lower-case
 
+management:
+  context-path: /monitor
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/boot-todo
