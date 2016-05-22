@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>管理コンソール</title>
+    <link rel="stylesheet" th:replace="/common/fragments/styles :: styles"  />
+  </head>
+  <body>
+    <main id="console">
+      <ul>
+        <li>
+          <a th:href="@{/todos}">TODO一覧へ</a>
+        </li>
+      </ul>
+      <div class="menu">
+        <ul>
+          <li>
+            <a href="" v-link="{ path: '/trace' }">Trace</a>
+          </li>
+        </ul>
+      </div>
+      <router-view></router-view>
+    </main>
+    <div class="common-libs-component" th:replace="/common/fragments/libs :: libs"></div>
+    <script th:src="@{/libs/common/component/props.js}"></script>
+    <div class="console-libs-component" th:replace="/console/fragments/trace :: trace"></div>
+    <script th:src="@{/libs/console/component/console-top.js}"></script>
+  </body>
+</html>

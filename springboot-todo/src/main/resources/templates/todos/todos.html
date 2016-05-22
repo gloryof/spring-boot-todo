@@ -7,6 +7,11 @@
   </head>
   <body>
     <article id="todos" th:attr="csrf-token=${_csrf.token},csrf-header-name=${_csrf.headerName}">
+      <ul>
+        <li>
+          <a th:href="@{/console}">管理コンソールへ</a>
+        </li>
+      </ul>
       <router-view></router-view>
     </article>
     <div class="common-libs-component" th:replace="/common/fragments/libs :: libs"></div>

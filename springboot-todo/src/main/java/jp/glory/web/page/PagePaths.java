@@ -45,4 +45,15 @@ public final class PagePaths {
         /** パス. */
         public static final String PATH = "/join";
     }
+
+    /**
+     * 管理コンソール.
+     * @author Junki Yamada
+     *
+     */
+    public static class Console {
+
+        /** パス. */
+        public static final String PATH = "/console";
+    }
 }

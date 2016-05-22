@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>管理コンソール</title>
+  </head>
+  <body>
+    <div th:fragment="trace" th:remove="tag">
+      <template id="trace">
+        <article class="trace-content">
+          <table>
+            <thead>
+              <tr>
+                <th>timestamp</th>
+                <th>info.path</th>
+                <th>info.method</th>
+                <th>info.headers.requeset</th>
+                <th>info.headess.response</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in trace">
+                <td v-text="row.timestamp"></td>
+                <td v-text="row.info.path"></td>
+                <td v-text="row.info.method"></td>
+                <td>
+                  <dl v-for="(key, val)  in row.info.headers.request">
+                    <dt v-text="key"></dt>
+                    <dd v-text="val"></dd>
+                  </dl>
+                </td>
+                <td>
+                  <dl v-for="(key, val)  in row.info.headers.response">
+                    <dt v-text="key"></dt>
+                    <dd v-text="val"></dd>
+                  </dl>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      </template>
+      <script th:src="@{/libs/console/component/trace.js}"></script>
+    </div>
+  </body>
+</html>
