@@ -8,12 +8,16 @@
     <div th:fragment="trace" th:remove="tag">
       <template id="trace">
         <article class="trace-content">
-          <table>
+          <table class="trace-list">
             <thead>
               <tr>
                 <th>timestamp</th>
+                <th>row.info.remoteAddress</th>
+                <th>row.row.info.sessionId</th>
                 <th>info.path</th>
                 <th>info.method</th>
+                <th>row.info.contextPath</th>
+                <th>info.parameters</th>
                 <th>info.headers.requeset</th>
                 <th>info.headess.response</th>
               </tr>
@@ -21,8 +25,22 @@
             <tbody>
               <tr v-for="row in trace">
                 <td v-text="row.timestamp"></td>
+                <td v-text="row.info.remoteAddress"></td>
+                <td v-text="row.info.sessionId"></td>
                 <td v-text="row.info.path"></td>
                 <td v-text="row.info.method"></td>
+                <td v-text="row.info.contextPath">
+                  <dl v-for="(key, val)  in row.info.parameters">
+                    <dt v-text="key"></dt>
+                    <dd v-text="val"></dd>
+                  </dl>
+                </td>
+                <td>
+                  <dl v-for="(key, val)  in row.info.parameters">
+                    <dt v-text="key"></dt>
+                    <dd v-text="val"></dd>
+                  </dl>
+                </td>
                 <td>
                   <dl v-for="(key, val)  in row.info.headers.request">
                     <dt v-text="key"></dt>
@@ -46,6 +64,12 @@
         </article>
       </template>
       <script th:src="@{/libs/console/component/trace.js}"></script>
+      <style>
+        table.trace-list > thead > tr >th,
+        table.trace-list > tbody > tr >td {
+          padding: 4px;
+        }
+      </style>
     </div>
   </body>
 </html>

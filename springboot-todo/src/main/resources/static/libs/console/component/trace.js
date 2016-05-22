@@ -6,7 +6,7 @@ var Trace = Vue.extend({
 	data: function() {
 
 		return {
-			trace: {},
+			trace: [],
 		}
 	},
 	ready: function() {
@@ -16,7 +16,7 @@ var Trace = Vue.extend({
 			.get("/monitor/trace")
 			.end(function(err, res) {
 
-				that.$set("trace",  res.body);
+				that.$set("trace", res.body);
 			});
 	}
 });
