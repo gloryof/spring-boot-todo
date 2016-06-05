@@ -5,9 +5,9 @@
 
 	<property name="LOG_BASE_DIR" value="/var/log/devlopment/spring-todo/"/>
 	<property name="ARCIVE_BASE_DIR" value="/var/log/devlopment/spring-todo/%d{yyyy-MM-dd}/"/>
+	<property name="PERFOMANCE_FORMAT" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t]%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
-	<appender name="INFO_LOG"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder>
 			<pattern>${FILE_LOG_PATTERN}</pattern>
 		</encoder>
@@ -17,10 +17,26 @@
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 	</appender>	
+
+	<appender name="performanceAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${PERFOMANCE_FORMAT}</pattern>
+		</encoder>
+		<file>${LOG_BASE_DIR}/performance.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${ARCIVE_BASE_DIR}/info.%d.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>	
+
+	<logger name="performanceLog">
+		<appender-ref ref="performanceAppender" />
+	</logger>
 	
 	<root level="INFO">
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="INFO_LOG" />
+		<appender-ref ref="infoAppender" />
 	</root>
+
 	
 </configuration>
