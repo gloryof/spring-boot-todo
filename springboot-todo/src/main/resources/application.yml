@@ -11,12 +11,3 @@ management:
   context-path: /monitor
   trace:
     include: REQUEST_HEADERS,RESPONSE_HEADERS,ERRORS,PATH_INFO,PATH_TRANSLATED,CONTEXT_PATH,USER_PRINCIPAL,PARAMETERS,QUERY_STRING,AUTH_TYPE,REMOTE_ADDRESS,SESSION_ID,REMOTE_USER
-
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/boot-todo
-    username: todo-user
-    password: todo-user
-    maximum-pool-size: 90
-    auto-commit: false
-    connection-timeout: 300000
