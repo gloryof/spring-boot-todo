@@ -6,9 +6,9 @@
   </head>
   <body>
     <form th:action="@{/executeLogin}" method="POST">
-      <p class="error-message" th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null" th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
-        メッセージ
-      </p>
+      <ul class="error-message" th:if="${session['failureMessages'] != null}">
+        <li th:each="message : ${session['failureMessages']}" th:text="${message}">メッセージ</li>
+      </ul>
       <dl>
       	<dt>ログインID</dt>
       	<dd><input type="text" name="username" /></dd>

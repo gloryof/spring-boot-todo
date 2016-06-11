@@ -5,7 +5,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import jp.glory.framework.security.handler.LoginFailureHandler;
 import jp.glory.web.api.ApiPaths;
 import jp.glory.web.page.PagePaths;
 
@@ -41,6 +43,16 @@ public class WebSecuritySetting extends WebSecurityConfigurerAdapter {
             .formLogin()
                 .loginPage(PagePaths.Login.PATH)
                 .loginProcessingUrl("/executeLogin")
+                .failureHandler(createFailureHandler())
                 .defaultSuccessUrl(PagePaths.Todo.PATH);
+    }
+
+    /**
+     * ログイン失敗ハンドラを作成する.
+     * @return ハンドラ
+     */
+    private AuthenticationFailureHandler createFailureHandler() {
+
+        return new LoginFailureHandler(PagePaths.Login.PATH + "?error");
     }
 }
