@@ -11,6 +11,11 @@ import jp.glory.domain.common.type.EntityId;
 public class TodoId extends EntityId {
 
     /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = -2754585214392061704L;
+
+    /**
      * コンストラクタ.
      * 
      * @param paramValue

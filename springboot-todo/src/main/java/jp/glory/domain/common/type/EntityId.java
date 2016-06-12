@@ -1,14 +1,21 @@
 package jp.glory.domain.common.type;
 
+import java.io.Serializable;
 import java.util.Optional;
+
 import lombok.Getter;
 
 /**
  * エンティティのID
  * @author Junki Yamada
  */
-public class EntityId {
+public class EntityId implements Serializable {
     
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = 1828170115031496962L;
+
     /**
      * 値.
      */

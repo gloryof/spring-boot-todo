@@ -12,6 +12,11 @@ import jp.glory.domain.common.type.EntityId;
 public class UserId extends EntityId {
 
     /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = 4747463306943376449L;
+
+    /**
      * 値を設定する
      * 
      * @param paramValue

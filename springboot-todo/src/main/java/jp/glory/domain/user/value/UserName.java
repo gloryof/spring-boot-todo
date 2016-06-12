@@ -13,6 +13,11 @@ import jp.glory.domain.common.type.InputText;
 @MaxLength(value = 50, label = UserName.LABEL)
 public class UserName extends InputText {
 
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = 8538281104376981045L;
+
     /** ラベル. */
     public static final String LABEL = "ユーザ名";
 

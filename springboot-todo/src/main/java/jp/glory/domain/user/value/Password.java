@@ -17,6 +17,11 @@ import jp.glory.domain.common.type.InputText;
 public class Password extends InputText {
 
     /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = -4364026566398001477L;
+
+    /**
      * ラベル.
      */
     public static final String LABEL = "パスワード";

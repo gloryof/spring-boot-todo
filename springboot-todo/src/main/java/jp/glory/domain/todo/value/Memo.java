@@ -12,6 +12,11 @@ import jp.glory.domain.common.type.InputText;
 @MaxLength(value = 1000, label = Memo.LABEL)
 public class Memo extends InputText {
 
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = 9089718032072713273L;
+
     /** ラベル. */
     public static final String LABEL = "メモ";
 

@@ -1,1 +1,1 @@
-java -jar sping-todo.jar --spring.config.location=/Users/gloryof/git/spring-boot-todo/springboot-todo/env/local.yml
+java -jar sping-todo.jar --spring.config.location=/Users/gloryof/git/spring-boot-todo/springboot-todo/env/local.yml --spring.redis.host=localhost --spring.redis.port=6379

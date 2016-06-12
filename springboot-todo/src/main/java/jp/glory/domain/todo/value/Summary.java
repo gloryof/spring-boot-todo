@@ -14,6 +14,11 @@ import jp.glory.domain.common.type.InputText;
 @MaxLength(value = 20, label = Summary.LABEL)
 public class Summary extends InputText {
 
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = -1746975120830986730L;
+
     /** ラベル. */
     public static final String LABEL = "概要";
 

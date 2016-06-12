@@ -16,6 +16,11 @@ import jp.glory.domain.common.type.InputText;
 @ValidCharacters(value = ValidCharcterType.OnlySingleByteChars, label = LoginId.LABEL)
 public class LoginId extends InputText {
 
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = -4354665558755601414L;
+
     /** ラベル. */
     public static final String LABEL = "ログインID";
 

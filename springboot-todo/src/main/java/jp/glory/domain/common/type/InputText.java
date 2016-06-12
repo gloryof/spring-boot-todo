@@ -1,6 +1,8 @@
 package jp.glory.domain.common.type;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Optional;
+
 import jp.glory.domain.common.annotation.MaxLength;
 import jp.glory.domain.common.annotation.Required;
 import jp.glory.domain.common.annotation.ValidCharacters;
@@ -18,7 +20,12 @@ import lombok.Getter;
 @MaxLength(isActive = false)
 @ValidCharacters(isActive = false)
 @Required(isActive = false)
-public abstract class InputText implements Validatable {
+public abstract class InputText implements Validatable, Serializable {
+
+    /**
+     * シリアルバージョンUID.
+     */
+    private static final long serialVersionUID = 1591293540244535848L;
 
     /**
      * 値.
