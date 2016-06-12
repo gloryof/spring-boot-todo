@@ -1,6 +1,16 @@
 package jp.glory.domain.common.type;
 
+import static jp.glory.test.validate.ValidateMatcher.validatedBy;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+
 import jp.glory.domain.common.annotation.MaxLength;
 import jp.glory.domain.common.annotation.Required;
 import jp.glory.domain.common.annotation.ValidCharacters;
@@ -8,14 +18,6 @@ import jp.glory.domain.common.annotation.param.ValidCharcterType;
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-
-import static jp.glory.test.validate.ValidateMatcher.validatedBy;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 @RunWith(Enclosed.class)
 public class InputTextTest {
@@ -23,6 +25,8 @@ public class InputTextTest {
     private static final String LABEL = "テスト";
 
     private static class StubClass extends InputText {
+
+        private static final long serialVersionUID = 1L;
 
         public StubClass(final String paramValue) {
 
@@ -35,6 +39,8 @@ public class InputTextTest {
     @ValidCharacters(value = ValidCharcterType.OnlySingleByteChars, label = LABEL, isActive = false)
     private static class RequiredClass extends StubClass {
 
+        private static final long serialVersionUID = 1L;
+
         public RequiredClass(String paramValue) {
             super(paramValue);
         }
@@ -46,6 +52,8 @@ public class InputTextTest {
     @ValidCharacters(value = ValidCharcterType.OnlySingleByteChars, label = LABEL, isActive = false)
     private static class MaxLengthClass extends StubClass {
 
+        private static final long serialVersionUID = 1L;
+
         public MaxLengthClass(final String paramValue) {
 
             super(paramValue);
@@ -56,6 +64,8 @@ public class InputTextTest {
     @MaxLength(value = 4, label = LABEL, isActive = false)
     @ValidCharacters(value = ValidCharcterType.OnlySingleByteChars, label = LABEL)
     private static class ValidCharClass extends StubClass {
+
+        private static final long serialVersionUID = 1L;
 
         public ValidCharClass(final String paramValue) {
 

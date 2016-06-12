@@ -1,14 +1,16 @@
 package jp.glory.domain.common.type;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class EntityIdTest {
 
     private static class StubClass extends EntityId {
+
+        private static final long serialVersionUID = 1L;
 
         public StubClass(final Long paramValue) {
             super(paramValue);
