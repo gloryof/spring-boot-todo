@@ -9,6 +9,9 @@
     <article id="todos" th:attr="csrf-token=${_csrf.token},csrf-header-name=${_csrf.headerName}">
       <ul>
         <li>
+          <a th:href="@{/logout}">ログアウト</a>
+        </li>
+        <li>
           <a th:href="@{/console}">管理コンソールへ</a>
         </li>
       </ul>

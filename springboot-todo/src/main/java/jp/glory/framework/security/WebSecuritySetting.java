@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import jp.glory.framework.security.handler.LoginFailureHandler;
 import jp.glory.web.api.ApiPaths;
@@ -44,7 +45,12 @@ public class WebSecuritySetting extends WebSecurityConfigurerAdapter {
                 .loginPage(PagePaths.Login.PATH)
                 .loginProcessingUrl("/executeLogin")
                 .failureHandler(createFailureHandler())
-                .defaultSuccessUrl(PagePaths.Todo.PATH);
+                .defaultSuccessUrl(PagePaths.Todo.PATH)
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .invalidateHttpSession(true)
+                .permitAll();
     }
 
     /**
