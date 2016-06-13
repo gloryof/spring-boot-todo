@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>TODO一覧</title>
-    <link rel="stylesheet" th:replace="/common/fragments/styles :: styles"  />
+    <link rel="stylesheet" th:replace="common/fragments/styles :: styles"  />
   </head>
   <body>
     <article id="todos" th:attr="csrf-token=${_csrf.token},csrf-header-name=${_csrf.headerName}">
@@ -17,12 +17,12 @@
       </ul>
       <router-view></router-view>
     </article>
-    <div class="common-libs-component" th:replace="/common/fragments/libs :: libs"></div>
+    <div class="common-libs-component" th:replace="common/fragments/libs :: libs"></div>
     <script th:src="@{/libs/common/component/props.js}"></script>
-    <div class="todo-list-component" th:replace="/common/fragments/errors :: errors"></div>
-    <div class="todo-list-component" th:replace="/todos/fragments/todo-list :: todoList"></div>
-    <div class="todo-list-component" th:replace="/todos/fragments/todo-register :: todoRegister"></div>
-    <div class="todo-list-component" th:replace="/todos/fragments/todo-detail :: todoDetail"></div>
+    <div class="todo-list-component" th:replace="common/fragments/errors :: errors"></div>
+    <div class="todo-list-component" th:replace="todos/fragments/todo-list :: todoList"></div>
+    <div class="todo-list-component" th:replace="todos/fragments/todo-register :: todoRegister"></div>
+    <div class="todo-list-component" th:replace="todos/fragments/todo-detail :: todoDetail"></div>
     <script th:src="@{/libs/todos/component/todos.js}"></script>
   </body>
 </html>

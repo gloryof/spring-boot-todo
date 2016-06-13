@@ -36,6 +36,6 @@ public class JoinPage {
      */
     private String getTemplatePath() {
 
-        return "/join/join";
+        return "join/join";
     }
 }

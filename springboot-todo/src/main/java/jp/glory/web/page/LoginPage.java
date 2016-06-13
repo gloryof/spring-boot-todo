@@ -36,6 +36,6 @@ public class LoginPage {
      */
     private String getTemplatePath() {
 
-        return "/login/login";
+        return "login/login";
     }
 }

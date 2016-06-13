@@ -36,6 +36,6 @@ public class ConsolePage {
      */
     private String getTemplatePath() {
 
-        return "/console/console";
+        return "console/console";
     }
 }

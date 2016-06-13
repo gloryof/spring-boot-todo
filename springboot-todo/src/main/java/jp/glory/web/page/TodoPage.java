@@ -29,6 +29,6 @@ public class TodoPage {
     @RequestMapping
     public ModelAndView view(@AuthenticationPrincipal final UserInfo userInfo) {
 
-        return new ModelAndView("/todos/todos");
+        return new ModelAndView("todos/todos");
     }
 }

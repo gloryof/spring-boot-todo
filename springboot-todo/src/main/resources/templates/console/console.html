@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>管理コンソール</title>
-    <link rel="stylesheet" th:replace="/common/fragments/styles :: styles"  />
+    <link rel="stylesheet" th:replace="common/fragments/styles :: styles"  />
   </head>
   <body>
     <main id="console">
@@ -24,10 +24,10 @@
       </div>
       <router-view></router-view>
     </main>
-    <div class="common-libs-component" th:replace="/common/fragments/libs :: libs"></div>
+    <div class="common-libs-component" th:replace="common/fragments/libs :: libs"></div>
     <script th:src="@{/libs/common/component/props.js}"></script>
-    <div class="console-libs-component" th:replace="/console/fragments/trace :: trace"></div>
-    <div class="console-libs-component" th:replace="/console/fragments/metrics :: metrics"></div>
+    <div class="console-libs-component" th:replace="console/fragments/trace :: trace"></div>
+    <div class="console-libs-component" th:replace="console/fragments/metrics :: metrics"></div>
     <script th:src="@{/libs/console/component/console-top.js}"></script>
   </body>
 </html>
