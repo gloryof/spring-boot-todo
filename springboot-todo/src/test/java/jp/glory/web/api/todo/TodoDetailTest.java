@@ -1,42 +1,21 @@
 package jp.glory.web.api.todo;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import jp.glory.SpringbootTodoApplication;
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
@@ -45,409 +24,273 @@ import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.todo.value.TodoIdArgMatcher;
+import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.value.UserId;
-import jp.glory.test.framework.security.MockLoginUser;
-import jp.glory.test.framework.security.MockUserFactory;
-import jp.glory.test.util.TestUtil;
+import jp.glory.framework.web.exception.InvalidRequestException;
+import jp.glory.test.util.TestUserUtil;
 import jp.glory.usecase.todo.SaveTodo;
+import jp.glory.usecase.todo.SaveTodo.Result;
 import jp.glory.usecase.todo.SearchTodo;
-import jp.glory.web.api.ApiPaths;
 import jp.glory.web.api.todo.request.TodoDetailSaveRequest;
+import jp.glory.web.api.todo.response.TodoDetailResponse;
 import jp.glory.web.session.UserInfo;
 
 @RunWith(Enclosed.class)
 public class TodoDetailTest {
 
+    private static final long TARGET_ID = 100;
+
     @RunWith(Enclosed.class)
-    public static class 許可されたアクセス {
+    public static class viewのテスト {
 
-        private static final long TARGET_ID = 100;
-        private static final String TARGET_PATH = ApiPaths.Todo.PATH + "/" + TARGET_ID;
+        public static class 対象のデータが存在する場合 {
 
-        @RunWith(Enclosed.class)
-        public static class GET {
+            private TodoDetail sut = null;
 
-            @RunWith(SpringJUnit4ClassRunner.class)
-            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-            @WebAppConfiguration
-            @MockLoginUser
-            public static class 対象のデータが存在する場合 {
+            private SearchTodo mockSearch = null;
+            private SaveTodo mockSave = null;
 
-                @Rule
-                public final MockitoRule rule = MockitoJUnit.rule();
+            private Todo expectedTodo = null;
 
-                @InjectMocks
-                private TodoDetail sut = null;
+            private ResponseEntity<TodoDetailResponse> actual = null;
 
-                @Autowired
-                private FilterChainProxy springSecurityFilterChain;
+            @Before
+            public void setUp() {
 
-                @Mock
-                private SearchTodo mockSearch;
+                mockSearch = Mockito.mock(SearchTodo.class);
+                mockSave = Mockito.mock(SaveTodo.class);
 
-                private MockMvc mockMvc;
+                expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"), new Memo("メモ"), true);
+                expectedTodo.version(20l);
 
-                private Todo expectedTodo = null;
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.of(expectedTodo));
 
-                @Before
-                public void setUp() {
+                sut = new TodoDetail(mockSearch, mockSave);
 
-                    expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"), new Memo("メモ"), true);
-                    expectedTodo.version(20l);
-                    Mockito
-                        .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                        .thenReturn(Optional.of(expectedTodo));
-
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
-                            .apply(springSecurity(springSecurityFilterChain))
-                            .build();
-                }
-
-                @Test
-                public void JSONにTodoの内容が設定される() throws Exception {
-
-                    this.mockMvc.perform(get(TARGET_PATH))
-                        .andExpect(status().isOk())
-                        .andExpect(TestTool.isId(expectedTodo.getId()))
-                        .andExpect(TestTool.isSummary(expectedTodo.getSummary()))
-                        .andExpect(TestTool.isMemo(expectedTodo.getMemo()))
-                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()))
-                        .andExpect(TestTool.isVesion(expectedTodo.getEntityVersion()));
-                }
+                actual = sut.view(TARGET_ID);
             }
 
-            @RunWith(SpringJUnit4ClassRunner.class)
-            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-            @WebAppConfiguration
-            @MockLoginUser
-            public static class 対象のデータが存在しない場合 {
+            @Test
+            public void ステータスはOK() {
 
-                @Rule
-                public final MockitoRule rule = MockitoJUnit.rule();
+                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+            }
 
-                @InjectMocks
-                private TodoDetail sut = null;
+            @Test
+            public void Todoの内容が返る() throws Exception {
 
-                @Autowired
-                private FilterChainProxy springSecurityFilterChain;
+                final TodoDetailResponse actualResponse = actual.getBody();
 
-                @Mock
-                private SearchTodo mockSearch;
-
-                private MockMvc mockMvc;
-
-                @Before
-                public void setUp() {
-
-                    Mockito
-                        .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                        .thenReturn(Optional.empty());
-
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
-                            .apply(springSecurity(springSecurityFilterChain))
-                            .build();
-                }
-
-                @Test
-                public void NotFoundが返る() throws Exception {
-
-                    this.mockMvc.perform(get(TARGET_PATH))
-                        .andExpect(status().isNotFound());
-                }
+                assertThat(actualResponse.getId(), is(expectedTodo.getId().getValue()));
+                assertThat(actualResponse.getSummary(), is(expectedTodo.getSummary().getValue()));
+                assertThat(actualResponse.getMemo(), is(expectedTodo.getMemo().getValue()));
+                assertThat(actualResponse.isCompleted(), is(expectedTodo.isCompleted()));
+                assertThat(actualResponse.getVersion(), is(expectedTodo.getEntityVersion()));
             }
         }
 
-        @RunWith(Enclosed.class)
-        public static class PUT {
+        public static class 対象のデータが存在しない場合 {
 
-            @RunWith(SpringJUnit4ClassRunner.class)
-            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-            @WebAppConfiguration
-            @MockLoginUser
-            public static class 対象のデータが存在して_入力内容に不備がない場合 {
+            private TodoDetail sut = null;
 
-                @Rule
-                public final MockitoRule rule = MockitoJUnit.rule();
+            private SearchTodo mockSearch = null;
+            private SaveTodo mockSave = null;
 
-                @InjectMocks
-                private TodoDetail sut = null;
+            private ResponseEntity<TodoDetailResponse> actual = null;
 
-                @Autowired
-                private FilterChainProxy springSecurityFilterChain;
+            @Before
+            public void setUp() {
 
-                @Mock
-                private SearchTodo mockSearch;
+                mockSearch = Mockito.mock(SearchTodo.class);
+                mockSave = Mockito.mock(SaveTodo.class);
 
-                @Mock
-                private SaveTodo mockSaveTodo;
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.empty());
 
-                @Mock
-                private SaveTodo.Result mockUseCaseResult;
+                sut = new TodoDetail(mockSearch, mockSave);
 
-                @Mock
-                private UserInfo mockUser;
-
-                private MockMvc mockMvc;
-
-                private TodoDetailSaveRequest request = null;
-                private Todo beforeTodo = null;
-                private Todo expectedTodo = null;
-
-                @Before
-                public void setUp() {
-
-                    final UserId userId = new UserId(200l);
-                    beforeTodo = new Todo(new TodoId(TARGET_ID), userId, new Summary("タイトルー"), new Memo("メモ"),
-                            true);
-                    beforeTodo.version(10l);
-
-                    expectedTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("変更後タイトル"),
-                            new Memo("新メモ"), false);
-                    expectedTodo.version(beforeTodo.getEntityVersion() + 1);
-                    Mockito
-                        .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                        .thenReturn(Optional.of(expectedTodo));
-
-                    Mockito.when(mockUser.getUserId()).thenReturn(userId);
-                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
-                    Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
-
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
-                            .apply(springSecurity(springSecurityFilterChain))
-                            .build();
-
-                    request = new TodoDetailSaveRequest();
-                    request.setSummary(expectedTodo.getSummary().getValue());
-                    request.setMemo(expectedTodo.getMemo().getValue());
-                    request.setCompleted(expectedTodo.isCompleted());
-                    request.setVersion(expectedTodo.getEntityVersion());
-                }
-
-                @Test
-                public void NoContetが返る() throws Exception {
-
-                    this.mockMvc.perform(TestTool.putSaveApi(TARGET_PATH, request))
-                        .andExpect(status().isNoContent());
-                }
-
-                @Test
-                public void 設定された内容が保存される() throws Exception {
-
-                    this.mockMvc.perform(get(TARGET_PATH))
-                        .andExpect(TestTool.isId(expectedTodo.getId()))
-                        .andExpect(TestTool.isSummary(expectedTodo.getSummary()))
-                        .andExpect(TestTool.isMemo(expectedTodo.getMemo()))
-                        .andExpect(TestTool.isCompleted(expectedTodo.isCompleted()))
-                        .andExpect(TestTool.isVesion(expectedTodo.getEntityVersion()));
-                }
+                actual = sut.view(TARGET_ID);
             }
 
-            @RunWith(SpringJUnit4ClassRunner.class)
-            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-            @WebAppConfiguration
-            @MockLoginUser
-            public static class 対象のデータが存在して_入力内容に不備がある場合 {
+            @Test
+            public void ステータスはNotFound() throws Exception {
 
-                @Rule
-                public final MockitoRule rule = MockitoJUnit.rule();
-
-                @InjectMocks
-                private TodoDetail sut = null;
-
-                @Autowired
-                private FilterChainProxy springSecurityFilterChain;
-
-                @Mock
-                private SearchTodo mockSearch;
-
-                @Mock
-                private SaveTodo mockSaveTodo;
-
-                @Mock
-                private SaveTodo.Result mockUseCaseResult;
-                
-                @Autowired
-                private HandlerExceptionResolver handlerExceptionResolver;
-
-                private MockMvc mockMvc;
-
-                private TodoDetailSaveRequest request = null;
-                private Todo expectedTodo = null;
-                private Todo invalidTodo = null;
-                private ValidateErrors expectedErrors = null;
-
-                @Before
-                public void setUp() {
-
-                    final UserId savedUserId = new UserId(200l);
-                    final UserId loginUserId = MockUserFactory.defaultUser().getUserId();
-                    expectedTodo = new Todo(new TodoId(TARGET_ID), savedUserId, new Summary("タイトルー"), new Memo("メモ"),
-                            true);
-                    invalidTodo = new Todo(expectedTodo.getId(), loginUserId, new Summary(""),
-                            new Memo(TestUtil.repeat("a", 1001)), false);
-
-                    expectedErrors = new ValidateErrors();
-                    expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
-                    expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
-
-                    Mockito
-                        .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                        .thenReturn(Optional.of(expectedTodo));
-                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
-                    Mockito.when(mockSaveTodo.save(Mockito.any())).thenReturn(mockUseCaseResult);
-
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
-                            .apply(springSecurity(springSecurityFilterChain))
-                            .setHandlerExceptionResolvers(handlerExceptionResolver)
-                            .build();
-
-                    request = new TodoDetailSaveRequest();
-                    request.setSummary(invalidTodo.getSummary().getValue());
-                    request.setMemo(invalidTodo.getMemo().getValue());
-                    request.setCompleted(invalidTodo.isCompleted());
-                }
-
-                @Test
-                public void BadRequestが返る() throws Exception {
-
-                    this.mockMvc.perform(TestTool.putSaveApi(TARGET_PATH, request))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.errors[0]", is(expectedErrors.toList().get(0).getMessage())))
-                        .andExpect(jsonPath("$.errors[1]", is(expectedErrors.toList().get(1).getMessage())));
-                }
-            }
-
-            @RunWith(SpringJUnit4ClassRunner.class)
-            @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-            @WebAppConfiguration
-            @MockLoginUser
-            public static class 対象のデータが存在しない場合 {
-
-                @Rule
-                public final MockitoRule rule = MockitoJUnit.rule();
-
-                @InjectMocks
-                private TodoDetail sut = null;
-
-                @Autowired
-                private FilterChainProxy springSecurityFilterChain;
-
-                @Mock
-                private SearchTodo mockSearch;
-
-                @Mock
-                private SaveTodo mockSaveTodo;
-
-                @Mock
-                private SaveTodo.Result mockUseCaseResult;
-
-                @Mock
-                private UserInfo mockUser;
-
-                private MockMvc mockMvc;
-
-                @Before
-                public void setUp() {
-
-                    Mockito
-                        .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                        .thenReturn(Optional.empty());
-
-                    this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                            .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
-                            .apply(springSecurity(springSecurityFilterChain))
-                            .build();
-                }
-
-                @Test
-                public void NotFoundが返る() throws Exception {
-
-                    this.mockMvc.perform(TestTool.putSaveApi(TARGET_PATH, new TodoDetailSaveRequest()))
-                        .andExpect(status().isNotFound());
-                }
+                assertThat(actual.getStatusCode(), is(HttpStatus.NOT_FOUND));
             }
         }
     }
 
-    @RunWith(SpringJUnit4ClassRunner.class)
-    @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-    @WebAppConfiguration
-    @MockLoginUser
-    public static class 許可されないアクセス {
+    @RunWith(Enclosed.class)
+    public static class saveのテスト {
 
-        private static final long TARGET_ID = 100;
-        private static final String TARGET_PATH = ApiPaths.Todo.PATH + "/" + TARGET_ID;
+        public static class 対象のデータが存在して_入力内容に不備がない場合 {
 
-        @Autowired
-        private WebApplicationContext wac;
+            private TodoDetail sut = null;
 
-        private MockMvc mockMvc;
+            private SearchTodo mockSearch = null;
+            private SaveTodo mockSave = null;
+            private SaveTodo.Result mockUseCaseResult = null;
 
-        @Before
-        public void setUp() {
+            private TodoDetailSaveRequest request = null;
 
-            this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                    .apply(springSecurity())
-                    .build();
+            private Todo expectedTodo = null;
+
+            private ResponseEntity<Object> actual = null;
+            private Todo actualTodo = null;
+
+            @Before
+            public void setUp() {
+
+                mockSearch = Mockito.mock(SearchTodo.class);
+                mockSave = Mockito.mock(SaveTodo.class);
+                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
+
+                final User user = TestUserUtil.createDefault();
+
+                expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"), new Memo("メモ"),
+                        true);
+                expectedTodo.version(10l);
+
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.of(expectedTodo));
+
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.of(expectedTodo));
+                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
+                Mockito.when(mockSave.save(Mockito.any())).then(new Answer<SaveTodo.Result>() {
+
+                    @Override
+                    public Result answer(InvocationOnMock invocation) throws Throwable {
+
+                        actualTodo = invocation.getArgumentAt(0, Todo.class);
+                        return mockUseCaseResult;
+                    }
+                });
+
+                request = new TodoDetailSaveRequest();
+                request.setSummary(expectedTodo.getSummary().getValue());
+                request.setMemo(expectedTodo.getMemo().getValue());
+                request.setCompleted(expectedTodo.isCompleted());
+                request.setVersion(expectedTodo.getEntityVersion());
+
+                sut = new TodoDetail(mockSearch, mockSave);
+                actual = sut.save(TARGET_ID, request, new UserInfo(user));
+            }
+
+            @Test
+            public void NoContetが返る() throws Exception {
+
+                assertThat(actual.getStatusCode(), is(HttpStatus.NO_CONTENT));
+            }
+
+            @Test
+            public void 設定された内容が保存される() throws Exception {
+
+                assertThat(actualTodo.getId().getValue(), is(expectedTodo.getId().getValue()));
+                assertThat(actualTodo.getSummary().getValue(), is(expectedTodo.getSummary().getValue()));
+                assertThat(actualTodo.getMemo().getValue(), is(expectedTodo.getMemo().getValue()));
+                assertThat(actualTodo.isCompleted(), is(expectedTodo.isCompleted()));
+                assertThat(actualTodo.getEntityVersion(), is(expectedTodo.getEntityVersion()));
+            }
         }
 
-        @Test
-        public void postアクセス() throws Exception {
+        public static class 対象のデータが存在して_入力内容に不備がある場合 {
 
-            this.mockMvc.perform(post(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
+            private TodoDetail sut = null;
+
+            private SearchTodo mockSearch = null;
+            private SaveTodo mockSave = null;
+            private SaveTodo.Result mockUseCaseResult = null;
+
+            private Todo expectedTodo = null;
+            private ValidateErrors expectedErrors = null;
+
+            @Before
+            public void setUp() {
+
+                mockSearch = Mockito.mock(SearchTodo.class);
+                mockSave = Mockito.mock(SaveTodo.class);
+                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
+
+                final User user = TestUserUtil.createDefault();
+
+                expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"), new Memo("メモ"),
+                        true);
+                expectedTodo.version(10l);
+
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.of(expectedTodo));
+
+                expectedErrors = new ValidateErrors();
+                expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
+                expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
+
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.of(expectedTodo));
+                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
+                Mockito.when(mockSave.save(Mockito.any())).thenReturn(mockUseCaseResult);
+
+                sut = new TodoDetail(mockSearch, mockSave);
+            }
+
+            @Test
+            public void InvalidRequestExceptionがスローされる() {
+
+                try {
+
+                    final User user = TestUserUtil.createDefault();
+                    sut.save(TARGET_ID, new TodoDetailSaveRequest(), new UserInfo(user));
+                    fail();
+                } catch (final InvalidRequestException exception) {
+
+                    final ValidateErrors actualErrors = exception.getErrors();
+
+                    for (int i = 0; i < actualErrors.toList().size(); i++) {
+
+                        final String actualMessage = actualErrors.toList().get(i).getMessage();
+                        final String expectedMessage = expectedErrors.toList().get(i).getMessage();
+                        assertThat(actualMessage, is(expectedMessage));
+                    }
+                }
+            }
         }
 
-        @Test
-        public void deleteアクセス() throws Exception {
+        public static class 対象のデータが存在しない場合 {
 
-            this.mockMvc.perform(delete(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
-        }
+            private TodoDetail sut = null;
 
-        @Test
-        public void patchアクセス() throws Exception {
+            private SearchTodo mockSearch = null;
+            private SaveTodo mockSave = null;
 
-            this.mockMvc.perform(patch(TARGET_PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
-        }
-    }
+            private ResponseEntity<Object> actual = null;
 
-    private static class TestTool {
+            @Before
+            public void setUp() {
 
-        public static ResultMatcher isId(final TodoId id) {
+                mockSearch = Mockito.mock(SearchTodo.class);
+                mockSave = Mockito.mock(SaveTodo.class);
 
-            return jsonPath("$.id", is(id.getValue().intValue()));
-        }
+                Mockito
+                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
+                    .thenReturn(Optional.empty());
 
-        public static ResultMatcher isSummary(final Summary summary) {
+                sut = new TodoDetail(mockSearch, mockSave);
 
-            return jsonPath("$.summary", is(summary.getValue()));
-        }
+                actual = sut.save(TARGET_ID, new TodoDetailSaveRequest(), new UserInfo(TestUserUtil.createDefault()));
+            }
 
-        public static ResultMatcher isMemo(final Memo memo) {
+            @Test
+            public void ステータスはNOT_FOUND() {
 
-            return jsonPath("$.memo", is(memo.getValue()));
-        }
-
-        public static ResultMatcher isCompleted(final boolean completed) {
-
-            return jsonPath("$.completed", is(completed));
-        }
-
-        public static ResultMatcher isVesion(final long version) {
-
-            return jsonPath("$.version", is((int) version));
-        }
-
-        public static RequestBuilder putSaveApi(final String path, final TodoDetailSaveRequest request) {
-            return put(path)
-                    .with(csrf())
-                    .param("version", String.valueOf(request.getVersion()))
-                    .param("summary", request.getSummary())
-                    .param("memo", request.getMemo())
-                    .param("completed", String.valueOf(request.isCompleted()));
+                assertThat(actual.getStatusCode(), is(HttpStatus.NOT_FOUND));
+            }
         }
     }
 }
