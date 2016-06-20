@@ -1,192 +1,158 @@
 package jp.glory.web.api.account;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import jp.glory.SpringbootTodoApplication;
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.value.LoginId;
-import jp.glory.domain.user.value.LoginIdArgMatcher;
 import jp.glory.domain.user.value.Password;
-import jp.glory.domain.user.value.PasswordArgMatcher;
 import jp.glory.domain.user.value.UserName;
-import jp.glory.domain.user.value.UserNameArgMatcher;
+import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.infra.encryption.Encryption;
 import jp.glory.usecase.user.CreateNewAccount;
 import jp.glory.usecase.user.CreateNewAccount.Result;
-import jp.glory.web.api.ApiPaths;
 import jp.glory.web.api.account.request.NewAccountRequest;
 
 @RunWith(Enclosed.class)
 public class AccountTest {
 
     @RunWith(Enclosed.class)
-    public static class アカウント作成 {
+    public static class createのテスト {
 
-        @RunWith(SpringJUnit4ClassRunner.class)
-        @SpringApplicationConfiguration({SpringbootTodoApplication.class})
-        @WebAppConfiguration
-        public static class postアクセス {
+        public static class 入力値が正常な場合 {
 
-            @Rule
-            public final MockitoRule rule = MockitoJUnit.rule();
-
-            @InjectMocks
             private Account sut = null;
 
-            @Mock
-            private CreateNewAccount createNewAccount;
-            
-            @Autowired
-            private HandlerExceptionResolver handlerExceptionResolver;
+            private CreateNewAccount mockCreateAccount = null;
+            private Encryption mockEncryption = null;
+            private CreateNewAccount.Result mockUseCaseResult = null;
 
-            @Autowired
-            private FilterChainProxy springSecurityFilterChain;
+            private LoginId expectedLoginId = null;
+            private UserName expectedUserName = null;
+            private Password expectedPassword = null;
 
-
-            @Mock
-            private Encryption encryption;
-
-            private MockMvc mockMvc;
+            private ResponseEntity<Object> actual = null;
+            private LoginId actualLoginId = null;
+            private UserName actualUserName = null;
+            private Password actualPassword = null;
 
             @Before
             public void setUp() {
 
-                this.mockMvc = MockMvcBuilders.standaloneSetup(sut)
-                        .apply(springSecurity(springSecurityFilterChain))
-                        .setHandlerExceptionResolvers(handlerExceptionResolver).build();
+                mockCreateAccount = Mockito.mock(CreateNewAccount.class);
+                mockEncryption = Mockito.mock(Encryption.class);
+                mockUseCaseResult = Mockito.mock(CreateNewAccount.Result.class);
+
+                expectedLoginId = new LoginId("test-login");
+                expectedUserName = new UserName("テストユーザ");
+                expectedPassword = new Password("test-password");
+
+                Mockito.when(mockEncryption.encrypt(Mockito.anyString())).thenReturn(expectedPassword);
+
+                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
+                Mockito
+                    .when(mockCreateAccount.create(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .then(new Answer<CreateNewAccount.Result>() {
+
+                        @Override
+                        public Result answer(InvocationOnMock invocation) throws Throwable {
+
+                            actualLoginId = invocation.getArgumentAt(0, LoginId.class);
+                            actualUserName = invocation.getArgumentAt(1, UserName.class);
+                            actualPassword = invocation.getArgumentAt(2, Password.class);
+                            return mockUseCaseResult;
+                        }
+                    });
+
+                sut = new Account(mockCreateAccount, mockEncryption);
+
+                final NewAccountRequest request = new NewAccountRequest();
+                request.setLoginId(expectedLoginId.getValue());
+                request.setUserName(expectedUserName.getValue());
+                request.setPassword(expectedPassword.getValue());
+
+                actual = sut.create(request);
             }
 
             @Test
-            public void 入力値が正常な場合はCreatedが帰ってくる() throws Exception {
+            public void ステータスはCREATED() {
 
-                final NewAccountRequest request = new NewAccountRequest();
-                request.setLoginId("test-user");
-                request.setUserName("テストユーザ");
-                request.setPassword("password");
-
-                final Password passwordData = new Password(request.getPassword());
-                Mockito.when(encryption.encrypt(Mockito.anyObject())).thenReturn(passwordData);
-                Mockito.when(createNewAccount.create(LoginIdArgMatcher.arg(request.getLoginId()),
-                        UserNameArgMatcher.arg(request.getUserName()), PasswordArgMatcher.arg(passwordData)))
-                        .thenReturn(new ResultMock(new ValidateErrors()));
-
-                this.mockMvc.perform(TestTool.postApi(request)).andExpect(status().isCreated());
+                assertThat(actual.getStatusCode(), is(HttpStatus.CREATED));
             }
 
             @Test
-            public void 入力不備がある場合はBadRequestが帰ってくる() throws Exception {
+            public void 設定された内容が保存される()  {
 
-                final NewAccountRequest request = new NewAccountRequest();
-                request.setLoginId("");
-                request.setUserName("");
-                request.setPassword("");
+                assertThat(actualLoginId.getValue(), is(expectedLoginId.getValue()));
+                assertThat(actualUserName.getValue(), is(expectedUserName.getValue()));
+                assertThat(actualPassword.getValue(), is(expectedPassword.getValue()));
+            }
+        }
 
-                final ValidateErrors expectedErrors = new ValidateErrors();
+        public static class 入力値が不正な場合 {
+
+            private Account sut = null;
+
+            private CreateNewAccount mockCreateAccount = null;
+            private Encryption mockEncryption = null;
+            private CreateNewAccount.Result mockUseCaseResult = null;
+
+            private ValidateErrors expectedErrors = null;
+
+            @Before
+            public void setUp() {
+
+                mockCreateAccount = Mockito.mock(CreateNewAccount.class);
+                mockEncryption = Mockito.mock(Encryption.class);
+                mockUseCaseResult = Mockito.mock(CreateNewAccount.Result.class);
+
+                expectedErrors = new ValidateErrors();
                 expectedErrors.add(new ValidateError(ErrorInfo.Required, LoginId.LABEL));
                 expectedErrors.add(new ValidateError(ErrorInfo.Required, UserName.LABEL));
                 expectedErrors.add(new ValidateError(ErrorInfo.Required, Password.LABEL));
 
-                final Password passwordData = new Password(request.getPassword());
-                Mockito.when(encryption.encrypt(Mockito.anyObject())).thenReturn(passwordData);
-                Mockito.when(createNewAccount.create(LoginIdArgMatcher.arg(request.getLoginId()),
-                        UserNameArgMatcher.arg(request.getUserName()), PasswordArgMatcher.arg(passwordData)))
-                        .thenReturn(new ResultMock(expectedErrors));
+                Mockito.when(mockEncryption.encrypt(Mockito.anyString())).thenReturn(Password.empty());
+                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
+                Mockito
+                    .when(mockCreateAccount.create(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(mockUseCaseResult);
 
-                this.mockMvc.perform(TestTool.postApi(request)).andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.errors[0]", is(expectedErrors.toList().get(0).getMessage())))
-                        .andExpect(jsonPath("$.errors[1]", is(expectedErrors.toList().get(1).getMessage())))
-                        .andExpect(jsonPath("$.errors[2]", is(expectedErrors.toList().get(2).getMessage())));
-            }
-        }
-
-        @RunWith(SpringJUnit4ClassRunner.class)
-        @SpringApplicationConfiguration(SpringbootTodoApplication.class)
-        @WebAppConfiguration
-        public static class 許可されないアクセス {
-
-            @Autowired
-            private WebApplicationContext wac;
-
-            private MockMvc mockMvc;
-
-            @Before
-            public void setUp() {
-
-                this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
+                sut = new Account(mockCreateAccount, mockEncryption);
             }
 
             @Test
-            public void getアクセス() throws Exception {
+            public void InvalidRequestExceptionがスローされる() {
 
-                this.mockMvc.perform(get(ApiPaths.Account.PATH)).andExpect(status().isMethodNotAllowed());
-            }
+                try {
 
-            @Test
-            public void putアクセス() throws Exception {
+                    sut.create(new NewAccountRequest());
+                    fail();
+                } catch (final InvalidRequestException exception) {
 
-                this.mockMvc.perform(put(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
-            }
+                    final ValidateErrors actualErrors = exception.getErrors();
 
-            @Test
-            public void deleteアクセス() throws Exception {
+                    for (int i = 0; i < actualErrors.toList().size(); i++) {
 
-                this.mockMvc.perform(delete(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
-            }
-
-            @Test
-            public void patchアクセス() throws Exception {
-
-                this.mockMvc.perform(patch(ApiPaths.Account.PATH).with(csrf())).andExpect(status().isMethodNotAllowed());
+                        final String actualMessage = actualErrors.toList().get(i).getMessage();
+                        final String expectedMessage = expectedErrors.toList().get(i).getMessage();
+                        assertThat(actualMessage, is(expectedMessage));
+                    }
+                }
             }
         }
     }
 
-    private static class TestTool {
-
-        private static RequestBuilder postApi(final NewAccountRequest request) {
-
-            return post(ApiPaths.Account.PATH).param("loginId", request.getLoginId())
-                    .param("userName", request.getUserName()).param("password", request.getPassword()).with(csrf());
-        }
-    }
-
-    private static class ResultMock extends Result {
-
-        public ResultMock(final ValidateErrors errors) {
-
-            super(errors);
-        }
-    }
 }
