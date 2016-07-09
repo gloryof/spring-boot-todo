@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t apache:web01 .
+docker build --build-arg tz=Asia/Tokyo  -t apache:web01 .
