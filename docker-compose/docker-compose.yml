@@ -1,0 +1,70 @@
+version: '2'
+services:
+  web:
+    build: ./apache
+    image: spring-todo:web01
+    container_name: web01
+    ports:
+      - "80:80"
+    env_file:
+      - ./env/common.env
+  db:
+    build: ./postgres
+    image: spring-todo:db01
+    container_name: db01
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./env/common.env
+    environment:
+      - POSTGRES_USER=postgres
+      - LC_ALL=C.UTF-8
+    volumes_from:
+      - datas
+  datas:
+    image: busybox
+    container_name: datas01
+    volumes:
+      - /var/lib/spring-boot-todo/datas/postgres
+  db-migration:
+    build: ./flyway
+    depends_on:
+      - db
+    image: spring-todo:flyway
+    container_name: flyway
+    env_file:
+      - ./env/common.env
+    environment:
+       - TARGET_IP=db
+       - TARGET_PORT=5432
+       - TARGET_DB=boot-todo
+       - DB_USER=todo-user
+       - DB_PASSWORD=todo_user
+       - DDL_PATH=/var/lib/spring-todo/git/spring-boot-todo/env/init/db/ddl
+    volumes:
+       - /var/lib/spring-todo/git:/var/lib/spring-todo/git
+  redis:
+    image: redis:latest
+    container_name: redis01
+    ports:
+      - "6379:6379"
+    env_file:
+      - ./env/common.env
+  app:
+    build:
+      context: ./app
+      args:
+        appPort: 8080
+    depends_on:
+      - db
+      - redis
+    image: spring-todo:app
+    container_name: app01
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./env/common.env
