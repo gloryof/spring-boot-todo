@@ -1,13 +1,12 @@
 #!/bin/sh
-
-if [ ! -e /var/lib/spring-todo/git/spring-boot-todo ]; then
-    cd /var/lib/spring-todo/git/
-    git clone -q https://github.com/gloryof/spring-boot-todo
-else
-    cd /var/lib/spring-todo/git/spring-boot-todo
-    git pull
-fi
+cd /var/lib/spring-todo/git/
 
 MIGRATE_URL=jdbc:postgresql://${TARGET_IP}:${TARGET_PORT}/${TARGET_DB}
+
+
+until psql -h "${TARGET_IP}" -d "${TARGET_DB}" -U "${DB_USER}" -c '\l'; do
+    >&2 echo "Postgres is unavailable - sleeping"
+    sleep 1
+done
 
 flyway -url=${MIGRATE_URL} -user=${DB_USER} -password=${DB_PASSWORD} -locations=filesystem:${DDL_PATH} migrate
