@@ -17,6 +17,7 @@ services:
     env_file:
       - ./env/common.env
     environment:
+      - PGDATA=/var/lib/spring-boot-todo/datas/postgres
       - POSTGRES_USER=postgres
       - LC_ALL=C.UTF-8
     volumes_from:
