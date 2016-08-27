@@ -7,6 +7,8 @@ services:
       - "80:80"
     env_file:
       - ./env/common.env
+    networks:
+      - todo-net
   web:
     build: ./apache
     image: spring-todo:web01
@@ -14,6 +16,10 @@ services:
       - ./env/common.env
     ports:
       - "80"
+    networks:
+      todo-net:
+        aliases:
+          - todo-web
   db:
     build: ./postgres
     image: spring-todo:db01
@@ -28,6 +34,8 @@ services:
       - LC_ALL=C.UTF-8
     volumes_from:
       - datas
+    networks:
+      - todo-net
   datas:
     image: busybox
     container_name: datas01
@@ -50,11 +58,15 @@ services:
        - DDL_PATH=/var/lib/spring-todo/git/spring-boot-todo/env/init/db/ddl
     volumes:
        - /var/lib/spring-todo/git:/var/lib/spring-todo/git
+    networks:
+      - todo-net
   redis:
     image: redis:latest
     container_name: redis01
     env_file:
       - ./env/common.env
+    networks:
+      - todo-net
   app:
     build:
       context: ./app
@@ -72,3 +84,9 @@ services:
       - ./env/common.env
     ports:
       - "8080"
+    networks:
+      todo-net:
+        aliases:
+          - todo-app
+networks:
+  todo-net:
