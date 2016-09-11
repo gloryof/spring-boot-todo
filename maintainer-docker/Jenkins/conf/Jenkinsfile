@@ -1,6 +1,6 @@
 node {
    stage 'Setup'
-   def mvnHome = tool 'Maven3'
+   def mvnHome = tool 'maven3'
 
    stage 'Checkout'
    git url: 'https://github.com/gloryof/spring-boot-todo'
