@@ -56,8 +56,6 @@ services:
        - DB_USER=todo-user
        - DB_PASSWORD=todo_user
        - DDL_PATH=/var/lib/spring-todo/git/spring-boot-todo/env/init/db/ddl
-    volumes:
-       - /var/lib/spring-todo/git:/var/lib/spring-todo/git
     networks:
       - todo-net
   redis:

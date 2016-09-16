@@ -12,8 +12,7 @@ ENV PATH /flyway-4.0.3:$PATH
 COPY exec-migrate.sh /usr/local/bin/exec-migrate.sh
 RUN chmod a+x /usr/local/bin/exec-migrate.sh
 
+WORKDIR /var/lib/spring-todo/git
 RUN git clone -q https://github.com/gloryof/spring-boot-todo
-
-VOLUME /var/lib/spring-todo/git
 
 CMD ["/usr/local/bin/exec-migrate.sh"]
