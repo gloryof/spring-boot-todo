@@ -1,0 +1,43 @@
+version: '2'
+services:
+  db:
+    build: ./postgres
+    image: todo-maintainer:postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./env/common.env
+    environment:
+      - POSTGRES_USER=postgres
+      - LC_ALL=C.UTF-8
+  jenkins:
+    build: ./jenkins
+    image: todo-maintainer:jenkins
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./env/common.env
+  zabbix:
+    build: ./zabbix
+    image: todo-maintainer:zabbix
+    container_name: zabbix-server
+    depends_on:
+      - db
+    env_file:
+      - ./env/common.env
+      - ./zabbix/env/user-password.env
+    environment:
+      - DB_SERVER_HOST=db
+  zabbix-web:
+    build: ./zabbix-web
+    image: todo-maintainer:zabbix-web
+    depends_on:
+      - db
+      - zabbix
+    ports:
+      - "80:80"
+    env_file:
+      - ./env/common.env
+      - ./zabbix/env/user-password.env
+    environment:
+      - DB_SERVER_HOST=db
