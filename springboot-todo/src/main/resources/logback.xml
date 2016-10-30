@@ -3,7 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-	<property name="LOG_BASE_DIR" value="/var/log/devlopment/spring-todo/"/>
+	<property name="LOG_BASE_DIR" value="/var/log/development/spring-todo"/>
 	<property name="ARCIVE_BASE_DIR" value="/var/log/devlopment/spring-todo/%d{yyyy-MM-dd}/"/>
 	<property name="PERFOMANCE_FORMAT" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t]%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
