@@ -1,0 +1,36 @@
+version: '2'
+services:
+  db:
+    build: ./postgres
+    image: web-api-test:db
+    container_name: db01
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./env/common.env
+    environment:
+      - PGDATA=/var/lib/spring-boot-todo/datas/postgres
+      - POSTGRES_USER=postgres
+      - LC_ALL=C.UTF-8
+  redis:
+    image: redis:latest
+    container_name: redis01
+    env_file:
+      - ./env/common.env
+  app:
+    build:
+      context: ./app
+      args:
+        appPort: 8080
+    depends_on:
+      - db
+      - redis
+    image: web-api-test:app
+    environment:
+      - APP_PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./env/common.env
+    ports:
+      - "8080:8080"
