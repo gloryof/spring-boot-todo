@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.repository.UserRepository;
@@ -13,6 +12,7 @@ import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
+import jp.glory.infra.db.annotation.DbRepository;
 import jp.glory.infra.db.user.dao.UsersDao;
 import jp.glory.infra.db.user.entity.UsersTable;
 
@@ -22,7 +22,7 @@ import jp.glory.infra.db.user.entity.UsersTable;
  * @author Junki Yamada
  *
  */
-@Repository
+@DbRepository
 public class UserRepositoryDbImpl implements UserRepository {
 
     /**

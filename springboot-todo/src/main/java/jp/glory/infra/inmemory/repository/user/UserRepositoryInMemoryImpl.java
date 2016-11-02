@@ -6,21 +6,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Repository;
-
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.repository.UserRepository;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
+import jp.glory.infra.inmemory.repository.annotation.InMemoryRepository;
 
 /**
  * インメモリで保持するユーザリポジトリ.
  * @author Junki Yamada
  *
  */
-@Repository
+@InMemoryRepository
 public class UserRepositoryInMemoryImpl implements UserRepository {
 
     /**

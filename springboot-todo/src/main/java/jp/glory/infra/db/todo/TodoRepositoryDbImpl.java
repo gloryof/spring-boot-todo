@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
@@ -14,6 +13,7 @@ import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
+import jp.glory.infra.db.annotation.DbRepository;
 import jp.glory.infra.db.todo.dao.TodosDao;
 import jp.glory.infra.db.todo.dao.TodosDetailDao;
 import jp.glory.infra.db.todo.entity.TodoInfo;
@@ -25,7 +25,7 @@ import jp.glory.infra.db.todo.entity.TodosTable;
  * @author Junki Yamada
  *
  */
-@Repository
+@DbRepository
 public class TodoRepositoryDbImpl implements TodoRepository {
 
     /**

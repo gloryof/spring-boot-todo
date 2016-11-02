@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Repository;
-
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
 import jp.glory.domain.todo.repository.TodoRepository;
@@ -15,13 +13,14 @@ import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
+import jp.glory.infra.inmemory.repository.annotation.InMemoryRepository;
 
 /**
  * インメモリで保持するTodoリポジトリ.
  * @author Junki Yamada
  *
  */
-@Repository
+@InMemoryRepository
 public class TodoRepositoryInMemoryImpl implements TodoRepository {
 
     /**
