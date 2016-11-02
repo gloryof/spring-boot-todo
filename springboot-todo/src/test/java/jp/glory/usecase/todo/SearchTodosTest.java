@@ -38,7 +38,7 @@ public class SearchTodosTest {
             LongStream.rangeClosed(1, 100).mapToObj(v -> {
 
                 return new Todo(new TodoId(v), UserId.notNumberingValue(), Summary.empty(), Memo.empty(), true);
-            }).forEach(mock::save);
+            }).forEach(mock::addTestData);
             sut = new SearchTodo(mock);
         }
 
@@ -68,7 +68,7 @@ public class SearchTodosTest {
                 final UserId userId = new UserId(v % 10);
 
                 return new Todo(new TodoId(v), userId, Summary.empty(), Memo.empty(), true);
-            }).forEach(mock::save);
+            }).forEach(mock::addTestData);
             sut = new SearchTodo(mock);
         }
 

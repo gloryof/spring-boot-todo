@@ -117,7 +117,7 @@ public class SaveTodoTest {
                 mockRepository = new TodoRepositoryMock();
                 final Todo beforeTodo = new Todo(new TodoId(expectedTodoIdVal), new UserId(2000l),
                         new Summary("before"), new Memo("メモ"), true);
-                mockRepository.save(beforeTodo);
+                mockRepository.addTestData(beforeTodo);
  
                 sut = new SaveTodo(mockRepository);
 

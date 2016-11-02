@@ -41,7 +41,7 @@ public class TodoSaveUpdateValidteRuleTest {
             saveTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("あたらいしタイトル"), new Memo("新しいメモ"), false);
 
             repositoryMock = new TodoRepositoryMock();
-            repositoryMock.save(beforeTodo);
+            repositoryMock.addTestData(beforeTodo);
 
             sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
 
@@ -71,7 +71,7 @@ public class TodoSaveUpdateValidteRuleTest {
             saveTodo = new Todo(TodoId.notNumberingValue(), UserId.notNumberingValue(), Summary.empty(), Memo.empty(), false);
 
             repositoryMock = new TodoRepositoryMock();
-            repositoryMock.save(beforeTodo);
+            repositoryMock.addTestData(beforeTodo);
 
             sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
 
@@ -145,7 +145,7 @@ public class TodoSaveUpdateValidteRuleTest {
                     beforeTodo.isCompleted());
 
             repositoryMock = new TodoRepositoryMock();
-            repositoryMock.save(beforeTodo);
+            repositoryMock.addTestData(beforeTodo);
 
             sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
 
