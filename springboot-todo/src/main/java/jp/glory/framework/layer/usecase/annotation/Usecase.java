@@ -1,4 +1,4 @@
-package jp.glory.framework.layer.annotation;
+package jp.glory.framework.layer.usecase.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

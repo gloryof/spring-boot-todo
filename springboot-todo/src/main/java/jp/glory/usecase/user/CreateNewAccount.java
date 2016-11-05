@@ -10,7 +10,7 @@ import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
-import jp.glory.framework.layer.annotation.Usecase;
+import jp.glory.framework.layer.usecase.annotation.Usecase;
 import lombok.Getter;
 
 /**

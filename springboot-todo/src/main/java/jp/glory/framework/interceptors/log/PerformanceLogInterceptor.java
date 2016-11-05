@@ -30,7 +30,7 @@ public class PerformanceLogInterceptor {
     /**
      * ユースケースポイントカット.
      */
-    @Pointcut("@within(jp.glory.framework.layer.annotation.Usecase)")
+    @Pointcut("@within(jp.glory.framework.layer.usecase.annotation.Usecase)")
     public void pointCutUseCase() { }
 
     /**
