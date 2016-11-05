@@ -1,1 +1,10 @@
-java -jar springboot-todo-1.0.0-SNAPSHOT.jar --spring.config.location=/Users/gloryof/git/spring-boot-todo/env/conf/local/conf.yml --server.port=8080 --spring.redis.host=localhost --spring.redis.port=6379
+java
+	-jar springboot-todo-1.0.0-SNAPSHOT.jar \
+	--spring.config.location=/Users/gloryof/git/spring-boot-todo/env/conf/local/conf.yml \
+	--server.port=8080 \
+	--spring.redis.host=localhost \
+	--spring.redis.port=6379
+
+
+[optional]
+	--spring.profiles.active="in-memory"
