@@ -3,17 +3,23 @@ package jp.glory.web.api.account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserName;
 import jp.glory.framework.web.exception.InvalidRequestException;
+import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
 import jp.glory.infra.encryption.Encryption;
 import jp.glory.usecase.user.CreateNewAccount;
 import jp.glory.usecase.user.CreateNewAccount.Result;
@@ -29,6 +35,7 @@ import jp.glory.web.api.account.request.NewAccountRequest;
 @RestController
 @RequestMapping(value = ApiPaths.Account.PATH)
 @Scope(value = WebApplicationContext.SCOPE_REQUEST)
+@Api(tags = {"Account Operation"})
 public class Account {
 
     /**
@@ -61,7 +68,15 @@ public class Account {
      *            アカウント作成リクエスト
      * @return 正常に登録できた場合:Created、入力不備がある場合：Bad Reauest
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation(
+            value = "アカウント作成",
+            notes="**[概要]**  \r\n新規ユーザとしてアカウントを登録する。\r\n\r\n**[事前条件]**\r\n- なし\r\n\r\n**[事後条件]**\r\n - アカウントが作成される\r\n - 作成されたアカウントでログインできる"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "正常に登録できた場合"),
+            @ApiResponse(code = 400, message = "入力不備がある場合", response = InvalidErrorResponse.class)
+    })
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> create(final NewAccountRequest requst) {
 
         final ValidateErrors errors = executeCreating(requst);
