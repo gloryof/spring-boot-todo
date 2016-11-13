@@ -2,6 +2,7 @@ package jp.glory.framework.doc.api;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -29,6 +30,7 @@ public class ApiDocConf {
                 .select()
                     .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                     .build()
-                .useDefaultResponseMessages(false);
+                .useDefaultResponseMessages(false)
+                .ignoredParameterTypes(AuthenticationPrincipal.class);
     }
 }
