@@ -1,7 +1,6 @@
 package jp.glory.web.api.account.request;
 
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +19,7 @@ public class NewAccountRequest {
     @Setter
     private String loginId;
 
-    @ApiParam(
+    @ApiModelProperty(
             value = "[項目名]  \r\nユーザ名\r\n\r\n[制限]\r\n- 必須\r\n- 50文字以下\r\n- 登録されている値と重複していないこと",
             required = true)
     @Getter
@@ -30,7 +29,7 @@ public class NewAccountRequest {
     /** パスワード. */
     @Getter
     @Setter
-    @ApiParam(
+    @ApiModelProperty(
             value = "[項目名]  \r\nパスワード\r\n\r\n[制限]\r\n- 必須\r\n- 半角文字のみ",
             required = true)
     private String password;
