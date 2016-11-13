@@ -3,6 +3,8 @@ package jp.glory.framework.web.exception.handler.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 /**
@@ -10,11 +12,13 @@ import lombok.Getter;
  * @author Junki Yamada
  *
  */
+@ApiModel
 public class InvalidErrorResponse {
 
     /**
      * エラーメッセージリスト.
      */
     @Getter
+    @ApiModelProperty
     private final List<String> errors = new ArrayList<>();
 }
