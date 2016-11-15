@@ -4,16 +4,15 @@
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
 	<property name="LOG_BASE_DIR" value="/var/log/development/spring-todo"/>
-	<property name="ARCIVE_BASE_DIR" value="/var/log/devlopment/spring-todo/%d{yyyy-MM-dd}/"/>
+	<property name="ARCIVE_BASE_DIR" value="/var/log/development/spring-todo/%d{yyyy-MM-dd}/"/>
 	<property name="PERFOMANCE_FORMAT" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t]%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
 	<appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder>
 			<pattern>${FILE_LOG_PATTERN}</pattern>
 		</encoder>
-		<file>${LOG_BASE_DIR}/info.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${ARCIVE_BASE_DIR}/info.%d.log</fileNamePattern>
+			<fileNamePattern>${ARCIVE_BASE_DIR}/info.log</fileNamePattern>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 	</appender>	
@@ -22,9 +21,8 @@
 		<encoder>
 			<pattern>${PERFOMANCE_FORMAT}</pattern>
 		</encoder>
-		<file>${LOG_BASE_DIR}/performance.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${ARCIVE_BASE_DIR}/info.%d.log</fileNamePattern>
+			<fileNamePattern>${ARCIVE_BASE_DIR}/performance.log</fileNamePattern>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 	</appender>	
