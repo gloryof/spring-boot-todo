@@ -1,5 +1,6 @@
 package jp.glory.web.api.todo.response;
 
+import io.swagger.annotations.ApiModelProperty;
 import jp.glory.domain.todo.entity.Todos;
 import lombok.Getter;
 
@@ -11,22 +12,16 @@ import lombok.Getter;
  */
 public class TodoStatistics {
 
-    /**
-     * 合計件数.
-     */
     @Getter
+    @ApiModelProperty(value = "TODOの合計件数", notes = "実行済み件数 + 未実行件数となる。",  required = true, readOnly = true)
     private final int total;
 
-    /**
-     * 実行済件数.
-     */
     @Getter
+    @ApiModelProperty(value = "実行済み件数", notes = "実行済みのTODOの件数。",  required = true, readOnly = true)
     private final int executed;
 
-    /**
-     * 未実行件数.
-     */
     @Getter
+    @ApiModelProperty(value = "未実行件数", notes = "未実行件数のTODOの件数。",  required = true, readOnly = true)
     private final int unexecuted;
 
     /**

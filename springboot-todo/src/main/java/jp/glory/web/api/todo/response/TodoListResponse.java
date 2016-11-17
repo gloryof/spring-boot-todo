@@ -3,6 +3,7 @@ package jp.glory.web.api.todo.response;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.swagger.annotations.ApiModelProperty;
 import jp.glory.domain.todo.entity.Todos;
 import lombok.Getter;
 
@@ -14,16 +15,12 @@ import lombok.Getter;
  */
 public class TodoListResponse {
 
-    /**
-     * TODOのリスト.
-     */
     @Getter
+    @ApiModelProperty(value = "TODOリスト", required = true, readOnly = true)
     private final List<TodoDetailResponse> details;
 
-    /**
-     * 統計.
-     */
     @Getter
+    @ApiModelProperty(value = "TODOの統計情報", notes = "件数に関する情報を保持する。",  required = true, readOnly = true)
     private final TodoStatistics statistics;
 
     /**

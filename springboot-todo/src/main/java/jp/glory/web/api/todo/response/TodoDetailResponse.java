@@ -1,5 +1,6 @@
 package jp.glory.web.api.todo.response;
 
+import io.swagger.annotations.ApiModelProperty;
 import jp.glory.domain.todo.entity.Todo;
 import lombok.Getter;
 
@@ -11,34 +12,24 @@ import lombok.Getter;
  */
 public class TodoDetailResponse {
 
-    /**
-     * TODOのID.
-     */
     @Getter
+    @ApiModelProperty(value = "ID", position = -1, required = true, readOnly = true)
     private final long id;
 
-    /**
-     * 概要.
-     */
     @Getter
+    @ApiModelProperty(value = "概要", notes = "改行は含まれない",  required = true, readOnly = true)
     private final String summary;
 
-    /**
-     * メモ.
-     */
     @Getter
+    @ApiModelProperty(value = "メモ", notes = "改行が含まれる",  readOnly = true)
     private final String memo;
 
-    /**
-     * 完了フラグ.
-     */
     @Getter
+    @ApiModelProperty(value = "完了フラグ", notes = "完了している場合：true  \r\n完了していない場合：false",  required = true, readOnly = true)
     private final boolean completed;
 
-    /**
-     * バージョン.
-     */
     @Getter
+    @ApiModelProperty(value = "バージョン", notes = "更新バージョン。  \r\n更新が行われるたびにインクリメントされる",  required = true, readOnly = true)
     private final long version;
 
     /**
