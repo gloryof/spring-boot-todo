@@ -88,13 +88,6 @@ public class TodoDetail {
         return new ResponseEntity<>(new TodoDetailResponse(optTodo.get()), HttpStatus.OK);
     }
 
-    /**
-     * TODOを更新する.
-     * @param id TODOのID
-     * @param request TODO保存リクエスト
-     * @param userInfo ユーザ情報
-     * @return 保存レスポンス
-     */
     @ApiOperation(
             value = "TODO更新",
             notes="**[概要]**  \r\nTODOを更新する  \r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n- 対象のTODOがすでに登録されている\r\n\r\n**[事後条件]**\r\n - 入力した内容で保存される"
@@ -103,7 +96,7 @@ public class TodoDetail {
         @ApiResponse(code = 400, message = "入力不備がある場合", response = InvalidErrorResponse.class),
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合"),
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<Object> save(@PathVariable @ApiParam(value = "TODOのID", required = true) final long id,
             final TodoDetailSaveRequest request,
             @AuthenticationPrincipal final UserInfo userInfo) {
