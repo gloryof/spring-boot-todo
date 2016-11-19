@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +14,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.framework.web.exception.InvalidRequestException;
+import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
 import jp.glory.usecase.todo.SaveTodo;
 import jp.glory.usecase.todo.SearchTodo;
 import jp.glory.web.api.ApiPaths;
@@ -34,6 +41,7 @@ import jp.glory.web.session.UserInfo;
 @RestController
 @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST)
 @RequestMapping(path = ApiPaths.Todo.PATH + "/{id}")
+@Api(tags = {"Todo Detail Operation"})
 public class TodoDetail {
 
     /**
@@ -58,13 +66,15 @@ public class TodoDetail {
         this.saveTodo = saveTodo;
     }
 
-    /**
-     * TODOを表示する.
-     * @param id TODOのID
-     * @return TODOの詳細レスポンス
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<TodoDetailResponse> view(@PathVariable final long id) {
+    @ApiOperation(
+            value = "TODO詳細取得",
+            notes="**[概要]**  \r\nTODOの詳細を取得する  \r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n- 対象のTODOがすでに登録されている\r\n\r\n**[事後条件]**\r\n - TODOが取得できる"
+    )
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "対象のTODOが存在しない場合")
+    })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TodoDetailResponse> view(@PathVariable @ApiParam(value = "TODOのID", required = true) final long id) {
 
         final TodoId todoId = new TodoId(id);
 
@@ -79,14 +89,23 @@ public class TodoDetail {
     }
 
     /**
-     * TODOを保存する.
+     * TODOを更新する.
      * @param id TODOのID
      * @param request TODO保存リクエスト
      * @param userInfo ユーザ情報
      * @return 保存レスポンス
      */
+    @ApiOperation(
+            value = "TODO更新",
+            notes="**[概要]**  \r\nTODOを更新する  \r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n- 対象のTODOがすでに登録されている\r\n\r\n**[事後条件]**\r\n - 入力した内容で保存される"
+    )
+    @ApiResponses({
+        @ApiResponse(code = 400, message = "入力不備がある場合", response = InvalidErrorResponse.class),
+        @ApiResponse(code = 404, message = "対象のTODOが存在しない場合"),
+    })
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<Object> save(@PathVariable final long id, final TodoDetailSaveRequest request,
+    public ResponseEntity<Object> save(@PathVariable @ApiParam(value = "TODOのID", required = true) final long id,
+            final TodoDetailSaveRequest request,
             @AuthenticationPrincipal final UserInfo userInfo) {
 
         if (!isExists(id)) {
