@@ -1,6 +1,9 @@
 package jp.glory.web.api.account.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import jp.glory.domain.user.value.LoginId;
+import jp.glory.domain.user.value.Password;
+import jp.glory.domain.user.value.UserName;
+import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,25 +15,29 @@ import lombok.Setter;
  */
 public class NewAccountRequest {
 
-    @ApiModelProperty(
-            value = "[項目名]  \r\nログインID\r\n\r\n[制限]\r\n- 必須\r\n- 50文字以下\r\n- 半角文字のみ",
-            required = true)
+    @OriginalRequestlDoc(
+            name = "ログインID",
+            validateType = LoginId.class,
+            key = true
+    )
     @Getter
     @Setter
     private String loginId;
 
-    @ApiModelProperty(
-            value = "[項目名]  \r\nユーザ名\r\n\r\n[制限]\r\n- 必須\r\n- 50文字以下\r\n- 登録されている値と重複していないこと",
-            required = true)
+    @OriginalRequestlDoc(
+            name = "ユーザ名",
+            validateType = UserName.class,
+            additionalRestrictions = "登録されている値と重複していないこと"
+    )
     @Getter
     @Setter
     private String userName;
 
-    /** パスワード. */
+    @OriginalRequestlDoc(
+            name = "パスワード",
+            validateType = Password.class
+    )
     @Getter
     @Setter
-    @ApiModelProperty(
-            value = "[項目名]  \r\nパスワード\r\n\r\n[制限]\r\n- 必須\r\n- 半角文字のみ",
-            required = true)
     private String password;
 }

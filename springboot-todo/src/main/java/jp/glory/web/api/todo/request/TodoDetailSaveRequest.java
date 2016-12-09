@@ -1,6 +1,8 @@
 package jp.glory.web.api.todo.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import jp.glory.domain.todo.value.Memo;
+import jp.glory.domain.todo.value.Summary;
+import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,34 +13,36 @@ import lombok.Setter;
  */
 public class TodoDetailSaveRequest {
 
+    @OriginalRequestlDoc(
+            name = "概要",
+            validateType = Summary.class
+    )
     @Setter
     @Getter
-    @ApiModelProperty(
-            value = "[項目名]  \r\n概要\r\n\r\n[制限]\r\n- 必須\r\n- 20文字以下",
-            required = true)
     private String summary;
 
+    @OriginalRequestlDoc(
+            name = "メモ",
+            validateType = Memo.class
+    )
     @Setter
     @Getter
-    @ApiModelProperty(
-            value = "[項目名]  \r\nメモ\r\n\r\n[制限]  \r\n- 1000文字以下",
-            required = false)
     private String memo;
 
+    @OriginalRequestlDoc(
+            name = "完了フラグ",
+            requied = true
+    )
     @Setter
     @Getter
-    @ApiModelProperty(
-            value = "[項目名]  \r\n完了フラグ",
-            required = true)
     private boolean completed;
 
-    /**
-     * バージョン.
-     */
+
+    @OriginalRequestlDoc(
+            name = "バージョン",
+            requied = true
+    )
     @Setter
     @Getter
-    @ApiModelProperty(
-            value = "[項目名]  \r\nバージョン",
-            required = true)
     private long version;
 }

@@ -16,7 +16,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jp.glory.domain.common.error.ValidateErrors;
@@ -24,6 +23,7 @@ import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
 import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
 import jp.glory.usecase.todo.SaveTodo;
@@ -74,7 +74,7 @@ public class TodoDetail {
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合")
     })
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TodoDetailResponse> view(@PathVariable @ApiParam(value = "TODOのID", required = true) final long id) {
+    public ResponseEntity<TodoDetailResponse> view(@PathVariable @OriginalRequestlDoc(name = "TODOのID", key = true) final long id) {
 
         final TodoId todoId = new TodoId(id);
 
@@ -97,7 +97,7 @@ public class TodoDetail {
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合"),
     })
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<Object> save(@PathVariable @ApiParam(value = "TODOのID", required = true) final long id,
+    public ResponseEntity<Object> save(@PathVariable @OriginalRequestlDoc(name = "TODOのID", key = true) final long id,
             final TodoDetailSaveRequest request,
             @AuthenticationPrincipal final UserInfo userInfo) {
 
