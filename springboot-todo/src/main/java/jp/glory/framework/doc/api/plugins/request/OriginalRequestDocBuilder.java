@@ -11,6 +11,7 @@ import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.members.RawField;
 
 import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
+import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.service.ResolvedMethodParameter;
 
@@ -36,15 +37,17 @@ public class OriginalRequestDocBuilder {
 
     /**
      * ビルド.
-     * @return 対象パラメータリスト
+     * @param builder オペレーションビルダー
      */
-    public List<Parameter> build() {
+    public void build(final OperationBuilder builder) {
 
-        return methodParams.stream()
-                           .flatMap(v -> convertTargetParmaeters(v).stream())
-                           .sorted()
-                           .map(v -> v.toSpec())
-                           .collect(Collectors.toList());
+        final List<Parameter> parameters =  methodParams.stream()
+                                                       .flatMap(v -> convertTargetParmaeters(v).stream())
+                                                       .sorted()
+                                                       .map(v -> v.toSpec())
+                                                       .collect(Collectors.toList());
+
+        builder.parameters(parameters);
     }
 
     /**
