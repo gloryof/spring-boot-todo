@@ -4,15 +4,16 @@ import java.util.Optional;
 
 import com.fasterxml.classmate.members.RawField;
 
+import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ResolvedMethodParameter;
 
 /**
- * パラメータの説明.
+ * リクエストの説明.
  * @author Junki Yamada
  *
  */
-class ParameterDescription {
+class RequestDescription {
 
     /**
      * キー項目.
@@ -27,7 +28,7 @@ class ParameterDescription {
     /**
      * パラメータタイプ.
      */
-    private final ParameterType type;
+    private final RequestType type;
 
     /**
      * パラメータのクラス.
@@ -48,12 +49,12 @@ class ParameterDescription {
      * @param param メソッドパラメータ
      * @param optDoc ドキュメントアノテーション
      */
-    ParameterDescription(final ResolvedMethodParameter param, final Optional<OriginalRequestlDoc> optDoc) {
+    RequestDescription(final ResolvedMethodParameter param, final Optional<OriginalRequestlDoc> optDoc) {
 
         this.key = optDoc.map(v -> v.key()).orElse(false);
         this.parameterName = Optional.ofNullable(param.defaultName().orNull())
                 .orElseThrow(() -> new IllegalStateException("parameterName is required."));
-        this.type = ParameterType.typeOf(param);
+        this.type = RequestType.typeOf(param);
         this.parameterClass = param.getParameterType().getErasedType();
         this.label = optDoc.map(v -> v.name()).orElse("");
         this.order = param.getParameterIndex() + 1;
@@ -65,11 +66,11 @@ class ParameterDescription {
      * @param field フィールド情報
      * @param optDoc ドキュメントアノテーション
      */
-    public ParameterDescription(final int order ,final RawField field, final Optional<OriginalRequestlDoc> optDoc) {
+    public RequestDescription(final int order ,final RawField field, final Optional<OriginalRequestlDoc> optDoc) {
 
         this.key = optDoc.map(v -> v.key()).orElse(false);
         this.parameterName = field.getName();
-        this.type = ParameterType.Body;
+        this.type = RequestType.Body;
         this.parameterClass = field.getRawMember().getType();
         this.label = optDoc.map(v -> v.name()).orElse("");
         this.order = order;
@@ -106,7 +107,7 @@ class ParameterDescription {
     /**
      * @return the type
      */
-    ParameterType getType() {
+    RequestType getType() {
         return type;
     }
 

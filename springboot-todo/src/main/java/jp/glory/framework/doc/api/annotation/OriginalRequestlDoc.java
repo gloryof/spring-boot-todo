@@ -1,4 +1,4 @@
-package jp.glory.framework.doc.api.plugins.request;
+package jp.glory.framework.doc.api.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

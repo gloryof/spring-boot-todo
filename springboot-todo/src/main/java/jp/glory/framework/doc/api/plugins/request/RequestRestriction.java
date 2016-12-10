@@ -9,13 +9,14 @@ import jp.glory.domain.common.annotation.Required;
 import jp.glory.domain.common.annotation.ValidCharacters;
 import jp.glory.domain.common.annotation.param.ValidCharcterType;
 import jp.glory.domain.common.type.Validatable;
+import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 
 /**
- * パラメータの制約.
+ * リクエストの制約.
  * @author Junki Yamada
  *
  */
-class ParameterRestriction {
+class RequestRestriction {
 
     /**
      * 制限の有無フラグ.
@@ -46,7 +47,7 @@ class ParameterRestriction {
      * コンストラクタ.
      * @param optDoc ドキュメントアノテーション
      */
-    ParameterRestriction(final Optional<OriginalRequestlDoc> optDoc) {
+    RequestRestriction(final Optional<OriginalRequestlDoc> optDoc) {
 
         final Class<? extends Validatable> validated;
         final List<Boolean> restrictionStatus = new ArrayList<>();

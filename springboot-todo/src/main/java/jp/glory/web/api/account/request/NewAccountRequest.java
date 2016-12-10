@@ -3,7 +3,7 @@ package jp.glory.web.api.account.request;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserName;
-import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
+import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 import lombok.Getter;
 import lombok.Setter;
 

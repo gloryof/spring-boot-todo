@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import springfox.documentation.service.ResolvedMethodParameter;
 
 /**
- * パラメータタイプ.
+ * リクエストタイプ.
  * @author Junki Yamada
  *
  */
-enum ParameterType {
+enum RequestType {
 
     Query,
     Header,
@@ -34,7 +34,7 @@ enum ParameterType {
      * @param param パラメータ内容
      * @return タイプ
      */
-    static ParameterType typeOf(final ResolvedMethodParameter param) {
+    static RequestType typeOf(final ResolvedMethodParameter param) {
 
         if (param.hasParameterAnnotation(PathVariable.class)) {
 

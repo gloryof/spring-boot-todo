@@ -1,7 +1,8 @@
-package jp.glory.framework.doc.api.plugins.request;
+package jp.glory.framework.doc.api.plugins;
 
 import org.springframework.stereotype.Component;
 
+import jp.glory.framework.doc.api.plugins.request.OriginalRequestDocBuilder;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;

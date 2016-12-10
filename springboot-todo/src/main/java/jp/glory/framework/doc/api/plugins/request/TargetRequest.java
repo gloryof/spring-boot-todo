@@ -6,11 +6,11 @@ import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.service.Parameter;
 
 /**
- * 対象パラメータ
+ * 対象リクエスト
  * @author Junki Yamada
  *
  */
-class TargetParameter implements Comparable<TargetParameter> {
+class TargetRequest implements Comparable<TargetRequest> {
 
     /**
      * 改行文字.
@@ -20,19 +20,19 @@ class TargetParameter implements Comparable<TargetParameter> {
     /**
      * パラメータの説明.
      */
-    private final ParameterDescription description;
+    private final RequestDescription description;
 
     /**
      * 制約.
      */
-    private final ParameterRestriction restriction;
+    private final RequestRestriction restriction;
 
     /**
      * コンストラクタ.
      * @param description 説明
      * @param restriction 制約
      */
-    TargetParameter(final ParameterDescription description, final ParameterRestriction restriction) {
+    TargetRequest(final RequestDescription description, final RequestRestriction restriction) {
 
         this.description = description;
         this.restriction = restriction;
@@ -107,7 +107,7 @@ class TargetParameter implements Comparable<TargetParameter> {
     }
 
     @Override
-    public int compareTo(final TargetParameter o) {
+    public int compareTo(final TargetRequest o) {
 
         if (o == null) {
 

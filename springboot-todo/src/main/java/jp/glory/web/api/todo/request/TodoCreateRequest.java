@@ -2,7 +2,7 @@ package jp.glory.web.api.todo.request;
 
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
-import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
+import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 import lombok.Getter;
 import lombok.Setter;
 

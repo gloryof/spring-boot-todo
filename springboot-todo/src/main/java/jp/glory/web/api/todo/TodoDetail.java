@@ -23,7 +23,7 @@ import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
-import jp.glory.framework.doc.api.plugins.request.OriginalRequestlDoc;
+import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
 import jp.glory.usecase.todo.SaveTodo;
