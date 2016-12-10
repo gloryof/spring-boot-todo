@@ -64,7 +64,7 @@ public class OriginalRequestDocBuilder {
             return returnList;
         }
 
-        return createBeanParameters(methodParam);
+        return createBeanRequests(methodParam);
     }
 
     /**
@@ -89,11 +89,11 @@ public class OriginalRequestDocBuilder {
     }
 
     /**
-     * Beanのパラメータリストを作成する.
+     * Beanのリクエストリストを作成する.
      * @param methodParam メソッドパラメータ
-     * @return パラメータリスト
+     * @return リクエストリスト
      */
-    private List<TargetRequest> createBeanParameters(final ResolvedMethodParameter methodParam) {
+    private List<TargetRequest> createBeanRequests(final ResolvedMethodParameter methodParam) {
 
         final ResolvedType paramType = methodParam.getParameterType();
         final List<RawField> fields = paramType.getMemberFields();
