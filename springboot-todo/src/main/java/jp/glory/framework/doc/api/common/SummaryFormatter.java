@@ -1,5 +1,8 @@
 package jp.glory.framework.doc.api.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 文章のフォーマットを行う.<br>
  * GitHub Flavored Markdown(GFM)のフォーマットに変換する.
@@ -7,29 +10,22 @@ package jp.glory.framework.doc.api.common;
  *
  */
 public class SummaryFormatter {
-
+    
     /**
-     * 改行文字.
+     * 文章のリスト.
      */
-    private static final String SEP = "\r\n";
-
-    /**
-     * 行末.
-     */
-    private static final String LINE_END = "  " + SEP;
-
-    /**
-     * ビルダー.
-     */
-    private final StringBuilder builder = new StringBuilder();
+    private final List<Sentence> sentenceList = new ArrayList<>();
 
     /**
      * 文章として追加する.
      * @param value 文字列
      */
-    public void paragraph(final String value) {
+    public Sentence paragraph(final String value) {
 
-        builder.append(value + LINE_END);
+        final Sentence sentence = new Sentence(value);
+        sentenceList.add(sentence);
+
+        return sentence.paragraph();
     }
 
     /**
@@ -37,23 +33,44 @@ public class SummaryFormatter {
      */
     public void insertEmptyRow() {
 
-        builder.append(LINE_END);
+        final Sentence sentence = new Sentence("");
+        sentence.lineBreak();
+        sentenceList.add(sentence);
     }
 
     /**
-     * リストとしてする.
-     * @param value
+     * リストとして追加する.
+     * @param value 文字列
      */
-    public void list(final String value) {
+    public Sentence list(final String value) {
 
-        builder.append("- " + value + SEP);
+        final Sentence sentence = new Sentence(value);
+        sentenceList.add(sentence);
+
+        return sentence.list();
+    }
+
+    /**
+     * 太文字にする.
+     * @param value 文字列
+     */
+    public Sentence bold(final String value) {
+
+        final Sentence sentence = new Sentence(value);
+        sentenceList.add(sentence);
+
+        return sentence.bold();
     }
 
     /**
      * 文字列として出力する.
-     * @return
+     * @return  文字列
      */
     public String output() {
+
+        final StringBuilder builder = new StringBuilder();
+
+        this.sentenceList.forEach(v -> builder.append(v.output()));
 
         return builder.toString();
     }
