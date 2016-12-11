@@ -2,6 +2,7 @@ package jp.glory.framework.doc.api.plugins.request;
 
 import java.util.Arrays;
 
+import jp.glory.framework.doc.api.common.SummaryFormatter;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.service.Parameter;
 
@@ -11,11 +12,6 @@ import springfox.documentation.service.Parameter;
  *
  */
 class TargetRequest implements Comparable<TargetRequest> {
-
-    /**
-     * 改行文字.
-     */
-    private static final String SEP = "\r\n";
 
     /**
      * パラメータの説明.
@@ -61,49 +57,45 @@ class TargetRequest implements Comparable<TargetRequest> {
      */
     private String createDescription() {
 
-        final StringBuilder builder = new StringBuilder();
+        final SummaryFormatter formatter = new SummaryFormatter();
 
-        builder.append("[項目名]  " + SEP);
-        builder.append(description.getLabel() + SEP);
-        builder.append(SEP);
+        formatter.paragraph("[項目名]");
+        formatter.paragraph(description.getLabel());
+        formatter.insertEmptyRow();
 
-        builder.append(createRestrictions());
+        createRestrictions(formatter);
 
-        return builder.toString();
+        return formatter.output();
     }
 
     /**
      * 制限部分を生成する.
-     * @return 制限部分の文字列
+     * @param formatter フォーマッター
      */
-    String createRestrictions() {
-
-        final StringBuilder builder = new StringBuilder();
+    void createRestrictions(final SummaryFormatter formatter) {
 
         if (!restriction.isRestriction()) {
 
-            return builder.toString();
+            return;
         }
 
-        builder.append("[制限]" + SEP);
+        formatter.paragraph("[制限]");
 
         if (restriction.isRequired()) {
 
-            builder.append("- 必須" + SEP);
+            formatter.list("必須");
         }
 
         if (restriction.hasMaxLength()) {
 
-            builder.append("- " + restriction.getMaxLength() + "文字以下" + SEP);
+            formatter.list(restriction.getMaxLength() + "文字以下");
         }
 
         Arrays.stream(restriction.getValidChars())
-              .forEach(v -> builder.append("- " + v.label + SEP));
+              .forEach(v -> formatter.list(v.label));
 
         Arrays.stream(restriction.getAddtionalRestrictions())
-              .forEach(v -> builder.append("- " + v + SEP));
-
-        return builder.toString();
+              .forEach(formatter::list);
     }
 
     @Override

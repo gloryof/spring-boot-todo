@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserName;
+import jp.glory.framework.doc.api.annotation.OriginalOperationDoc;
 import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
 import jp.glory.infra.encryption.Encryption;
@@ -68,9 +68,19 @@ public class Account {
      *            アカウント作成リクエスト
      * @return 正常に登録できた場合:Created、入力不備がある場合：Bad Reauest
      */
+    /*
     @ApiOperation(
             value = "アカウント作成",
             notes="**[概要]**  \r\n新規ユーザとしてアカウントを登録する。\r\n\r\n**[事前条件]**\r\n- なし\r\n\r\n**[事後条件]**\r\n - アカウントが作成される\r\n - 作成されたアカウントでログインできる"
+    )*/
+    @OriginalOperationDoc(
+            name = "アカウント作成",
+            summary = "新規ユーザとしてアカウントに登録する。",
+            ignoreAuth = true,
+            postcondition = {
+                                "アカウントが作成される",
+                                "作成されたアカウントでログインできる"
+                            }
     )
     @ApiResponses({
             @ApiResponse(code = 201, message = "正常に登録できた場合"),
