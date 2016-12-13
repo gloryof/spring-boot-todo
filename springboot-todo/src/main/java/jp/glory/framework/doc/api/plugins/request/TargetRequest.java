@@ -60,7 +60,7 @@ class TargetRequest implements Comparable<TargetRequest> {
         final SummaryFormatter formatter = new SummaryFormatter();
 
         formatter.text("[項目名]").lineBreak();
-        formatter.text(description.getLabel());
+        formatter.text(description.getLabel()).lineBreak();
         formatter.newParagraph();
 
         createRestrictions(formatter);
@@ -79,7 +79,7 @@ class TargetRequest implements Comparable<TargetRequest> {
             return;
         }
 
-        formatter.text("[制限]");
+        formatter.text("[制限]").lineBreak();
 
         if (restriction.isRequired()) {
 
