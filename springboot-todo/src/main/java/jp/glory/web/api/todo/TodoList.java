@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.framework.doc.api.annotation.OriginalOperationDoc;
 import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.usecase.todo.SaveTodo;
 import jp.glory.usecase.todo.SearchTodo;
@@ -62,15 +62,12 @@ public class TodoList {
         this.saveTodo = saveTodo;
     }
 
-    /**
-     * 一覧を表示する.
-     * 
-     * @param userInfo ユーザ情報
-     * @return TODOリスト
-     */
-    @ApiOperation(
-            value = "TODOリスト取得",
-            notes="**[概要]**  \r\nログインしているユーザのTODOのリストを取得する。\r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n\r\n**[事後条件]**\r\n - ログインしているユーザの全てのTODOのリストが取得できる"
+    @OriginalOperationDoc(
+            name = "TODOリスト取得",
+            summary = "ログインしているユーザのTODOのリストを取得する",
+            postcondition = {
+                                "ログインしているユーザの全てのTODOのリストが取得できる"
+                            }
     )
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TodoListResponse> list(@AuthenticationPrincipal final UserInfo userInfo) {
@@ -80,17 +77,15 @@ public class TodoList {
         return new ResponseEntity<TodoListResponse>(response, HttpStatus.OK);
     }
 
-    /**
-     * TODOを新規作成する.
-     * @param request 作成リクエスト
-     * @param userInfo ユーザ情報
-     * @return 入力エラーがない場合：成功レスポンス、入力エラーがある場合：エラーレスポンス
-     */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(
-            value = "TODO新規作成",
-            notes="**[概要]**  \r\nログインしているユーザでTODOを作成する。\r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n\r\n**[事後条件]**\r\n - 新規にTODOが作成される\r\n - 作成されたTODOのIDが返却される\r\n"
+    @OriginalOperationDoc(
+            name = "TODO新規作成",
+            summary = "ログインしているユーザでTODOを作成する",
+            postcondition = {
+                                "新規にTODOが作成される",
+                                "作成されたTODOのIDが返る"
+                            }
     )
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TodoCreateSuccessResponse> save(final TodoCreateRequest request, @AuthenticationPrincipal final UserInfo userInfo) {
 
         final SaveTodo.Result result = saveTodo.save(new Todo(TodoId.notNumberingValue(), userInfo.getUserId(),

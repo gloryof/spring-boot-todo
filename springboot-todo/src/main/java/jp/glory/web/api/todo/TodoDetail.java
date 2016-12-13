@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jp.glory.domain.common.error.ValidateErrors;
@@ -23,6 +22,7 @@ import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
+import jp.glory.framework.doc.api.annotation.OriginalOperationDoc;
 import jp.glory.framework.doc.api.annotation.OriginalRequestlDoc;
 import jp.glory.framework.web.exception.InvalidRequestException;
 import jp.glory.framework.web.exception.handler.response.InvalidErrorResponse;
@@ -66,9 +66,15 @@ public class TodoDetail {
         this.saveTodo = saveTodo;
     }
 
-    @ApiOperation(
-            value = "TODO詳細取得",
-            notes="**[概要]**  \r\nTODOの詳細を取得する  \r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n- 対象のTODOがすでに登録されている\r\n\r\n**[事後条件]**\r\n - TODOが取得できる"
+    @OriginalOperationDoc(
+            name = "TODO詳細取得",
+            summary = "TODOの詳細を取得する",
+            preconditions = {
+                                "対象のTODOがすでに登録されている"
+                            },
+            postcondition = {
+                                "TODOが取得できる"
+                            }
     )
     @ApiResponses({
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合")
@@ -88,9 +94,15 @@ public class TodoDetail {
         return new ResponseEntity<>(new TodoDetailResponse(optTodo.get()), HttpStatus.OK);
     }
 
-    @ApiOperation(
-            value = "TODO更新",
-            notes="**[概要]**  \r\nTODOを更新する  \r\n\r\n**[事前条件]**\r\n- 任意のユーザでログインしている\r\n- 対象のTODOがすでに登録されている\r\n\r\n**[事後条件]**\r\n - 入力した内容で保存される"
+    @OriginalOperationDoc(
+            name = "TODO更新",
+            summary = "TODOを更新する",
+            preconditions = {
+                                "対象のTODOがすでに登録されている"
+                            },
+            postcondition = {
+                                "入力した内容で保存される"
+                            }
     )
     @ApiResponses({
         @ApiResponse(code = 400, message = "入力不備がある場合", response = InvalidErrorResponse.class),

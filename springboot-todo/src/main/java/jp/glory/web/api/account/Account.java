@@ -68,11 +68,6 @@ public class Account {
      *            アカウント作成リクエスト
      * @return 正常に登録できた場合:Created、入力不備がある場合：Bad Reauest
      */
-    /*
-    @ApiOperation(
-            value = "アカウント作成",
-            notes="**[概要]**  \r\n新規ユーザとしてアカウントを登録する。\r\n\r\n**[事前条件]**\r\n- なし\r\n\r\n**[事後条件]**\r\n - アカウントが作成される\r\n - 作成されたアカウントでログインできる"
-    )*/
     @OriginalOperationDoc(
             name = "アカウント作成",
             summary = "新規ユーザとしてアカウントに登録する。",
