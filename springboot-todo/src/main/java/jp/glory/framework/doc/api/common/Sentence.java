@@ -24,11 +24,6 @@ public class Sentence {
     private final String value;
 
     /**
-     * 段落フラグ.
-     */
-    private boolean isParagraph = false;
-
-    /**
      * 改行フラグ.
      */
     private boolean isLineBreak = false;
@@ -50,17 +45,6 @@ public class Sentence {
     Sentence(final String value) {
 
         this.value = value;
-    }
-
-    /**
-     * 段落として設定する.
-     * @return このオブジェクト
-     */
-    public Sentence paragraph() {
-
-        this.isParagraph = true;
-
-        return this;
     }
 
     /**
@@ -118,11 +102,6 @@ public class Sentence {
         }
 
         if (isLineBreak) {
-
-            builder.append(SEP);
-        }
-
-        if (isParagraph) {
 
             builder.append(LINE_END);
         }

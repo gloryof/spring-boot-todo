@@ -1,7 +1,11 @@
 package jp.glory.framework.doc.api.plugins;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
+import jp.glory.framework.doc.api.annotation.OriginalOperationDoc;
+import jp.glory.framework.doc.api.plugins.oeration.OriginalOperationDocBuilder;
 import jp.glory.framework.doc.api.plugins.request.OriginalRequestDocBuilder;
 import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.spi.DocumentationType;
@@ -25,6 +29,10 @@ public class OriginalRequestDocPlugin implements OperationBuilderPlugin {
     public void apply(final OperationContext context) {
 
         final OperationBuilder builder = context.operationBuilder();
+
+        final Optional<OriginalOperationDoc> optOpe = Optional.ofNullable(context.findAnnotation(OriginalOperationDoc.class).orNull());
+        optOpe.ifPresent(v -> new OriginalOperationDocBuilder(v).build(builder));
+
         final OriginalRequestDocBuilder requestBuilder = new OriginalRequestDocBuilder(context.getParameters());
         requestBuilder.build(builder);
 

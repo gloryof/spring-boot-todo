@@ -17,24 +17,25 @@ public class SummaryFormatter {
     private final List<Sentence> sentenceList = new ArrayList<>();
 
     /**
-     * 文章として追加する.
-     * @param value 文字列
+     * 通常のテキストとして追加する.
+     * @param value 値
+     * @return 
      */
-    public Sentence paragraph(final String value) {
+    public Sentence text(final String value) {
 
         final Sentence sentence = new Sentence(value);
         sentenceList.add(sentence);
 
-        return sentence.paragraph();
+        return sentence;
     }
 
     /**
      * 空行を入れる.
      */
-    public void insertEmptyRow() {
+    public void newParagraph() {
 
-        final Sentence sentence = new Sentence("");
-        sentence.lineBreak();
+        final Sentence sentence = new Sentence("").lineBreak();
+
         sentenceList.add(sentence);
     }
 
@@ -44,10 +45,10 @@ public class SummaryFormatter {
      */
     public Sentence list(final String value) {
 
-        final Sentence sentence = new Sentence(value);
+        final Sentence sentence = new Sentence(value).list();
         sentenceList.add(sentence);
 
-        return sentence.list();
+        return sentence;
     }
 
     /**
@@ -56,10 +57,10 @@ public class SummaryFormatter {
      */
     public Sentence bold(final String value) {
 
-        final Sentence sentence = new Sentence(value);
+        final Sentence sentence = new Sentence(value).bold();
         sentenceList.add(sentence);
 
-        return sentence.bold();
+        return sentence;
     }
 
     /**
