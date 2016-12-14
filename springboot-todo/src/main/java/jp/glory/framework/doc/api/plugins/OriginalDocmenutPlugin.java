@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import jp.glory.framework.doc.api.annotation.OriginalOperationDoc;
-import jp.glory.framework.doc.api.plugins.oeration.OriginalOperationDocBuilder;
+import jp.glory.framework.doc.api.plugins.operation.OriginalOperationDocBuilder;
 import jp.glory.framework.doc.api.plugins.request.OriginalRequestDocBuilder;
 import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.spi.DocumentationType;

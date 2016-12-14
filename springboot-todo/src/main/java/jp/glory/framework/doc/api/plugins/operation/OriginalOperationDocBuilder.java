@@ -1,4 +1,4 @@
-package jp.glory.framework.doc.api.plugins.oeration;
+package jp.glory.framework.doc.api.plugins.operation;
 
 import java.util.Arrays;
 
