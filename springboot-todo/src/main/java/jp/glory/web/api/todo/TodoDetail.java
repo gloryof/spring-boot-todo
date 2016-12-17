@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -80,6 +81,7 @@ public class TodoDetail {
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合")
     })
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TodoDetailResponse> view(@PathVariable @OriginalRequestlDoc(name = "TODOのID", key = true) final long id) {
 
         final TodoId todoId = new TodoId(id);
@@ -109,6 +111,7 @@ public class TodoDetail {
         @ApiResponse(code = 404, message = "対象のTODOが存在しない場合"),
     })
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Object> save(@PathVariable @OriginalRequestlDoc(name = "TODOのID", key = true) final long id,
             final TodoDetailSaveRequest request,
             @AuthenticationPrincipal final UserInfo userInfo) {
