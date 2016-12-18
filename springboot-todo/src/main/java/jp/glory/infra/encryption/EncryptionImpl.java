@@ -21,6 +21,11 @@ public class EncryptionImpl implements Encryption {
 
         final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+        if (value == null) {
+
+            return new Password("");
+        }
+
         return new Password(encoder.encode(value));
     }
 
