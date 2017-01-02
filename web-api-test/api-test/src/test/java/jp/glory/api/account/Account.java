@@ -14,6 +14,7 @@ import jp.glory.api.ApiPaths;
 import jp.glory.api.account.request.AccountPostRequest;
 import jp.glory.common.login.LoginExecutor;
 import jp.glory.common.login.LoginResult;
+import jp.glory.common.login.LoginUser;
 import jp.glory.common.request.HeaderValues;
 import jp.glory.common.response.StatusCode;
 import jp.glory.common.setup.Setup;
@@ -52,7 +53,7 @@ public class Account {
 
             final LoginExecutor loginPage = new LoginExecutor(filter);
 
-            final LoginResult respones = loginPage.login(request.getLoginId(), request.getPassword());
+            final LoginResult respones = loginPage.login(LoginUser.as(request.getLoginId(), request.getPassword()));
             assertTrue(respones.isSuccess());
         }
 

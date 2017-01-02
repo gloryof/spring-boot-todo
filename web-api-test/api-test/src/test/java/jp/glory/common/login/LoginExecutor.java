@@ -17,13 +17,16 @@ public class LoginExecutor {
 
     public void login() {
 
-        this.login("test-user", "test-password");
+        this.login(LoginUser.as("test-user", "test-password"));
     }
 
-    public LoginResult login(final String userId, final String password) {
+    public LoginResult login(final LoginUser user) {
 
         final Response response =  given()
-                                        .auth().form(userId, password, new FormAuthConfig("/executeLogin", "username", "password").withCsrfFieldName("_csrf"))
+                                        .auth()
+                                            .form(user.getLoginId(),
+                                                    user.getPassword(),
+                                                    new FormAuthConfig("/executeLogin", "username", "password").withCsrfFieldName("_csrf"))
                                         .filter(filter)
                                     .when()
                                         .get("/todos")

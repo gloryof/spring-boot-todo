@@ -19,6 +19,7 @@ public class AccountPage {
         this.path = given().filter(filter).when().get("/join").andReturn().htmlPath();
     }
 
+
     public CsrfToken getToken() {
 
         return new TokenFinder(path).find();
