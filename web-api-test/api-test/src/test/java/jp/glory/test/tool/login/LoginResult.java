@@ -1,4 +1,4 @@
-package jp.glory.common.login;
+package jp.glory.test.tool.login;
 
 import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;

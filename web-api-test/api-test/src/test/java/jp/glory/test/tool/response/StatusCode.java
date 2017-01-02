@@ -1,4 +1,4 @@
-package jp.glory.common.response;
+package jp.glory.test.tool.response;
 
 public enum StatusCode {
 

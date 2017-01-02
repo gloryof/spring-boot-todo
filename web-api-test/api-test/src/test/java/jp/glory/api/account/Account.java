@@ -12,13 +12,13 @@ import org.junit.runner.RunWith;
 import io.restassured.filter.session.SessionFilter;
 import jp.glory.api.ApiPaths;
 import jp.glory.api.account.request.AccountPostRequest;
-import jp.glory.common.login.LoginExecutor;
-import jp.glory.common.login.LoginResult;
-import jp.glory.common.login.LoginUser;
-import jp.glory.common.request.HeaderValues;
-import jp.glory.common.response.StatusCode;
-import jp.glory.common.setup.Setup;
-import jp.glory.page.AccountPage;
+import jp.glory.test.tool.login.LoginExecutor;
+import jp.glory.test.tool.login.LoginResult;
+import jp.glory.test.tool.login.LoginUser;
+import jp.glory.test.tool.page.AccountPage;
+import jp.glory.test.tool.request.HeaderValues;
+import jp.glory.test.tool.response.StatusCode;
+import jp.glory.test.tool.setup.Setup;
 
 @RunWith(Enclosed.class)
 public class Account {

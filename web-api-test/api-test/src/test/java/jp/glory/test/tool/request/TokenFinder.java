@@ -1,4 +1,4 @@
-package jp.glory.common.request;
+package jp.glory.test.tool.request;
 
 import io.restassured.path.xml.XmlPath;
 

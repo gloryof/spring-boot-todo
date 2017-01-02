@@ -1,4 +1,4 @@
-package jp.glory.page;
+package jp.glory.test.tool.page;
 
 import static io.restassured.RestAssured.given;
 
@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import io.restassured.filter.session.SessionFilter;
 import io.restassured.path.xml.XmlPath;
 import jp.glory.api.account.request.AccountPostRequest;
-import jp.glory.common.request.CsrfToken;
-import jp.glory.common.request.TokenFinder;
+import jp.glory.test.tool.request.CsrfToken;
+import jp.glory.test.tool.request.TokenFinder;
 
 public class AccountPage {
 

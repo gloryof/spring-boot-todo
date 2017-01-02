@@ -1,4 +1,4 @@
-package jp.glory.common.login;
+package jp.glory.test.tool.login;
 
 public class LoginUser {
 

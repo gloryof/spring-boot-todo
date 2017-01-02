@@ -1,4 +1,4 @@
-package jp.glory.common.setup;
+package jp.glory.test.tool.setup;
 
 import java.time.LocalDateTime;
 
