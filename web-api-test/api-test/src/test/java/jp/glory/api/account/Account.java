@@ -1,6 +1,7 @@
 package jp.glory.api.account;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
@@ -53,6 +54,31 @@ public class Account {
 
             final LoginResult respones = loginPage.login(request.getLoginId(), request.getPassword());
             assertTrue(respones.isSuccess());
+        }
+
+        @Test
+        public void 入力チェックエラーがある場合は400エラーになる() {
+
+
+            final SessionFilter filter = new SessionFilter();
+            final AccountPage accountPage = new AccountPage(filter);
+
+            final AccountPostRequest request = accountPage.createEmptyRequest();
+
+            final HeaderValues headers = new HeaderValues();
+            headers.setToken(accountPage.getToken());
+
+            given()
+                .formParams(request.toMap())
+                .headers(headers.toMap())
+                .filter(filter)
+            .when()
+                .post(ApiPaths.Account.PATH)
+            .then()
+                .log().all()
+                .statusCode(StatusCode.BadRequest.getValue())
+                .body("errors.size()", greaterThan(1));
+
         }
     }
 }

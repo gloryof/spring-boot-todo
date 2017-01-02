@@ -35,4 +35,9 @@ public class AccountPage {
 
         return request;
     }
+
+    public AccountPostRequest createEmptyRequest() {
+
+        return new AccountPostRequest();
+    }
 }

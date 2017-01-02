@@ -3,7 +3,8 @@ package jp.glory.common.response;
 public enum StatusCode {
 
     Created(201),
-    Found(302);
+    Found(302),
+    BadRequest(400);
 
     private final int value;
 
