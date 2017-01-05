@@ -12,12 +12,11 @@ import org.junit.runner.RunWith;
 import io.restassured.filter.session.SessionFilter;
 import jp.glory.api.ApiPaths;
 import jp.glory.api.account.request.AccountPostRequest;
-import jp.glory.test.tool.login.LoginExecutor;
-import jp.glory.test.tool.login.LoginResult;
-import jp.glory.test.tool.login.LoginUser;
 import jp.glory.test.tool.page.AccountPage;
 import jp.glory.test.tool.request.HeaderValues;
 import jp.glory.test.tool.response.StatusCode;
+import jp.glory.test.tool.script.login.LoginResult;
+import jp.glory.test.tool.script.login.LoginScript;
 import jp.glory.test.tool.setup.Setup;
 
 @RunWith(Enclosed.class)
@@ -51,10 +50,11 @@ public class Account {
             .then()
                 .statusCode(StatusCode.Created.getValue());
 
-            final LoginExecutor loginPage = new LoginExecutor(filter);
-
-            final LoginResult respones = loginPage.login(LoginUser.as(request.getLoginId(), request.getPassword()));
-            assertTrue(respones.isSuccess());
+            final LoginResult response = LoginScript.as(request.getLoginId())
+                                                    .password(request.getPassword())
+                                                    .filter(filter)
+                                                    .login();
+            assertTrue(response.isSuccess());
         }
 
         @Test
