@@ -20,7 +20,7 @@ import jp.glory.test.tool.script.login.LoginScript;
 import jp.glory.test.tool.setup.Setup;
 
 @RunWith(Enclosed.class)
-public class Account {
+public class AccountTest {
 
     @BeforeClass
     public static void setup() {
