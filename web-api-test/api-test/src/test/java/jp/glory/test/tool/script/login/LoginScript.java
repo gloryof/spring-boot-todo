@@ -22,11 +22,15 @@ public class LoginScript {
         this.loginId = loginId;
     }
 
-    public static LoginScript register(final LoginId loginId, final UserName userName, final Password password) {
+    public static LoginScript register(final String prefixLabel) {
 
         final SessionFilter registerSession = new SessionFilter();
         final AccountPage accountPage = new AccountPage(registerSession);
         final AccountPostRequest request = accountPage.createValidRequest();
+
+        request.setLoginId(prefixLabel + "-" + request.getLoginId());
+        request.setUserName(prefixLabel + "-" + request.getUserName());
+        request.setPassword(prefixLabel + "-" + request.getPassword());
 
         final HeaderValues headers = new HeaderValues();
         headers.setToken(accountPage.getToken());
@@ -44,7 +48,7 @@ public class LoginScript {
             throw new IllegalStateException("アカウント登録に失敗しました。");
         }
 
-        return LoginScript.as(loginId).password(password);
+        return LoginScript.as(new LoginId(request.getLoginId())).password(new Password(request.getPassword()));
     }
 
     public static LoginScript as(final LoginId loginId) {
