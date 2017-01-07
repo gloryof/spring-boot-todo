@@ -5,6 +5,11 @@ import static io.restassured.RestAssured.given;
 import io.restassured.authentication.FormAuthConfig;
 import io.restassured.filter.session.SessionFilter;
 import io.restassured.response.Response;
+import jp.glory.api.ApiPaths;
+import jp.glory.api.account.request.AccountPostRequest;
+import jp.glory.test.tool.page.AccountPage;
+import jp.glory.test.tool.request.HeaderValues;
+import jp.glory.test.tool.response.StatusCode;
 
 public class LoginScript {
 
@@ -17,14 +22,39 @@ public class LoginScript {
         this.loginId = loginId;
     }
 
-    public static LoginScript as(final String loginId) {
+    public static LoginScript register(final LoginId loginId, final UserName userName, final Password password) {
 
-        return new LoginScript(new LoginId(loginId));
+        final SessionFilter registerSession = new SessionFilter();
+        final AccountPage accountPage = new AccountPage(registerSession);
+        final AccountPostRequest request = accountPage.createValidRequest();
+
+        final HeaderValues headers = new HeaderValues();
+        headers.setToken(accountPage.getToken());
+
+        final Response response = given()
+                                     .formParams(request.toMap())
+                                     .headers(headers.toMap())
+                                     .filter(registerSession)
+                                 .when()
+                                     .post(ApiPaths.Account.PATH)
+                                 .andReturn();
+
+        if (response.getStatusCode() != StatusCode.Created.getValue()) {
+
+            throw new IllegalStateException("アカウント登録に失敗しました。");
+        }
+
+        return LoginScript.as(loginId).password(password);
     }
 
-    public LoginScript password(final String password) {
+    public static LoginScript as(final LoginId loginId) {
 
-        this.password = new Password(password);
+        return new LoginScript(loginId);
+    }
+
+    public LoginScript password(final Password password) {
+
+        this.password = password;
 
         return this;
     }

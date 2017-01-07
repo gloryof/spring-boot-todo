@@ -1,10 +1,10 @@
 package jp.glory.test.tool.script.login;
 
-public class Password {
+public class UserName {
 
     private final String value;
 
-    public Password(final String value) {
+    public UserName(final String value) {
 
         this.value = value;
     }

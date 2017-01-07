@@ -4,7 +4,7 @@ public class LoginId {
 
     private final String value;
 
-    LoginId(final String value) {
+    public LoginId(final String value) {
 
         this.value = value;
     }

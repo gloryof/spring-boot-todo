@@ -15,8 +15,10 @@ import jp.glory.api.account.request.AccountPostRequest;
 import jp.glory.test.tool.page.AccountPage;
 import jp.glory.test.tool.request.HeaderValues;
 import jp.glory.test.tool.response.StatusCode;
+import jp.glory.test.tool.script.login.LoginId;
 import jp.glory.test.tool.script.login.LoginResult;
 import jp.glory.test.tool.script.login.LoginScript;
+import jp.glory.test.tool.script.login.Password;
 import jp.glory.test.tool.setup.Setup;
 
 @RunWith(Enclosed.class)
@@ -50,8 +52,8 @@ public class AccountTest {
             .then()
                 .statusCode(StatusCode.Created.getValue());
 
-            final LoginResult response = LoginScript.as(request.getLoginId())
-                                                    .password(request.getPassword())
+            final LoginResult response = LoginScript.as(new LoginId(request.getLoginId()))
+                                                    .password(new Password(request.getPassword()))
                                                     .filter(filter)
                                                     .login();
             assertTrue(response.isSuccess());
