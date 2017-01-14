@@ -2,6 +2,7 @@ package jp.glory.test.tool.response;
 
 public enum StatusCode {
 
+    Ok(200),
     Created(201),
     Found(302),
     BadRequest(400);

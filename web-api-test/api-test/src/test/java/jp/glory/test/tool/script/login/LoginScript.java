@@ -87,6 +87,6 @@ public class LoginScript {
                                         .get("/todos")
                                     .andReturn();
 
-        return new LoginResult(response);
+        return new LoginResult(response, sessionFilter);
     }
 }
