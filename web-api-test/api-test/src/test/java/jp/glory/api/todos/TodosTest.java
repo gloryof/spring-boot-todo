@@ -98,6 +98,37 @@ public class TodosTest {
                         .body("total", is(5));
             }
         }
+
+        public static class データが0件の場合 {
+
+            private static LoginResult loginResult = null;
+
+            @BeforeClass
+            public static void setup() {
+
+                loginResult = LoginScript.register("todo-get-002-").login();
+            }
+
+            @Test
+            public void 詳細データの一覧が取得できる() {
+
+                final Response response = given()
+                                               .filter(loginResult.getSessionFilter())
+                                           .when()
+                                               .get(ApiPaths.Todo.PATH)
+                                           .andReturn();
+
+                response.then()
+                    .body("details.size()", is(0));
+
+                response.then()
+                    .root("statistics")
+                        .body("executed", is(0))
+                        .body("unexecuted", is(0))
+                        .body("total", is(0));
+            }
+
+        }
     }
 
     public static class Post {
