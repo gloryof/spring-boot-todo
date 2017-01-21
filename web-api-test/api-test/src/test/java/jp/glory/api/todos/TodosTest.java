@@ -77,7 +77,6 @@ public class TodosTest {
                 final List<TodoData> expectTodos = todoResult.getDatas();
 
                 response.then()
-                    .log().all()
                     .body("details.size()", is(expectTodos.size()));
 
                 for (int i = 0; i < expectTodos.size(); i++) {
