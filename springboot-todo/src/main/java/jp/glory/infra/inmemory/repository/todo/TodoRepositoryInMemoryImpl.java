@@ -1,9 +1,9 @@
 package jp.glory.infra.inmemory.repository.todo;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import jp.glory.domain.todo.entity.Todo;
@@ -26,7 +26,7 @@ public class TodoRepositoryInMemoryImpl implements TodoRepository {
     /**
      * TODOのMap.
      */
-    private final Map<Long, Todo> todoMap = new HashMap<>();
+    private final Map<Long, Todo> todoMap = new ConcurrentHashMap<>();
 
     /**
      * シーケンス.
@@ -95,12 +95,16 @@ public class TodoRepositoryInMemoryImpl implements TodoRepository {
      */
     private Todo copy(final Todo src) {
 
-        return new Todo(
-                new TodoId(src.getId().getValue()),
-                new UserId(src.getUserId().getValue()),
-                new Summary(src.getSummary().getValue()),
-                new Memo(src.getMemo().getValue()),
-                src.isCompleted());
+        final Todo copied = new Todo(
+                                new TodoId(src.getId().getValue()),
+                                new UserId(src.getUserId().getValue()),
+                                new Summary(src.getSummary().getValue()),
+                                new Memo(src.getMemo().getValue()),
+                                src.isCompleted());
+
+        copied.version(src.getEntityVersion());
+
+        return copied;
     }
 
     /**
