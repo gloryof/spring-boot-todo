@@ -49,7 +49,6 @@ public class TodoScript {
         request.setCompleted(data.isCompleted());
 
         final Response response = given()
-                                        .log().all()
                                         .formParams(request.toMap())
                                         .headers(headers.toMap())
                                         .filter(filter)
@@ -64,6 +63,6 @@ public class TodoScript {
 
         final int id = response.getBody().jsonPath().getInt("id");
 
-        return new TodoData(id, data);
+        return new TodoData(id, 1, data);
     }
 }

@@ -14,4 +14,9 @@ public class TodoRegisterResult {
     public List<TodoData> getDatas() {
         return datas;
     }
+
+    public TodoData get(final int index) {
+
+        return datas.get(index);
+    }
 }

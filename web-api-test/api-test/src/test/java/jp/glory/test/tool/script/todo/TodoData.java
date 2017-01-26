@@ -9,19 +9,22 @@ public class TodoData {
     private final Summary summary;
     private Memo memo = new Memo("テストメモ-" + LocalDateTime.now().toString());;
     private boolean completed = false;
+    private final Optional<Integer> version;
 
     public TodoData(final Summary summary) {
 
         this.id = Optional.empty();
         this.summary = summary;
+        this.version = Optional.empty();
     }
 
-    TodoData(final Integer id, final TodoData base) {
+    TodoData(final Integer id, final Integer version, final TodoData base) {
 
         this.id = Optional.of(id);
         this.summary = base.summary;
         this.memo = base.memo;
         this.completed = base.completed;
+        this.version = Optional.of(version);
     }
 
     public TodoData memo(final Memo memo) {
@@ -42,6 +45,7 @@ public class TodoData {
         return memo;
     }
 
+
     public boolean isCompleted() {
         return completed;
     }
@@ -53,4 +57,9 @@ public class TodoData {
     public Summary getSummary() {
         return summary;
     }
+
+    public Optional<Integer> getVersion() {
+        return version;
+    }
+
 }
