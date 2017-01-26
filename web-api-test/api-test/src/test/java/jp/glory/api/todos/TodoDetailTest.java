@@ -37,6 +37,75 @@ public class TodoDetailTest {
         Setup.setup();
     }
 
+    public static class Get {
+
+        private static LoginResult loginResult = null;
+        private static TodoRegisterResult todoResults = null;
+
+        @BeforeClass
+        public static void setup() {
+
+            loginResult = LoginScript.register("todo-get-").login();
+
+            final List<TodoData> datas = IntStream.rangeClosed(1, 5).mapToObj(v -> {
+
+                final TodoData data = new TodoData(new Summary("テスト" + v));
+                if (v % 2 == 0) {
+
+                    data.complete();
+                }
+
+                return data;
+            }).collect(Collectors.toList());
+
+            todoResults = TodoScript.todos(loginResult.getSessionFilter(), datas).create();
+        }
+
+        @Test
+        public void 指定したIDのTODOが取得できる() {
+
+            final SessionFilter filter = loginResult.getSessionFilter();
+            final TodoRegisterPage page = new TodoRegisterPage(filter);
+
+            final HeaderValues headers = new HeaderValues();
+            headers.setToken(page.getToken());
+
+            final TodoData expected = todoResults.get(3);
+
+            final int id = expected.getId().get();
+            final Response response = given()
+                                            .filter(filter)
+                                        .when()
+                                            .get(ApiPaths.Todo.PATH + "/" + id)
+                                        .andReturn();
+
+            response.then()
+                .statusCode(StatusCode.Ok.getValue())
+                .body("id", is(expected.getId().get()))
+                .body("completed", is(expected.isCompleted()))
+                .body("memo", is(expected.getMemo().getValue()))
+                .body("summary", is(expected.getSummary().getValue()))
+                .body("version", is(expected.getVersion().get()));
+        }
+
+        @Test
+        public void 存在しないTODOの場合はNOT_FOUNDが帰ってくる() {
+
+            final SessionFilter filter = loginResult.getSessionFilter();
+            final TodoRegisterPage page = new TodoRegisterPage(filter);
+
+            final HeaderValues headers = new HeaderValues();
+            headers.setToken(page.getToken());
+
+            given()
+                .filter(filter)
+            .when()
+                .get(ApiPaths.Todo.PATH + "/" + Integer.MAX_VALUE)
+            .then()
+                .statusCode(StatusCode.NotFound.getValue());
+        }
+    }
+
     public static class Put {
 
         private static LoginResult loginResult = null;

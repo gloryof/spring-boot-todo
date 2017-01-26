@@ -6,7 +6,8 @@ public enum StatusCode {
     Created(201),
     NoContent(204),
     Found(302),
-    BadRequest(400);
+    BadRequest(400),
+    NotFound(404);
 
     private final int value;
 
