@@ -86,5 +86,34 @@ services:
       todo-net:
         aliases:
           - todo-app
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+    image: spring-todo:elasitcsearch
+    env_file:
+      - ./env/common.env
+    ports:
+      - "9200"
+      - "9300"
+    networks:
+      todo-net:
+        aliases:
+          - todo-app
+  kibana:
+    build:
+      context: ./kibana
+    image: spring-todo:kibana
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200 
+    env_file:
+      - ./env/common.env
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
+    networks:
+      todo-net:
+        aliases:
+          - todo-app
 networks:
   todo-net:
