@@ -1,24 +1,26 @@
 package jp.glory.domain.user.value;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-@RunWith(Enclosed.class)
-public class UserIdTest {
+class UserIdTest {
 
-    public static class notNumberingValueのテスト {
+    @DisplayName("notNumberingValueのテスト")
+    @Nested
+    class TestNotNuberingValue {
 
+        @DisplayName("値が0で未採番の値が返却される")
         @Test
-        public void 値が0で未採番の値が返却される() {
+        void assertValue () {
 
             final UserId actual = UserId.notNumberingValue();
 
-            assertThat(actual.getValue(), is(0L));
-            assertThat(actual.isSetValue(), is(false));
+            assertEquals((Long) 0L, actual.getValue());
+            assertFalse(actual.isSetValue());
         }
     }
 }

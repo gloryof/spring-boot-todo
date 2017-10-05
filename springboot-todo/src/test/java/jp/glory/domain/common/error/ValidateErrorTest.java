@@ -1,41 +1,50 @@
 package jp.glory.domain.common.error;
-import org.junit.Before;
-import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class ValidateErrorTest {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+class ValidateErrorTest {
     
     private ValidateError sut;
     private final Object[] messageParam = {"テスト"};
     private final ErrorInfo errorInfo = ErrorInfo.Required;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         sut = new ValidateError(errorInfo, messageParam);
     }
 
+    @DisplayName("isSmaeに同一のエラーを設定するとtrueが返却される")
     @Test
-    public void isSmaeに同一のエラーを設定するとtrueが返却される() {
+    void testIsSameReturnTrue() {
 
         final ValidateError paramError = new ValidateError(errorInfo, messageParam);
 
-        assertThat(sut.isSame(paramError), is(true));
+        assertTrue(sut.isSame(paramError));
     }
 
-    @Test
-    public void isSmaeに異なるエラーを設定するとfalseが返却される() {
+    @DisplayName("isSmaeに異なるエラーを設定するとfalseが返却される")
+    @ParameterizedTest(name = "[{index}] argument is \"{arguments}\".")
+    @MethodSource("diffrentValues")
+    void testIsSameReturnFalse(String value) {
 
-        final ValidateError paramError = new ValidateError(errorInfo, new Object[] { "テスト2" });
+        final ValidateError paramError = new ValidateError(errorInfo, new Object[] { value });
 
-        assertThat(sut.isSame(paramError), is(false));
+        assertFalse(sut.isSame(paramError));
     }
 
-    @Test
-    public void isSmaeにNullを設定するとtrueが返却される() {
+    static Stream<String> diffrentValues() {
 
-        assertThat(sut.isSame(null), is(false));
+        return Stream.of("テスト2", "" , null);
     }
 }

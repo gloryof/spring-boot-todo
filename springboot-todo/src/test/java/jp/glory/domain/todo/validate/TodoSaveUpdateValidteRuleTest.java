@@ -1,14 +1,12 @@
 package jp.glory.domain.todo.validate;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
@@ -20,22 +18,21 @@ import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.value.UserId;
-import jp.glory.test.validate.ValidateErrorsHelper;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class TodoSaveUpdateValidteRuleTest {
+class TodoSaveUpdateValidteRuleTest {
 
-    public static class すべての値が正常に設定されている場合 {
+    private TodoSaveUpdateValidteRule sut = null;
+    private TodoRepositoryMock repositoryMock = null;
+    private ValidateErrors actualErrors = null;
+    private Todo saveTodo = null;
 
-        private TodoSaveUpdateValidteRule sut = null;
+    @DisplayName("すべての値が正常に設定されている場合")
+    @Nested
+    class WhenValueValid {
 
-        private TodoRepositoryMock repositoryMock = null;
-        private Todo saveTodo = null;
-
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
             saveTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("あたらいしタイトル"), new Memo("新しいメモ"), false);
@@ -48,24 +45,20 @@ public class TodoSaveUpdateValidteRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを実行しても入力チェックエラーにならない")
         @Test
-        public void validateを実行しても入力チェックエラーにならない() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class すべての値が未設定の場合 {
+    @DisplayName("すべての値が未設定の場合")
+    @Nested
+    class WhenAllValueIsNotSet {
 
-        private TodoSaveUpdateValidteRule sut = null;
-
-        private TodoRepositoryMock repositoryMock = null;
-        private Todo saveTodo = null;
-
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
             saveTodo = new Todo(TodoId.notNumberingValue(), UserId.notNumberingValue(), Summary.empty(), Memo.empty(), false);
@@ -78,33 +71,34 @@ public class TodoSaveUpdateValidteRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("hasErrorはtrue")
         @Test
-        public void validateで必須項目がエラーになる() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(true));
+            assertTrue(actualErrors.hasError());
+        }
 
-            final List<ValidateError> errorList = new ArrayList<>();
+        @DisplayName("各エラー情報が設定される")
+        @Test
+        void assertErrors() {
 
-            errorList.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
-            errorList.add(new ValidateError(ErrorInfo.Required, User.LABEL));
-            errorList.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErrors);
-            helper.assertErrors(errorList);
+            expectedErrors.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, User.LABEL));
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
+
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class 対象のTODOが存在しない場合 {
+    @DisplayName("対象のTODOが存在しない場合")
+    @Nested
+    class WhenTodoNotExists {
 
-        private TodoSaveUpdateValidteRule sut = null;
-
-        private TodoRepositoryMock repositoryMock = null;
-        private Todo saveTodo = null;
-
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             saveTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), false);
 
@@ -114,31 +108,32 @@ public class TodoSaveUpdateValidteRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("hasErrorはtrue")
         @Test
-        public void validateで登録されていないTODOとしてエラーになる() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(true));
+            assertTrue(actualErrors.hasError());
+        }
 
-            final List<ValidateError> errorList = new ArrayList<>();
+        @DisplayName("validateで登録されていないTODOとしてエラーになる")
+        @Test
+        void assertErrors() {
 
-            errorList.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErrors);
-            helper.assertErrors(errorList);
+            expectedErrors.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
+
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class 異なるユーザの場合 {
+    @DisplayName("異なるユーザの場合")
+    @Nested
+    class WhenOtherUser {
 
-        private TodoSaveUpdateValidteRule sut = null;
-
-        private TodoRepositoryMock repositoryMock = null;
-        private Todo saveTodo = null;
-
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
             saveTodo = new Todo(beforeTodo.getId(), new UserId(300l), beforeTodo.getSummary(), beforeTodo.getMemo(),
@@ -152,17 +147,23 @@ public class TodoSaveUpdateValidteRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("hasErrorはtrue")
         @Test
-        public void validateで異なるユーザとしてエラーになる() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(true));
+            assertTrue(actualErrors.hasError());
+        }
 
-            final List<ValidateError> errorList = new ArrayList<>();
+        @DisplayName("各エラー情報が設定される")
+        @Test
+        void assertErrors() {
 
-            errorList.add(new ValidateError(ErrorInfo.SavedToOtherUser));
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErrors);
-            helper.assertErrors(errorList);
+            expectedErrors.add(new ValidateError(ErrorInfo.SavedToOtherUser));
+
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);
+            validate.assertAll();
         }
     }
 }

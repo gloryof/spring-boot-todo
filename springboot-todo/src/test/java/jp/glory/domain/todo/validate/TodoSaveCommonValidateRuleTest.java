@@ -1,15 +1,12 @@
 package jp.glory.domain.todo.validate;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
@@ -21,111 +18,121 @@ import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.test.util.TestUtil;
-import jp.glory.test.validate.ValidateErrorsHelper;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class TodoSaveCommonValidateRuleTest {
+class TodoSaveCommonValidateRuleTest {
 
-    public static class 正常な値が入力されている場合 {
+    @DisplayName("正常な値が入力されている場合")
+    @Nested
+    class WhenValidValue {
 
         private TodoSaveCommonValidateRule sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"), new Memo("メモ"), false);
             sut = new TodoSaveCommonValidateRule(todo);
         }
 
+        @DisplayName("validateを実行しても入力チェックエラーにならない")
         @Test
-        public void validateを実行しても入力チェックエラーにならない() {
+        void testValidate() {
 
             final ValidateErrors actualErros = sut.validate();
 
-            assertThat(actualErros.hasError(), is(false));
+            assertFalse(actualErros.hasError());
         }
     }
 
-    public static class ユーザID未設定の場合 {
+    @DisplayName("ユーザID未設定の場合")
+    @Nested
+    class WhenUserIdNotSet {
 
         private TodoSaveCommonValidateRule sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), UserId.notNumberingValue(), new Summary("概要"), new Memo("メモ"),
                     false);
             sut = new TodoSaveCommonValidateRule(todo);
         }
 
+        @DisplayName("validateを実行すると入力チェックエラーになる")
         @Test
-        public void validateを実行すると入力チェックエラーになる() {
+        void testValidate() {
 
             final ValidateErrors actualErros = sut.validate();
 
-            assertThat(actualErros.hasError(), is(true));
+            assertTrue(actualErros.hasError());
 
-            final List<ValidateError> errorList = new ArrayList<>();
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            errorList.add(new ValidateError(ErrorInfo.Required, User.LABEL));
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, User.LABEL));
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErros);
-            helper.assertErrors(errorList);
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErros);
+            validate.assertAll();
         }
     }
 
-    public static class 概要に入力不備がある場合 {
+    @DisplayName("概要に入力不備がある場合")
+    @Nested
+    class WhenSummaryInvalid {
 
         private TodoSaveCommonValidateRule sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary(""), new Memo("メモ"), false);
             sut = new TodoSaveCommonValidateRule(todo);
         }
 
+        @DisplayName("validateを実行すると入力チェックエラーにる")
         @Test
-        public void validateを実行すると入力チェックエラーにる() {
+        void testValidate() {
 
             final ValidateErrors actualErros = sut.validate();
 
-            assertThat(actualErros.hasError(), is(true));
+            assertTrue(actualErros.hasError());
 
-            final List<ValidateError> errorList = new ArrayList<>();
+            final ValidateErrors expectedErrors = new ValidateErrors();
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
 
-            errorList.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
-
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErros);
-            helper.assertErrors(errorList);
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErros);
+            validate.assertAll();
         }
     }
 
-    public static class メモに入力不備がある場合 {
+    @DisplayName("メモに入力不備がある場合")
+    @Nested
+    class WhenMemoInvalid {
 
         private TodoSaveCommonValidateRule sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"),
                     new Memo(TestUtil.repeat("a", 1001)), false);
             sut = new TodoSaveCommonValidateRule(todo);
         }
 
+        @DisplayName("validateを実行すると入力チェックエラーにる")
         @Test
-        public void validateを実行すると入力チェックエラーにる() {
+        void testValidate() {
 
             final ValidateErrors actualErros = sut.validate();
 
-            assertThat(actualErros.hasError(), is(true));
+            assertTrue(actualErros.hasError());
 
-            final List<ValidateError> errorList = new ArrayList<>();
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            errorList.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
+            expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErros);
-            helper.assertErrors(errorList);
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErros);
+            validate.assertAll();
         }
     }
 }

@@ -1,13 +1,12 @@
 package jp.glory.web.api.account;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -26,19 +25,30 @@ import jp.glory.usecase.user.CreateNewAccount;
 import jp.glory.usecase.user.CreateNewAccount.Result;
 import jp.glory.web.api.account.request.NewAccountRequest;
 
-@RunWith(Enclosed.class)
-public class AccountTest {
+class AccountTest {
 
-    @RunWith(Enclosed.class)
-    public static class createのテスト {
 
-        public static class 入力値が正常な場合 {
+    private Account sut = null;
 
-            private Account sut = null;
+    private CreateNewAccount mockCreateAccount = null;
+    private Encryption mockEncryption = null;
+    private CreateNewAccount.Result mockUseCaseResult = null;
 
-            private CreateNewAccount mockCreateAccount = null;
-            private Encryption mockEncryption = null;
-            private CreateNewAccount.Result mockUseCaseResult = null;
+    @BeforeEach
+    void setUp() {
+
+        mockCreateAccount = Mockito.mock(CreateNewAccount.class);
+        mockEncryption = Mockito.mock(Encryption.class);
+        mockUseCaseResult = Mockito.mock(CreateNewAccount.Result.class);
+    }
+
+    @DisplayName("createのテスト")
+    @Nested
+    class Create {
+
+        @DisplayName("入力値が正常な場合")
+        @Nested
+        class WhenValueIsValid {
 
             private LoginId expectedLoginId = null;
             private UserName expectedUserName = null;
@@ -49,12 +59,8 @@ public class AccountTest {
             private UserName actualUserName = null;
             private Password actualPassword = null;
 
-            @Before
-            public void setUp() {
-
-                mockCreateAccount = Mockito.mock(CreateNewAccount.class);
-                mockEncryption = Mockito.mock(Encryption.class);
-                mockUseCaseResult = Mockito.mock(CreateNewAccount.Result.class);
+            @BeforeEach
+            void setUp() {
 
                 expectedLoginId = new LoginId("test-login");
                 expectedUserName = new UserName("テストユーザ");
@@ -87,33 +93,31 @@ public class AccountTest {
                 actual = sut.create(request);
             }
 
+            @DisplayName("ステータスはCREATED")
             @Test
-            public void ステータスはCREATED() {
+            void assertStatusCode () {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.CREATED));
+                assertEquals(HttpStatus.CREATED, actual.getStatusCode());
             }
 
+            @DisplayName("設定された内容が保存される")
             @Test
-            public void 設定された内容が保存される()  {
+            void assertSavedValues() {
 
-                assertThat(actualLoginId.getValue(), is(expectedLoginId.getValue()));
-                assertThat(actualUserName.getValue(), is(expectedUserName.getValue()));
-                assertThat(actualPassword.getValue(), is(expectedPassword.getValue()));
+                assertEquals(expectedLoginId.getValue(), actualLoginId.getValue());
+                assertEquals(expectedUserName.getValue(), actualUserName.getValue());
+                assertEquals(expectedPassword.getValue(), actualPassword.getValue());
             }
         }
 
-        public static class 入力値が不正な場合 {
-
-            private Account sut = null;
-
-            private CreateNewAccount mockCreateAccount = null;
-            private Encryption mockEncryption = null;
-            private CreateNewAccount.Result mockUseCaseResult = null;
+        @DisplayName("入力値が不正な場合")
+        @Nested
+        class WhenValueIsInvalid {
 
             private ValidateErrors expectedErrors = null;
 
-            @Before
-            public void setUp() {
+            @BeforeEach
+            void setUp() {
 
                 mockCreateAccount = Mockito.mock(CreateNewAccount.class);
                 mockEncryption = Mockito.mock(Encryption.class);
@@ -133,23 +137,20 @@ public class AccountTest {
                 sut = new Account(mockCreateAccount, mockEncryption);
             }
 
+            @DisplayName("InvalidRequestExceptionがスローされる")
             @Test
-            public void InvalidRequestExceptionがスローされる() {
+            void assertThrowException () {
 
-                try {
+                final InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                        () -> sut.create(new NewAccountRequest()));
 
-                    sut.create(new NewAccountRequest());
-                    fail();
-                } catch (final InvalidRequestException exception) {
+                        final ValidateErrors actualErrors = exception.getErrors();
 
-                    final ValidateErrors actualErrors = exception.getErrors();
+                for (int i = 0; i < actualErrors.toList().size(); i++) {
 
-                    for (int i = 0; i < actualErrors.toList().size(); i++) {
-
-                        final String actualMessage = actualErrors.toList().get(i).getMessage();
-                        final String expectedMessage = expectedErrors.toList().get(i).getMessage();
-                        assertThat(actualMessage, is(expectedMessage));
-                    }
+                    final String actualMessage = actualErrors.toList().get(i).getMessage();
+                    final String expectedMessage = expectedErrors.toList().get(i).getMessage();
+                    assertEquals(expectedMessage, actualMessage);
                 }
             }
         }

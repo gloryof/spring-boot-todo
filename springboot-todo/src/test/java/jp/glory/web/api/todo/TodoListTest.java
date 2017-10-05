@@ -1,18 +1,19 @@
 package jp.glory.web.api.todo;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,31 +37,37 @@ import jp.glory.web.api.todo.response.TodoListResponse;
 import jp.glory.web.api.todo.response.TodoStatistics;
 import jp.glory.web.session.UserInfo;
 
-@RunWith(Enclosed.class)
-public class TodoListTest {
+class TodoListTest {
 
-    @RunWith(Enclosed.class)
-    public static class listのテスト {
 
-        public static class 件数が0件の場合 {
+    private TodoList sut = null;
 
-            private TodoList sut = null;
+    private SearchTodo mockSearch = null;
+    private SaveTodo mockSave = null;
+    private UserInfo userInfo = null;
 
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
+    @BeforeEach
+    void setUp() {
 
-            private UserInfo userInfo = null;
+        mockSearch = Mockito.mock(SearchTodo.class);
+        mockSave = Mockito.mock(SaveTodo.class);
 
-            private ResponseEntity<TodoListResponse> actual = null;
-            private TodoListResponse actualResponse = null;
+        userInfo = new UserInfo(TestUserUtil.createDefault());
+    }
 
-            @Before
-            public void setUp() {
+    @DisplayName("listのテスト")
+    @Nested
+    class TestList {
 
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
+        private ResponseEntity<TodoListResponse> actual = null;
+        private TodoListResponse actualResponse = null;
 
-                userInfo = new UserInfo(TestUserUtil.createDefault());
+        @DisplayName("件数が0件の場合")
+        @Nested
+        class CountIs0 {
+
+            @BeforeEach
+            void setUp() {
 
                 Mockito
                     .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userInfo.getUserId().getValue())))
@@ -72,49 +79,61 @@ public class TodoListTest {
                 actualResponse = actual.getBody();
             }
 
+            @DisplayName("ステータスはOK")
             @Test
-            public void ステータスはOK() {
+            void assertStatus() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+                assertEquals(HttpStatus.OK, actual.getStatusCode());
             }
 
+            @DisplayName("リストは空")
             @Test
-            public void リストは空() throws Exception {
+            void asseertDetailsIsEmpty() {
 
-                assertThat(actualResponse.getDetails().isEmpty(), is(true));
+                assertTrue(actualResponse.getDetails().isEmpty());
             }
 
-            @Test
-            public void 統計はすべて0件() throws Exception {
+            @DisplayName("統計の値のテスト")
+            @Nested
+            class Statistics {
 
-                final TodoStatistics actualStatistics = actualResponse.getStatistics();
+                private TodoStatistics actualStatistics  = null;
 
-                assertThat(actualStatistics.getTotal(), is(0));
-                assertThat(actualStatistics.getUnexecuted(), is(0));
-                assertThat(actualStatistics.getExecuted(), is(0));
+                @BeforeEach
+                void setUp() {
+
+                    actualStatistics = actualResponse.getStatistics();
+                }
+
+                @DisplayName("トータルは0件")
+                @Test
+                void assertTotal() {
+
+                    assertEquals(0, actualStatistics.getTotal());
+                }
+
+                @DisplayName("未実行は0件")
+                @Test
+                void assertUnexecuted() {
+
+                    assertEquals(0, actualStatistics.getUnexecuted());
+                }
+
+                @DisplayName("実行済みは0件")
+                @Test
+                void assertExecuted() {
+
+                    assertEquals(0, actualStatistics.getExecuted());
+                }
             }
         }
 
-        public static class 実行済みのみの場合 {
+        @DisplayName("実行済みのみの場合")
+        @Nested
+        class OnlyExecuted {
 
-            private TodoList sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-
-            private UserInfo userInfo = null;
-
-            private ResponseEntity<TodoListResponse> actual = null;
-            private TodoListResponse actualResponse = null;
-            private TodoStatistics actualStatistics = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
-
-                userInfo = new UserInfo(TestUserUtil.createDefault());
+            @BeforeEach
+            void setUp() {
 
                 final List<Todo> todoList = LongStream.rangeClosed(1, 1)
                     .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), true))
@@ -128,60 +147,63 @@ public class TodoListTest {
 
                 actual = sut.list(userInfo);
                 actualResponse = actual.getBody();
-                actualStatistics = actualResponse.getStatistics();
             }
 
+            @DisplayName("ステータスはOK")
             @Test
-            public void ステータスはOK() {
+            void assertStatus() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+                assertEquals(HttpStatus.OK, actual.getStatusCode());
             }
 
+            @DisplayName("リストは1件")
             @Test
-            public void リストは1件() throws Exception {
+            void assertDetailCount() throws Exception {
 
-                assertThat(actualResponse.getDetails().size(), is(1));
+                assertEquals(1, actualResponse.getDetails().size());
             }
 
-            @Test
-            public void トータルは1件() throws Exception {
+            @DisplayName("統計の値のテスト")
+            @Nested
+            class Statistics {
 
-                assertThat(actualStatistics.getTotal(), is(1));
-            }
+                private TodoStatistics actualStatistics  = null;
 
-            @Test
-            public void 実行済みは1件() throws Exception {
+                @BeforeEach
+                void setUp() {
 
-                assertThat(actualStatistics.getExecuted(), is(1));
-            }
+                    actualStatistics = actualResponse.getStatistics();
+                }
 
-            @Test
-            public void 未実行は0件() throws Exception {
+                @DisplayName("トータルは1件")
+                @Test
+                void assertTotal() {
 
-                assertThat(actualStatistics.getUnexecuted(), is(0));
+                    assertEquals(1, actualStatistics.getTotal());
+                }
+
+                @DisplayName("未実行は0件")
+                @Test
+                void assertUnexecuted() {
+
+                    assertEquals(0, actualStatistics.getUnexecuted());
+                }
+
+                @DisplayName("実行済みは1件")
+                @Test
+                void assertExecuted() {
+
+                    assertEquals(1, actualStatistics.getExecuted());
+                }
             }
         }
 
-        public static class 未行済のみの場合 {
+        @DisplayName("未行済のみの場合")
+        @Nested
+        class OnlyUnexecuted {
 
-            private TodoList sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-
-            private UserInfo userInfo = null;
-
-            private ResponseEntity<TodoListResponse> actual = null;
-            private TodoListResponse actualResponse = null;
-            private TodoStatistics actualStatistics = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
-
-                userInfo = new UserInfo(TestUserUtil.createDefault());
+            @BeforeEach
+            void setUp() {
 
                 final List<Todo> todoList = LongStream.rangeClosed(1, 1)
                     .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), false))
@@ -195,60 +217,63 @@ public class TodoListTest {
 
                 actual = sut.list(userInfo);
                 actualResponse = actual.getBody();
-                actualStatistics = actualResponse.getStatistics();
             }
 
+            @DisplayName("ステータスはOK")
             @Test
-            public void ステータスはOK() {
+            void assertStatus() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+                assertEquals(HttpStatus.OK, actual.getStatusCode());
             }
 
+            @DisplayName("リストは1件")
             @Test
-            public void リストは1件() throws Exception {
+            void assertDetailCount() throws Exception {
 
-                assertThat(actualResponse.getDetails().size(), is(1));
+                assertEquals(1, actualResponse.getDetails().size());
             }
 
-            @Test
-            public void トータルは1件() throws Exception {
+            @DisplayName("統計の値のテスト")
+            @Nested
+            class Statistics {
 
-                assertThat(actualStatistics.getTotal(), is(1));
-            }
+                private TodoStatistics actualStatistics  = null;
 
-            @Test
-            public void 実行済みは0件() throws Exception {
+                @BeforeEach
+                void setUp() {
 
-                assertThat(actualStatistics.getExecuted(), is(0));
-            }
+                    actualStatistics = actualResponse.getStatistics();
+                }
 
-            @Test
-            public void 未実行は1件() throws Exception {
+                @DisplayName("トータルは1件")
+                @Test
+                void assertTotal() {
 
-                assertThat(actualStatistics.getUnexecuted(), is(1));
+                    assertEquals(1, actualStatistics.getTotal());
+                }
+
+                @DisplayName("未実行は1件")
+                @Test
+                void assertUnexecuted() {
+
+                    assertEquals(1, actualStatistics.getUnexecuted());
+                }
+
+                @DisplayName("実行済みは0件")
+                @Test
+                void assertExecuted() {
+
+                    assertEquals(0, actualStatistics.getExecuted());
+                }
             }
         }
 
-        public static class 実行済み3件_未実行2件の場合 {
+        @DisplayName("実行済み:3件 未実行:2件")
+        @Nested
+        class MultiPattern {
 
-            private TodoList sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-
-            private UserInfo userInfo = null;
-
-            private ResponseEntity<TodoListResponse> actual = null;
-            private TodoListResponse actualResponse = null;
-            private TodoStatistics actualStatistics = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
-
-                userInfo = new UserInfo(TestUserUtil.createDefault());
+            @BeforeEach
+            void setUp() {
 
                 final List<Todo> executedList = LongStream.rangeClosed(1, 3)
                         .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), true))
@@ -269,64 +294,82 @@ public class TodoListTest {
 
                 actual = sut.list(userInfo);
                 actualResponse = actual.getBody();
-                actualStatistics = actualResponse.getStatistics();
             }
 
-            @Test
-            public void ステータスはOK() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+            @DisplayName("ステータスはOK")
+            @Test
+            void assertStatus() {
+
+                assertEquals(HttpStatus.OK, actual.getStatusCode());
             }
 
+            @DisplayName("リストは5件")
             @Test
-            public void リストは5件() throws Exception {
+            void assertDetailCount() throws Exception {
 
-                assertThat(actualResponse.getDetails().size(), is(5));
+                assertEquals(5, actualResponse.getDetails().size());
             }
 
-            @Test
-            public void トータルは5件() throws Exception {
 
-                assertThat(actualStatistics.getTotal(), is(5));
-            }
+            @DisplayName("統計の値のテスト")
+            @Nested
+            class Statistics {
 
-            @Test
-            public void 実行済みは3件() throws Exception {
+                private TodoStatistics actualStatistics  = null;
 
-                assertThat(actualStatistics.getExecuted(), is(3));
-            }
+                @BeforeEach
+                void setUp() {
 
-            @Test
-            public void 未実行は2件() throws Exception {
+                    actualStatistics = actualResponse.getStatistics();
+                }
 
-                assertThat(actualStatistics.getUnexecuted(), is(2));
+                @DisplayName("トータルは5件")
+                @Test
+                void assertTotal() {
+
+                    assertEquals(5, actualStatistics.getTotal());
+                }
+
+                @DisplayName("未実行は2件")
+                @Test
+                void assertUnexecuted() {
+
+                    assertEquals(2, actualStatistics.getUnexecuted());
+                }
+
+                @DisplayName("実行済みは3件")
+                @Test
+                void assertExecuted() {
+
+                    assertEquals(3, actualStatistics.getExecuted());
+                }
             }
         }
     }
 
-    @RunWith(Enclosed.class)
-    public static class createtTodoのテスト {
+    @DisplayName("createTodoのテスト")
+    @Nested
+    class CreateTodo {
 
+        private SaveTodo.Result mockUseCaseResult;
 
-        public static class 入力内容に不備がない場合 {
+        final TodoId expectedTodoId = new TodoId(1000l);
 
-            private TodoList sut = null;
+        private ResponseEntity<TodoCreateSuccessResponse> actual = null;
 
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
+        @BeforeEach
+        void setUp() {
 
-            private UserInfo userInfo = null;
-            private SaveTodo.Result mockUseCaseResult;
+            mockUseCaseResult = mock(SaveTodo.Result.class);
+        }
 
-            private ResponseEntity<TodoCreateSuccessResponse> actual = null;
+        @DisplayName("入力内容に不備がない場合")
+        @Nested
+        class ValueIsValid {
 
-            @Before
-            public void setUp() {
-
-                final TodoId expectedTodoId = new TodoId(1000l);
-
-                mockSave = Mockito.mock(SaveTodo.class);
-                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
+            @BeforeEach
+            void setUp() {
 
                 Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
                 Mockito.when(mockUseCaseResult.getSavedTodoId()).thenReturn(expectedTodoId);
@@ -339,32 +382,23 @@ public class TodoListTest {
             }
 
 
+            @DisplayName("ステータスはCREATED")
             @Test
-            public void ステータスはCREATED() {
+            void assertStatusCode() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.CREATED));
+                assertEquals(HttpStatus.CREATED, actual.getStatusCode());
             }
         }
 
-        public static class 入力内容に不備がある場合 {
+        @DisplayName("入力内容に不備がある場合")
+        @Nested
+        class ValueIsInvalid {
 
-
-            private TodoList sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-
-            private UserInfo userInfo = null;
-            private SaveTodo.Result mockUseCaseResult;
             private ValidateErrors expectedErrors = null;
 
-            @Before
-            public void setUp() {
+            @BeforeEach
+            void setUp() {
 
-                final TodoId expectedTodoId = new TodoId(1000l);
-
-                mockSave = Mockito.mock(SaveTodo.class);
-                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
 
                 expectedErrors = new ValidateErrors();
                 expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
@@ -378,25 +412,22 @@ public class TodoListTest {
                 sut = new TodoList(mockSearch, mockSave);
             }
 
+            @DisplayName("InvalidRequestExceptionがスローされる")
             @Test
-            public void InvalidRequestExceptionがスローされる() {
+            void asseertThrowException() {
 
-                try {
+                final InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                        () -> sut.save(new TodoCreateRequest(), userInfo));
+                final ValidateErrors actualErrors = exception.getErrors();
 
-                    sut.save(new TodoCreateRequest(), userInfo);
-                    fail();
-                } catch (final InvalidRequestException exception) {
+                for (int i = 0; i < actualErrors.toList().size(); i++) {
 
-                    final ValidateErrors actualErrors = exception.getErrors();
-
-                    for (int i = 0; i < actualErrors.toList().size(); i++) {
-
-                        final String actualMessage = actualErrors.toList().get(i).getMessage();
-                        final String expectedMessage = expectedErrors.toList().get(i).getMessage();
-                        assertThat(actualMessage, is(expectedMessage));
-                    }
+                    final String actualMessage = actualErrors.toList().get(i).getMessage();
+                    final String expectedMessage = expectedErrors.toList().get(i).getMessage();
+                    assertEquals(expectedMessage, actualMessage);
                 }
             }
+
         }
     }
 

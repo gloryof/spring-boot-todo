@@ -1,17 +1,19 @@
 package jp.glory.usecase.todo;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.entity.Todos;
@@ -21,19 +23,24 @@ import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 
-@RunWith(Enclosed.class)
-public class SearchTodosTest {
+class SearchTodosTest {
 
-    public static class searchById {
+    private SearchTodo sut = null;
+    private TodoRepositoryMock mock = null;
 
+    @BeforeEach
+    void setUp() {
 
-        private SearchTodo sut = null;
-        private TodoRepositoryMock mock = null;
+        mock = new TodoRepositoryMock();
+    }
 
-        @Before
-        public void setUp() {
+    @DisplayName("searchByIdのテスト")
+    @Nested
+    class SearchById {
 
-            mock = new TodoRepositoryMock();
+        @BeforeEach
+        void setUp() {
+
 
             LongStream.rangeClosed(1, 100).mapToObj(v -> {
 
@@ -42,27 +49,40 @@ public class SearchTodosTest {
             sut = new SearchTodo(mock);
         }
 
+        @DisplayName("指定したIDに紐づくTodoが返る")
         @Test
-        public void 指定したIDに紐づくTodoが返る() {
+        void testMatchId() {
 
             final TodoId expectedTodoId = new TodoId(20l);
 
             final Optional<Todo> actual = sut.searchById(expectedTodoId);
 
-            assertThat(actual.isPresent(), is(true));
-            assertThat(actual.get().getId().isSame(expectedTodoId), is(true));
+            assertTrue(actual.isPresent());
+            assertTrue(actual.get().getId().isSame(expectedTodoId));
+        }
+
+        @DisplayName("IDに紐づくTodoがない場合はOptionaは空")
+        @Test
+        void testNotMatchId() {
+
+            final TodoId expectedTodoId = new TodoId(120l);
+
+            final Optional<Todo> actual = sut.searchById(expectedTodoId);
+
+            assertFalse(actual.isPresent());
         }
     }
 
-    public static class searchByUser {
+    @DisplayName("searchByUserのテスト")
+    @Nested
+    class SearchByUser {
 
-        private SearchTodo sut = null;
-        private TodoRepositoryMock mock = null;
+        private Todos actual = null;
+        private Todos.Statistics actualStatistics = null;
+        private List<Todo> actualList = null;
 
-        @Before
-        public void setUp() {
-
-            mock = new TodoRepositoryMock();
+        @BeforeEach
+        void setUp() {
 
             LongStream.rangeClosed(1, 100).mapToObj(v -> {
                 final UserId userId = new UserId(v % 10);
@@ -72,22 +92,72 @@ public class SearchTodosTest {
             sut = new SearchTodo(mock);
         }
 
-        @Test
-        public void 指定したユーザIDのTodoリストが返る() {
+        @DisplayName("指定したユーザIDのTODOが10件存在する場合")
+        @Nested
+        class TodoIsExisits {
 
-            final UserId expectedUserId = new UserId(3l);
+            private final UserId expectedUserId = new UserId(3l);
 
-            final Todos actual = sut.searchTodosByUser(expectedUserId);
-            final Todos.Statistics actualStatistics = actual.getStatistics();
+            @BeforeEach
+            void setUp() {
 
-            assertThat(actualStatistics.getTotal(), is(10));
+                actual = sut.searchTodosByUser(expectedUserId);
 
-            final List<Todo> actualList = actual.asList();
-            assertThat(actualList.size(), is(10));
+                actualStatistics  = actual.getStatistics();
+                actualList = actual.asList();
+            }
 
-            final List<Todo> actualUserIdFiltered = actualList.stream()
-                    .filter(v -> v.getUserId().isSame(expectedUserId)).collect(Collectors.toList());
-            assertThat(actualUserIdFiltered.size(), is(10));
+            @DisplayName("トータル件数が10件")
+            @Test
+            void assertTotal() {
+
+                assertEquals(10, actualStatistics.getTotal());
+            }
+
+            @DisplayName("リストのサイズが10件")
+            @Test
+            void assertSize() {
+
+                assertEquals(10, actualList.size());
+            }
+
+            @DisplayName("全てのTODOのユーザID一致する")
+            void 指定したユーザIDのTodoリストが返る() {
+
+                final List<Todo> actualUserIdFiltered = actualList.stream()
+                        .filter(v -> v.getUserId().isSame(expectedUserId)).collect(Collectors.toList());
+                assertEquals(10, actualUserIdFiltered.size());
+            }
+        }
+
+        @DisplayName("指定したユーザIDのTODOが存在しない場合")
+        @Nested
+        class TodoIsNoExisits {
+
+
+            @BeforeEach
+            void setUp() {
+
+                actual = sut.searchTodosByUser(new UserId(10000l));
+
+                actualStatistics  = actual.getStatistics();
+                actualList = actual.asList();
+            }
+
+
+            @DisplayName("トータル件数が0件")
+            @Test
+            void assertTotal() {
+
+                assertEquals(0, actualStatistics.getTotal());
+            }
+
+            @DisplayName("リストのサイズが0件")
+            @Test
+            void assertSize() {
+
+                assertEquals(0, actualList.size());
+            }
         }
     }
 }

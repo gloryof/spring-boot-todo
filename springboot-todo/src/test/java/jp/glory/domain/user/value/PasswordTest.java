@@ -1,97 +1,284 @@
 package jp.glory.domain.user.value;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.util.stream.Stream;
 
-public class PasswordTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
-    public static class emptyのテスト {
+import jp.glory.domain.common.error.ErrorInfo;
+import jp.glory.domain.common.error.ValidateError;
+import jp.glory.domain.common.error.ValidateErrors;
+import jp.glory.test.validate.ValidateAssert;
 
+class PasswordTest {
+
+    private Password sut = null;
+    private ValidateErrors actualErrors = null;
+
+    @DisplayName("emptyのテスト")
+    @Nested
+    class TestEmpty {
+
+        @DisplayName("ブランクが返る")
         @Test
-        public void 初期値が返却される() {
+        void returnBlank() {
 
-            final Password actual = Password.empty();
+            sut = Password.empty();
 
-            assertThat(actual, is(not(nullValue())));
-            assertThat(actual.getValue(), is(""));
+            assertEquals("", sut.getValue());
         }
     }
 
-    public static class 値が設定されている場合 {
+    @DisplayName("値が設定されている場合")
+    @Nested
+    class WhenValueIsSet {
 
-        private Password sut = null;
+        private final String ENCRYPTED_VALUE = "19CB2A070DDBE8157E17C5DDA0EA38E8AA16FAE1725C1F7AC22747D870368579";
 
-        private static final String ENCRYPTED_VALUE = "19CB2A070DDBE8157E17C5DDA0EA38E8AA16FAE1725C1F7AC22747D870368579";
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Password(ENCRYPTED_VALUE);
         }
 
-        @Test
-        public void パスワードが一致している場合_isMatchでtrueが返却される() {
+        @DisplayName("isMatchのテスト")
+        @Nested
+        class TestIsMatch {
 
-            final Password comparePassword = new Password(ENCRYPTED_VALUE);
+            @DisplayName("パスワードが一致している場合はtrue")
+            @Test
+            void ifMatchPassword () {
 
-            assertThat(sut.isMatch(comparePassword), is(true));
+                final Password comparePassword = new Password(ENCRYPTED_VALUE);
+
+                assertTrue(sut.isMatch(comparePassword));
+            }
+
+            @DisplayName("パスワードが一致していない場合はfalse")
+            @ArgumentsSource(DifferentValueProvider.class)
+            @ParameterizedTest(name = "[{index}] Password({0})")
+            void ifNotMatchPassword (final String label, final Password comparePassword) {
+
+                assertFalse(sut.isMatch(comparePassword));
+            }
         }
 
-        @Test
-        public void パスワードが一致していない場合_isMatchでfalseが返却される() {
+        @DisplayName("validateのテスト")
+        @Nested
+        class TestValidate {
 
-            final Password comparePassword = new Password("test");
+            @BeforeEach
+            void setUp() {
 
-            assertThat(sut.isMatch(comparePassword), is(false));
-        }
+                actualErrors = sut.validate();
+            }
 
-        @Test
-        public void Nullが渡された場合_falseが返却される() {
+            @DisplayName("validateを行っても入力チェックエラーにならない")
+            @Test
+            void notError() {
 
-            assertThat(sut.isMatch(null), is(false));
+                assertFalse(actualErrors.hasError());
+            }
         }
     }
 
-    public static class 空文字が設定されている場合 {
+    @DisplayName("空文字が設定されている場合")
+    @Nested
+    class WhenBlankIsSet {
 
-        private Password sut = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Password("");
         }
 
-        @Test
-        public void パスワードが一致している場合でも_isMatchでfalseが返却される() {
+        @DisplayName("isMatchのテスト")
+        @Nested
+        class TestIsMatch {
 
-            final Password comparePassword = new Password("");
+            @DisplayName("パスワードが一致している場合でもfasle")
+            @Test
+            void returnFalse () {
 
-            assertThat(sut.isMatch(comparePassword), is(false));
+                final Password comparePassword = new Password("");
+
+                assertFalse(sut.isMatch(comparePassword));
+            }
+        }
+
+        @DisplayName("validateのテスト")
+        @Nested
+        class TestValidate {
+
+            @BeforeEach
+            void setUp() {
+
+                actualErrors = sut.validate();
+            }
+
+            @DisplayName("validateを行うと入力チェックエラーになる")
+            @Test
+            void assertHasError() {
+
+                assertTrue(actualErrors.hasError());
+            }
+
+            @DisplayName("必須チェックエラーになる")
+            @Test
+            void assertErrors() {
+
+                final ValidateError expectedError = new ValidateError(ErrorInfo.Required, Password.LABEL);
+
+                final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+                validate.assertAll();
+            }
         }
     }
 
-    public static class Nullが設定されている場合 {
+    @DisplayName("Nullが設定されている場合")
+    @Nested
+    class WhenNullIsSet {
 
-        private Password sut = null;
+        @BeforeEach
+        void setUp() {
 
-        @Before
-        public void setUp() {
-
-            sut = new Password("");
+            sut = new Password(null);
         }
 
-        @Test
-        public void パスワードが一致している場合でも_isMatchでfalseが返却される() {
+        @DisplayName("isMatchのテスト")
+        @Nested
+        class TestIsMatch {
 
-            final Password comparePassword = new Password("");
+            @DisplayName("パスワードが一致している場合でもfasle")
+            @Test
+            void returnFalse () {
 
-            assertThat(sut.isMatch(comparePassword), is(false));
+                final Password comparePassword = new Password("");
+
+                assertFalse(sut.isMatch(comparePassword));
+            }
+        }
+
+        @DisplayName("validateのテスト")
+        @Nested
+        class TestValidate {
+
+            @BeforeEach
+            void setUp() {
+
+                actualErrors = sut.validate();
+            }
+
+            @DisplayName("validateを行うと入力チェックエラーになる")
+            @Test
+            void assertHasError() {
+
+                assertTrue(actualErrors.hasError());
+            }
+
+            @DisplayName("必須チェックエラーになる")
+            @Test
+            void assertErrors() {
+
+                final ValidateError expectedError = new ValidateError(ErrorInfo.Required, Password.LABEL);
+
+                final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+                validate.assertAll();
+            }
+        }
+    }
+
+    @DisplayName("値に使用できない文字のみ設定されている場合")
+    @Nested
+    class WhenInvalidCharacters {
+
+        @BeforeEach
+        void setUp() {
+
+            sut = new Password("あ");
+        }
+
+        @DisplayName("isMatchのテスト")
+        @Nested
+        class TestIsMatch {
+
+            @DisplayName("パスワードが一致している場合はtrue")
+            @Test
+            void ifMatchPassword () {
+
+                final Password comparePassword = new Password("あ");
+
+                assertTrue(sut.isMatch(comparePassword));
+            }
+
+            @DisplayName("パスワードが一致していない場合はfalse")
+            @ArgumentsSource(DifferentValueProvider.class)
+            @ParameterizedTest(name = "[{index}] Password({0})")
+            void ifNotMatchPassword (final String label, final Password comparePassword) {
+
+                assertFalse(sut.isMatch(comparePassword));
+            }
+        }
+
+
+        @DisplayName("validateのテスト")
+        @Nested
+        class TestValidate {
+
+            @BeforeEach
+            void setUp() {
+
+                actualErrors = sut.validate();
+            }
+
+            @DisplayName("hasErrorはtrue")
+            @Test
+            void hasError() {
+
+                assertTrue(actualErrors.hasError());
+            }
+
+            @DisplayName("文字種エラーになる")
+            @Test
+            void assertErrors() {
+
+                final ValidateError expectedError = new ValidateError(ErrorInfo.InvalidCharacters, Password.LABEL);
+
+                final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+                validate.assertAll();
+            }
+        }
+    }
+
+    static class DifferentValueProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+
+            
+
+            return Stream.of(new Password("test"), new Password("test2"), null).map(this::createArguments);
+        }
+
+        private Arguments createArguments(final Password password) {
+
+            if (password == null) {
+
+                return Arguments.of(null, null);
+            }
+
+            return Arguments.of(password.getValue(), password);
         }
     }
 }

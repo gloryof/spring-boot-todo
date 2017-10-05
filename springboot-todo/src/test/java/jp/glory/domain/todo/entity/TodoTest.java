@@ -1,61 +1,87 @@
 package jp.glory.domain.todo.entity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.todo.value.Memo;
 import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 
-@RunWith(Enclosed.class)
-public class TodoTest {
+class TodoTest {
 
-    public static class すべての値が正常に設定されている場合 {
+    @DisplayName("すべての値が正常に設定されている場合")
+    @Nested
+    class AllValueIsValid {
 
         private Todo sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Todo(new TodoId(1000l), new UserId(1l), new Summary("概要テスト"), new Memo("新しいメモ"), false);
         }
 
+        @DisplayName("versionでバージョンが設定されたエンティティが返る")
         @Test
-        public void versionでバージョンが設定されたエンティティが帰る() {
+        void testGetEntityVersion() {
 
             final long expectedVersion = 10l;
 
-            assertThat(sut.getEntityVersion(), is(1l));
+            assertEquals(1L, sut.getEntityVersion());
 
             sut.version(expectedVersion);
 
-            assertThat(sut.getEntityVersion(), is(expectedVersion));
+            assertEquals(expectedVersion, sut.getEntityVersion());
         }
 
+        @DisplayName("isRegisteredにtrueが設定されている")
         @Test
-        public void isRegisteredにtrueが設定されている() {
+        void testIsRegistered() {
 
-            assertThat(sut.isRegistered(), is(true));
+            assertTrue(sut.isRegistered());
         }
 
+        @DisplayName("isComplatedはfalse")
         @Test
-        public void markAsCompleteで完了フラグがON_unmarkAsCompleteで完了フラグがOFFになる() {
+        void testIsCompleted() {
 
-            assertThat(sut.isCompleted(), is(false));
+            assertFalse(sut.isCompleted());
+        }
+
+        @DisplayName("markAsCompleteで実行済みになる")
+        @Test
+        void testMarkAsComplete() {
 
             sut.markAsComplete();
 
-            assertThat(sut.isCompleted(), is(true));
+            assertTrue(sut.isCompleted());
+        }
 
-            sut.unmarkFromComplete();
+        @DisplayName("すでに実行済みの場合")
+        @Nested
+        class AlreadlyComplated {
 
-            assertThat(sut.isCompleted(), is(false));
+            @BeforeEach
+            void setUp() {
+
+                sut.markAsComplete();
+            }
+
+            @DisplayName("unmarkFromCompleteで未実行になる")
+            @Test
+            void testUnmarkFromComplete() {
+
+                sut.unmarkFromComplete();
+
+                assertFalse(sut.isCompleted());
+            }
         }
     }
 }

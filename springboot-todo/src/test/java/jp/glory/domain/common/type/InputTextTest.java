@@ -1,15 +1,13 @@
 package jp.glory.domain.common.type;
 
-import static jp.glory.test.validate.ValidateMatcher.validatedBy;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.common.annotation.MaxLength;
 import jp.glory.domain.common.annotation.Required;
@@ -18,9 +16,9 @@ import jp.glory.domain.common.annotation.param.ValidCharcterType;
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class InputTextTest {
+class InputTextTest {
 
     private static final String LABEL = "テスト";
 
@@ -73,154 +71,159 @@ public class InputTextTest {
         }
     }
 
-    public static class 必須項目で初期値に値が設定されている場合 {
+    private StubClass sut = null;
 
-        private StubClass sut = null;
+    private static final String INIT_VALUE = "タイトルテスト";
 
-        private static final String INIT_VALUE = "タイトルテスト";
+    @DisplayName("必須項目で初期値に値が設定されている場合")
+    @Nested
+    class WhenSetRequiredOnly {
 
-        @Before
+        @BeforeEach
         public void setUp() {
 
             sut = new RequiredClass(INIT_VALUE);
         }
 
+        @DisplayName("valueには初期値が設定されている")
         @Test
-        public void valueには初期値が設定されている() {
+        public void testGetValue() {
 
-            assertThat(sut.getValue(), is(INIT_VALUE));
+            assertEquals(INIT_VALUE, sut.getValue());
         }
 
+        @DisplayName("validateで入力チェックエラーにならない")
         @Test
-        public void validateで入力チェックエラーにならない() {
+        public void testValidate() {
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
+        }
+
+        @DisplayName("必須項目で初期値にNullが設定されている場合")
+        @Nested
+        class  WhenInitValueIsNull {
+
+            @BeforeEach
+            public void setUp() {
+
+                sut = new RequiredClass(null);
+            }
+
+            @DisplayName("valueにはブランクが設定されている")
+            @Test
+            public void testGetValue() {
+
+                assertEquals("", sut.getValue());
+            }
+
+            @DisplayName("validateを行うと必須チェックエラーになる")
+            @Test
+            public void testValidate() {
+
+                final ValidateErrors actualErrors = sut.validate();
+
+                assertTrue(actualErrors.hasError());
+
+                final ValidateError expectedError = new ValidateError(ErrorInfo.Required, LABEL);
+
+                ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+                validate.assertAll();
+            }
         }
     }
 
-    public static class 必須項目で初期値にNullが設定されている場合 {
+    @DisplayName("必須項目で初期値にブランクが設定されている場合")
+    @Nested
+    class WhenSetBlank {
 
-        private StubClass sut = null;
-
-        private static final String INIT_VALUE = null;
-
-        @Before
+        @BeforeEach
         public void setUp() {
 
-            sut = new RequiredClass(INIT_VALUE);
+            sut = new RequiredClass("");
         }
 
+        @DisplayName("valueにはブランクが設定されている")
         @Test
-        public void valueにはブランクが設定されている() {
+        public void testGetValue() {
 
-            assertThat(sut.getValue(), is(""));
+            assertEquals("", sut.getValue());
         }
 
+        @DisplayName("validateを行うと必須チェックエラーになる")
         @Test
-        public void validateを行うと必須チェックエラーになる() {
+        public void testValidate() {
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+            assertTrue(actualErrors.hasError());
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.Required, LABEL);
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+            ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class 必須項目で初期値にブランクが設定されている場合 {
-        
-        private StubClass sut = null;
+    @DisplayName("最大文字数のテスト")
+    @Nested
+    class TestMaxLength {
 
-        private static final String INIT_VALUE = "";
-
-        @Before
-        public void setUp() {
-
-            sut = new RequiredClass(INIT_VALUE);
-        }
-
+        @DisplayName("最大文字数以内の場合入力チェックエラーにならない")
         @Test
-        public void valueにはブランクが設定されている() {
-
-            assertThat(sut.getValue(), is(""));
-        }
-
-        @Test
-        public void validateを行うと必須チェックエラーになる() {
-
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
-
-            final ValidateError expectedError = new ValidateError(ErrorInfo.Required, LABEL);
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
-        }
-    }
-
-    public static class 最大文字数が設定されている場合 {
-        
-        @Test
-        public void 最大文字数以内の場合入力チェックエラーにならない() {
+        public void notOver() {
 
             final StubClass sut =  new MaxLengthClass("１２３４");
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
 
+        @DisplayName("最大文字数を超えていて場合入力チェックエラーになる")
         @Test
-        public void 最大文字数を超えていて場合入力チェックエラーになる() {
+        public void over() {
 
             final StubClass sut =  new MaxLengthClass("１２３４５");
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+            assertTrue(actualErrors.hasError());
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.MaxLengthOver, LABEL, "4");
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+            ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
-    
-    public static class 許可文字列が指定されている場合 {
 
+    @DisplayName("許可文字のテスト")
+    @Nested
+    class AllowedCharacters {
+
+        @DisplayName("許可文字列のみの場合入力チェックエラーにならない")
         @Test
-        public void 許可文字列のみの場合入力チェックエラーにならない() {
+        public void onlyAllowed() {
 
             final StubClass sut = new ValidCharClass("123456789abcABC!#$%&'()");
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
 
+        @DisplayName("許可文字列以外を含む場合は入力チェックエラーになる")
         @Test
-        public void 許可文字列以外を含む場合は入力チェックエラーになる() {
+        public void notAllowed() {
 
             final StubClass sut = new ValidCharClass("1234あ5");
 
             final ValidateErrors actualErrors = sut.validate();
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+            assertTrue(actualErrors.hasError());
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.InvalidCharacters, LABEL);
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+            ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 }

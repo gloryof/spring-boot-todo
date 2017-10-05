@@ -1,70 +1,76 @@
 package jp.glory.domain.common.error;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
-import static jp.glory.test.validate.ValidateMatcher.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-@RunWith(Enclosed.class)
-public class ValidateErrorsTest {
+import jp.glory.test.validate.ValidateAssert;
 
-    public static class 初期状態でエラーがない場合 {
+class ValidateErrorsTest {
 
-        private ValidateErrors sut;
+    private ValidateErrors sut;
 
-        @Before
-        public void setUp() {
+    @DisplayName("初期状態でエラーがない場合")
+    @Nested
+    class NotExistErrors {
+
+        @BeforeEach
+        void setUp() {
 
             sut = new ValidateErrors();
         }
 
+        @DisplayName("toListで空のリストが返却される")
         @Test
-        public void toListで空のリストが返却される() {
+        void testToList() {
 
             final List<ValidateError> actual = sut.toList();
-            assertThat(actual, is(not(nullValue())));
-            assertThat(actual.isEmpty(), is(true));
+            assertNotNull(actual);
+            assertTrue(actual.isEmpty());
         }
 
-        @Test(expected = UnsupportedOperationException.class)
-        public void toListの戻り値リストは不変() {
+        @DisplayName("toListの戻り値リストは不変")
+        @Test
+        void testToListReturnImmutable() {
 
             final List<ValidateError> actual = sut.toList();
 
-            actual.add(null);
+            assertThrows(UnsupportedOperationException.class, () -> actual.add(null));
         }
 
+        @DisplayName("hasErrorでfalseが返却される")
         @Test
-        public void hasErrorでfalseが返却される() {
+        void testHasError() {
 
-            assertThat(sut.hasError(), is(false));
+            assertFalse(sut.hasError());
         }
 
+        @DisplayName("addでエラーが追加される")
         @Test
-        public void addでエラーが追加される() {
+        void testAdd() {
 
             final Object[] messageParam = {"テスト"};
             final ValidateError expectError = new ValidateError(ErrorInfo.Required, messageParam);
 
             sut.add(expectError);
-            assertThat(sut.hasError(), is(true));
+            assertTrue(sut.hasError());
 
-            final List<ValidateError> actualList = sut.toList();
-            assertThat(actualList.size(), is(1));
-
-            final ValidateError actual = actualList.get(0);
-            assertThat(actual, is(validatedBy(expectError)));
+            final ValidateAssert validate = new ValidateAssert(expectError, sut);
+            validate.assertAll();
         }
 
+        @DisplayName("addAllで全てのエラーが追加される")
         @Test
-        public void addAllで全てのエラーが追加される() {
+        void testAddAll() {
 
             final ValidateErrors expectedErrors = new ValidateErrors();
 
@@ -74,51 +80,46 @@ public class ValidateErrorsTest {
 
             sut.addAll(expectedErrors);
 
-            assertThat(sut.hasError(), is(true));
+            assertTrue(sut.hasError());
 
-            final List<ValidateError> expectedList = expectedErrors.toList();
-            final List<ValidateError> actualList = sut.toList();
-
-            assertThat(actualList.size(), is(expectedList.size()));
-
-            IntStream.range(1, expectedList.size()).forEach(
-                i -> {
-                    final ValidateError expectedError = expectedList.get(i);
-                    final ValidateError actualError = actualList.get(i);
-                    assertThat(actualError, is(validatedBy(expectedError)));
-                });
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, sut);
+            validate.assertAll();
         }
     }
 
-    public static class エラーが1件追加されている場合 {
+    @DisplayName("エラーが1件追加されている場合")
+    @Nested
+    class ExistError {
 
         private ValidateErrors sut;
         private final Object[] messageParam = {"テスト"};
         private final ValidateError baseError = new ValidateError(ErrorInfo.Required, messageParam);
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new ValidateErrors();
             sut.add(baseError);
         }
 
+        @DisplayName("同一のエラーを追加しても件数は変わらない")
         @Test
-        public void 同一のエラーを追加しても件数は変わらない() {
+        void testAddSameValue() {
 
             sut.add(baseError);
 
-            assertThat(sut.toList().size(), is(1));
+            assertEquals(1, sut.toList().size());
         }
 
+        @DisplayName("異なるエラーの場合は件数が増える")
         @Test
-        public void 異なるエラーの場合は件数が増える() {
+        void testAddDiffrentValue() {
 
             final Object[] otherParam = {"テスト2"};
             final ValidateError otherError = new ValidateError(ErrorInfo.Required, otherParam);
             sut.add(otherError);
 
-            assertThat(sut.toList().size(), is(2));
+            assertEquals(2, sut.toList().size());
         }
     }
 }

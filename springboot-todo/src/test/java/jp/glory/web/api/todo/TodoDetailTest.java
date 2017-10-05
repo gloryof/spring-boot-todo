@@ -1,15 +1,14 @@
 package jp.glory.web.api.todo;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -35,30 +34,36 @@ import jp.glory.web.api.todo.request.TodoDetailSaveRequest;
 import jp.glory.web.api.todo.response.TodoDetailResponse;
 import jp.glory.web.session.UserInfo;
 
-@RunWith(Enclosed.class)
-public class TodoDetailTest {
+class TodoDetailTest {
 
-    private static final long TARGET_ID = 100;
+    private final long TARGET_ID = 100;
 
-    @RunWith(Enclosed.class)
-    public static class viewのテスト {
+    private TodoDetail sut = null;
 
-        public static class 対象のデータが存在する場合 {
+    private SearchTodo mockSearch = null;
+    private SaveTodo mockSave = null;
 
-            private TodoDetail sut = null;
+    private Todo expectedTodo = null;
 
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
+    @BeforeEach
+    void setUp() {
 
-            private Todo expectedTodo = null;
+        mockSearch = Mockito.mock(SearchTodo.class);
+        mockSave = Mockito.mock(SaveTodo.class);
+    }
 
-            private ResponseEntity<TodoDetailResponse> actual = null;
+    @DisplayName("viewのテスト")
+    @Nested
+    class View {
 
-            @Before
-            public void setUp() {
+        private ResponseEntity<TodoDetailResponse> actual = null;
 
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
+        @DisplayName("対象のデータが存在する場合")
+        @Nested
+        class IfExists {
+
+            @BeforeEach
+            void setUp() {
 
                 expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"), new Memo("メモ"), true);
                 expectedTodo.version(20l);
@@ -72,39 +77,33 @@ public class TodoDetailTest {
                 actual = sut.view(TARGET_ID);
             }
 
+            @DisplayName("ステータスはOK")
             @Test
-            public void ステータスはOK() {
+            void assertStatus() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+                assertEquals(HttpStatus.OK, actual.getStatusCode());
             }
 
+            @DisplayName("Todoの内容が返る")
             @Test
-            public void Todoの内容が返る() throws Exception {
+            void assertTodoDetails() throws Exception {
 
                 final TodoDetailResponse actualResponse = actual.getBody();
 
-                assertThat(actualResponse.getId(), is(expectedTodo.getId().getValue()));
-                assertThat(actualResponse.getSummary(), is(expectedTodo.getSummary().getValue()));
-                assertThat(actualResponse.getMemo(), is(expectedTodo.getMemo().getValue()));
-                assertThat(actualResponse.isCompleted(), is(expectedTodo.isCompleted()));
-                assertThat(actualResponse.getVersion(), is(expectedTodo.getEntityVersion()));
+                assertEquals(expectedTodo.getId().getValue().longValue(), actualResponse.getId());
+                assertEquals(expectedTodo.getSummary().getValue(), actualResponse.getSummary());
+                assertEquals(expectedTodo.getMemo().getValue(), actualResponse.getMemo());
+                assertEquals(expectedTodo.isCompleted(), actualResponse.isCompleted());
+                assertEquals(expectedTodo.getEntityVersion(), actualResponse.getVersion());
             }
         }
 
-        public static class 対象のデータが存在しない場合 {
+        @DisplayName("対象のデータが存在しない場合")
+        @Nested
+        class IfNotExists {
 
-            private TodoDetail sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-
-            private ResponseEntity<TodoDetailResponse> actual = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
+            @BeforeEach
+            void setUp() {
 
                 Mockito
                     .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
@@ -115,109 +114,39 @@ public class TodoDetailTest {
                 actual = sut.view(TARGET_ID);
             }
 
+            @DisplayName("ステータスはNotFound")
             @Test
-            public void ステータスはNotFound() throws Exception {
+            void assertStatusCode() throws Exception {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.NOT_FOUND));
+                assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
             }
         }
     }
 
-    @RunWith(Enclosed.class)
-    public static class saveのテスト {
+    @DisplayName("saveのテスト")
+    @Nested
+    class Save {
 
-        public static class 対象のデータが存在して_入力内容に不備がない場合 {
 
-            private TodoDetail sut = null;
+        private TodoDetailSaveRequest request = null;
+        private SaveTodo.Result mockUseCaseResult = null;
+        private final User user = TestUserUtil.createDefault();
 
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-            private SaveTodo.Result mockUseCaseResult = null;
+        private ResponseEntity<Object> actual = null;
+        private Todo actualTodo = null;
 
-            private TodoDetailSaveRequest request = null;
+        @BeforeEach
+        void setUp () {
 
-            private Todo expectedTodo = null;
-
-            private ResponseEntity<Object> actual = null;
-            private Todo actualTodo = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
-                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
-
-                final User user = TestUserUtil.createDefault();
-
-                expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"), new Memo("メモ"),
-                        true);
-                expectedTodo.version(10l);
-
-                Mockito
-                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                    .thenReturn(Optional.of(expectedTodo));
-
-                Mockito
-                    .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
-                    .thenReturn(Optional.of(expectedTodo));
-                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
-                Mockito.when(mockSave.save(Mockito.any())).then(new Answer<SaveTodo.Result>() {
-
-                    @Override
-                    public Result answer(InvocationOnMock invocation) throws Throwable {
-
-                        actualTodo = invocation.getArgumentAt(0, Todo.class);
-                        return mockUseCaseResult;
-                    }
-                });
-
-                request = new TodoDetailSaveRequest();
-                request.setSummary(expectedTodo.getSummary().getValue());
-                request.setMemo(expectedTodo.getMemo().getValue());
-                request.setCompleted(expectedTodo.isCompleted());
-                request.setVersion(expectedTodo.getEntityVersion());
-
-                sut = new TodoDetail(mockSearch, mockSave);
-                actual = sut.save(TARGET_ID, request, new UserInfo(user));
-            }
-
-            @Test
-            public void NoContetが返る() throws Exception {
-
-                assertThat(actual.getStatusCode(), is(HttpStatus.NO_CONTENT));
-            }
-
-            @Test
-            public void 設定された内容が保存される() throws Exception {
-
-                assertThat(actualTodo.getId().getValue(), is(expectedTodo.getId().getValue()));
-                assertThat(actualTodo.getSummary().getValue(), is(expectedTodo.getSummary().getValue()));
-                assertThat(actualTodo.getMemo().getValue(), is(expectedTodo.getMemo().getValue()));
-                assertThat(actualTodo.isCompleted(), is(expectedTodo.isCompleted()));
-                assertThat(actualTodo.getEntityVersion(), is(expectedTodo.getEntityVersion()));
-            }
+            mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
         }
 
-        public static class 対象のデータが存在して_入力内容に不備がある場合 {
+        @DisplayName("対象のデータが存在している場合")
+        @Nested
+        class IfExisits {
 
-            private TodoDetail sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
-            private SaveTodo.Result mockUseCaseResult = null;
-
-            private Todo expectedTodo = null;
-            private ValidateErrors expectedErrors = null;
-
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
-                mockUseCaseResult = Mockito.mock(SaveTodo.Result.class);
-
-                final User user = TestUserUtil.createDefault();
+            @BeforeEach
+            void setUp() {
 
                 expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"), new Memo("メモ"),
                         true);
@@ -227,28 +156,84 @@ public class TodoDetailTest {
                     .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
                     .thenReturn(Optional.of(expectedTodo));
 
-                expectedErrors = new ValidateErrors();
-                expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
-                expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
-
                 Mockito
                     .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
                     .thenReturn(Optional.of(expectedTodo));
-                Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
-                Mockito.when(mockSave.save(Mockito.any())).thenReturn(mockUseCaseResult);
-
-                sut = new TodoDetail(mockSearch, mockSave);
             }
 
-            @Test
-            public void InvalidRequestExceptionがスローされる() {
+            @DisplayName("入力内容に不備がない場合")
+            @Nested
+            class ValueIsValid {
 
-                try {
 
-                    final User user = TestUserUtil.createDefault();
-                    sut.save(TARGET_ID, new TodoDetailSaveRequest(), new UserInfo(user));
-                    fail();
-                } catch (final InvalidRequestException exception) {
+                @BeforeEach
+                void setUp() {
+
+                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(new ValidateErrors());
+                    Mockito.when(mockSave.save(Mockito.any())).then(new Answer<SaveTodo.Result>() {
+
+                        @Override
+                        public Result answer(InvocationOnMock invocation) throws Throwable {
+
+                            actualTodo = invocation.getArgumentAt(0, Todo.class);
+                            return mockUseCaseResult;
+                        }
+                    });
+
+                    request = new TodoDetailSaveRequest();
+                    request.setSummary(expectedTodo.getSummary().getValue());
+                    request.setMemo(expectedTodo.getMemo().getValue());
+                    request.setCompleted(expectedTodo.isCompleted());
+                    request.setVersion(expectedTodo.getEntityVersion());
+
+                    sut = new TodoDetail(mockSearch, mockSave);
+                    actual = sut.save(TARGET_ID, request, new UserInfo(user));
+                }
+
+                @DisplayName("NoContetが返る")
+                @Test
+                void assertStatusCode() throws Exception {
+
+                    assertEquals(HttpStatus.NO_CONTENT, actual.getStatusCode());
+                }
+
+                @Test
+                void 設定された内容が保存される() throws Exception {
+
+                    assertEquals(expectedTodo.getId().getValue(), actualTodo.getId().getValue());
+                    assertEquals(expectedTodo.getSummary().getValue(), actualTodo.getSummary().getValue());
+                    assertEquals(expectedTodo.getMemo().getValue(), actualTodo.getMemo().getValue());
+                    assertEquals(expectedTodo.isCompleted(), actualTodo.isCompleted());
+                    assertEquals(expectedTodo.getEntityVersion(), actualTodo.getEntityVersion());
+                }
+
+            }
+
+            @DisplayName("入力内容に不備がある場合")
+            @Nested
+            class ValueIsInvalid {
+
+                private ValidateErrors expectedErrors = null;
+
+                @BeforeEach
+                void setUp() {
+
+                    expectedErrors = new ValidateErrors();
+                    expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
+                    expectedErrors.add(new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, 1000));
+
+                    Mockito.when(mockUseCaseResult.getErrors()).thenReturn(expectedErrors);
+                    Mockito.when(mockSave.save(Mockito.any())).thenReturn(mockUseCaseResult);
+
+                    sut = new TodoDetail(mockSearch, mockSave);
+                }
+
+                @DisplayName("InvalidRequestExceptionがスローされる")
+                @Test
+                void assertThrowException() {
+
+                    final InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                            () -> sut.save(TARGET_ID, new TodoDetailSaveRequest(), new UserInfo(user)));
 
                     final ValidateErrors actualErrors = exception.getErrors();
 
@@ -256,26 +241,22 @@ public class TodoDetailTest {
 
                         final String actualMessage = actualErrors.toList().get(i).getMessage();
                         final String expectedMessage = expectedErrors.toList().get(i).getMessage();
-                        assertThat(actualMessage, is(expectedMessage));
+                        assertEquals(expectedMessage, actualMessage);
                     }
                 }
             }
+
         }
 
-        public static class 対象のデータが存在しない場合 {
 
-            private TodoDetail sut = null;
-
-            private SearchTodo mockSearch = null;
-            private SaveTodo mockSave = null;
+        @DisplayName("対象のデータが存在しない場合")
+        @Nested
+        class IfNotExists {
 
             private ResponseEntity<Object> actual = null;
 
-            @Before
-            public void setUp() {
-
-                mockSearch = Mockito.mock(SearchTodo.class);
-                mockSave = Mockito.mock(SaveTodo.class);
+            @BeforeEach
+            void setUp() {
 
                 Mockito
                     .when(mockSearch.searchById(TodoIdArgMatcher.arg(TARGET_ID)))
@@ -286,10 +267,11 @@ public class TodoDetailTest {
                 actual = sut.save(TARGET_ID, new TodoDetailSaveRequest(), new UserInfo(TestUserUtil.createDefault()));
             }
 
+            @DisplayName("ステータスはNOT_FOUND")
             @Test
-            public void ステータスはNOT_FOUND() {
+            void assertStatus() {
 
-                assertThat(actual.getStatusCode(), is(HttpStatus.NOT_FOUND));
+                assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
             }
         }
     }

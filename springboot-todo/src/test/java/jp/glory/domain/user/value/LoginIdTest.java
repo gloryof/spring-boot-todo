@@ -1,145 +1,166 @@
 package jp.glory.domain.user.value;
 
-import static jp.glory.test.validate.ValidateMatcher.validatedBy;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.test.util.TestUtil;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class LoginIdTest {
+class LoginIdTest {
 
-    public static class emptyのテスト {
+    private LoginId sut = null;
+    private ValidateErrors actualErrors = null;
 
+    @DisplayName("emptyのテスト")
+    @Nested
+    class TestEmpty {
+
+        @DisplayName("ブランクが返る")
         @Test
-        public void ブランクが返却される() {
+        void returnBlank() {
 
-            final LoginId actual = LoginId.empty();
+            sut = LoginId.empty();
 
-            assertThat(actual.getValue(), is(""));
+            assertEquals("", sut.getValue());
         }
     }
 
-    public static class 正常な値が設定されている場合 {
+    @DisplayName("正常な値が設定されている場合")
+    @Nested
+    class WhenValidValue {
 
-        private LoginId sut = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new LoginId("tes-user");
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行っても入力チェックエラーにならない")
         @Test
-        public void validateを行っても入力チェックエラーにならない() {
+        void assertHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 値が未設定の場合 {
+    @DisplayName("値が未設定の場合")
+    @Nested
+    class WhenValueIsNotSet {
 
-        private LoginId sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new LoginId("");
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行うと入力チェックエラーになる")
         @Test
-        public void validateを行うと必須チェックエラーになる() {
+        void assertHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
+            assertTrue(actualErrors.hasError());
+        }
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+        @DisplayName("必須チェックエラーになる")
+        @Test
+        void assertErrors() {
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.Required, LoginId.LABEL);
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+
+            final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class 値が50文字の場合 {
+    @DisplayName("値が50文字の場合")
+    @Nested
+    class WhenLengthMax {
 
-        private LoginId sut = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new LoginId(TestUtil.repeat("a", 50));
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行っても入力チェックエラーにならない")
         @Test
-        public void validateを行っても入力チェックエラーにならない() {
+        void assertHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 値が51文字以上の場合 {
 
-        private LoginId sut = null;
+    @DisplayName("値が51文字以上の場合")
+    @Nested
+    class WhenLengthMaxOver {
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new LoginId(TestUtil.repeat("a", 51));
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行うと入力チェックエラーになる")
         @Test
-        public void validateを行うと文字数オーバーエラーになる() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
+            assertTrue(actualErrors.hasError());
+        }
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+        @DisplayName("文字数オーバーエラーになる")
+        @Test
+        void assertErrors() {
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.MaxLengthOver, LoginId.LABEL, "50");
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+
+            final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class 値に使用できない文字のみ設定されている場合 {
+    @DisplayName("値に使用できない文字のみ設定されている場合")
+    @Nested
+    class WhenInvalidCharacters {
 
-        private LoginId sut = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new LoginId("あ");
+            actualErrors = sut.validate();
         }
 
+
+        @DisplayName("validateを行うと入力チェックエラーになる")
         @Test
-        public void validateを行うと入力文字エラーになる() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
+            assertTrue(actualErrors.hasError());
+        }
 
-            assertThat(actualErrors.hasError(), is(true));
+        @DisplayName("文字種エラーになる")
+        @Test
+        void assertErrors() {
 
-            final List<ValidateError> actualList = actualErrors.toList();
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.InvalidCharacters, LoginId.LABEL);
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(validatedBy(expectedError)));
+
+            final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 }

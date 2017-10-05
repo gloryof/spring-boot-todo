@@ -1,142 +1,196 @@
 package jp.glory.domain.common.type;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EntityIdTest {
+import java.util.stream.Stream;
 
-    private static class StubClass extends EntityId {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+
+class EntityIdTest {
+
+
+    static class StubClass extends EntityId {
 
         private static final long serialVersionUID = 1L;
 
-        public StubClass(final Long paramValue) {
+        StubClass(final Long paramValue) {
             super(paramValue);
+        }
+
+        @Override
+        public String toString() {
+
+            return String.valueOf(getValue());
         }
     }
 
-    public static class 初期値に1が設定されている場合 {
+    static class DiffrentValueProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+
+            return Stream.of(new StubClass(2L), new StubClass(4L), null).map(this::createArguments);
+        }
+
+        private Arguments createArguments(final StubClass stub) {
+
+            if (stub == null) {
+
+                return Arguments.of(null, null);
+            }
+
+            return Arguments.of(stub.getValue(), stub);
+        }
+    }
+
+    @DisplayName("初期値に1が設定されている場合")
+    @Nested
+    class WhenInitValueIsOne {
 
         private EntityId sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new StubClass(1L);
         }
 
+        @DisplayName("valueには1が設定されている")
         @Test
-        public void valueには1が設定されている() {
+        void testGetValue() {
 
-            assertThat(sut.getValue(), is(1L));
+            assertEquals((Long)1L, sut.getValue());
         }
 
+        @DisplayName("isSetValueにはtrueが設定されている")
         @Test
-        public void isSetValueにはtrueが設定されている() {
+        void testSetValue() {
 
-            assertThat(sut.isSetValue(), is(true));
+            assertTrue(sut.isSetValue());
         }
 
+        @DisplayName("isSameに同じ値が設定された場合trueが返される")
         @Test
-        public void isSameにNullが設定された場合falseが返却される() {
+        void testIsSame1() {
 
-            assertThat(sut.isSame(null), is(false));
+            assertTrue(sut.isSame(new StubClass(1L)));
         }
 
-        @Test
-        public void isSameに0のIDが設定された場合falseが返却される() {
+        @DisplayName("isSameに異なる値が設定された場合falseが返される")
+        @ParameterizedTest(name = "[{index}] StubClass({0})")
+        @ArgumentsSource(DiffrentValueProvider.class)
+        void testIsSame2(Long longValue, StubClass value) {
 
-            assertThat(sut.isSame(new StubClass(0L)), is(false));
+            assertFalse(sut.isSame(value));
         }
 
+        @DisplayName("isSameにNullが設定された場合falseが返される")
         @Test
-        public void isSameに1のIDが設定された場合trueが返却される() {
+        void testIsSame3() {
 
-            assertThat(sut.isSame(new StubClass(1L)), is(true));
+            assertFalse(sut.isSame(null));
         }
     }
 
-    public static class 初期値に0が設定されている場合 {
+    @DisplayName("初期値に0が設定されている場合")
+    @Nested
+    class WhenInitValueIsZero {
 
-        private StubClass sut = null;
+        private EntityId sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new StubClass(0L);
         }
 
+        @DisplayName("valueには0が設定されている")
         @Test
-        public void valueには0が設定されている() {
+        void testGetValue() {
 
-            assertThat(sut.getValue(), is(0L));
+            assertEquals((Long) 0L, sut.getValue());
         }
 
+        @DisplayName("isSetValueにはtrueが設定されている")
         @Test
-        public void isSetValueにはtrueが設定されている() {
+        void testIsSetValue() {
 
-            assertThat(sut.isSetValue(), is(true));
+            assertTrue(sut.isSetValue());
         }
 
+        @DisplayName("isSameに同じ値が設定された場合trueが返される")
         @Test
-        public void isSameにNullが設定された場合falseが返却される() {
+        void testIsSame1() {
 
-            assertThat(sut.isSame(null), is(false));
+            assertTrue(sut.isSame(new StubClass(0L)));
         }
 
-        @Test
-        public void isSameに0のIDが設定された場合trueが返却される() {
+        @DisplayName("isSameに異なる値が設定された場合falseが返される")
+        @ParameterizedTest(name = "[{index}] StubClass({0})")
+        @ArgumentsSource(DiffrentValueProvider.class)
+        void testIsSame2(Long longValue, StubClass value) {
 
-            assertThat(sut.isSame(new StubClass(0L)), is(true));
+            assertFalse(sut.isSame(value));
         }
 
+        @DisplayName("isSameにNullが設定された場合falseが返される")
         @Test
-        public void isSameに1のIDが設定された場合falseが返却される() {
+        void testIsSame3() {
 
-            assertThat(sut.isSame(new StubClass(1L)), is(false));
+            assertFalse(sut.isSame(null));
         }
     }
 
-    public static class Nullが設定されている場合 {
+    @DisplayName("Nullが設定されている場合")
+    @Nested
+    class WhenInitValueIsNull {
 
         private EntityId sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new StubClass(null);
         }
 
+        @DisplayName("valueには0が設定されている")
         @Test
-        public void valueには0が設定されている() {
+        void testGetValue() {
 
-            assertThat(sut.getValue(), is(0L));
+            assertEquals((Long) 0L, sut.getValue());
         }
 
+        @DisplayName("isSetValueにはfalseが設定されている")
         @Test
-        public void isSetValueにはfalseが設定されている() {
+        void testIsSetValue1() {
 
-            assertThat(sut.isSetValue(), is(false));
+            assertFalse(sut.isSetValue());
         }
 
+        @DisplayName("isSameにNullが設定された場合falseが返される")
         @Test
-        public void isSameにNullが設定された場合falseが返却される() {
+        void testIsSame1() {
 
-            assertThat(sut.isSame(null), is(false));
+            assertFalse(sut.isSame(null));
         }
 
-        @Test
-        public void isSameに0のIDが設定された場合falseが返却される() {
+        @DisplayName("isSameに異なる値が設定された場合falseが返却される")
+        @ParameterizedTest(name = "[{index}] StubClass({0})")
+        @ArgumentsSource(DiffrentValueProvider.class)
+        void testIsSame2(Long longValue, StubClass value) {
 
-            assertThat(sut.isSame(new StubClass(0L)), is(false));
-        }
-
-        @Test
-        public void isSameに1のIDが設定された場合falseが返却される() {
-
-            assertThat(sut.isSame(new StubClass(1L)), is(false));
+            assertFalse(sut.isSame(value));
         }
     }
 

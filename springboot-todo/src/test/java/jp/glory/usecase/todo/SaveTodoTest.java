@@ -1,12 +1,16 @@
 package jp.glory.usecase.todo;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.todo.entity.Todo;
 import jp.glory.domain.todo.repository.TodoRepositoryMock;
@@ -16,105 +20,107 @@ import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.usecase.todo.SaveTodo.Result;
 
-@RunWith(Enclosed.class)
-public class SaveTodoTest {
+class SaveTodoTest {
 
-    @RunWith(Enclosed.class)
-    public static class save {
+    private SaveTodo sut = null;
 
-        public static class 入力内容に不備がない_未採番のTODOの場合 {
+    private TodoRepositoryMock mockRepository = null;
 
-            private SaveTodo sut = null;
+    private Result actual = null;
 
-            private TodoRepositoryMock mockRepository = null;
+    private final long expectedTodoIdVal = 1000;
 
-            private Result actual = null;
-            private final long expectedTodoIdVal = 1000;
+    @BeforeEach
+    void setUp() {
 
-            @Before
-            public void setUp() {
+        mockRepository = new TodoRepositoryMock();
+        sut = new SaveTodo(mockRepository);
+        mockRepository.setSequence(expectedTodoIdVal);
+    }
 
-                mockRepository = new TodoRepositoryMock();
-                sut = new SaveTodo(mockRepository);
+    @DisplayName("saveのテスト")
+    @Nested
+    class Save {
 
-                mockRepository.setSequence(expectedTodoIdVal);
-                final Todo todo = new Todo(TodoId.notNumberingValue(), new UserId(2000l), new Summary("test"),
-                        Memo.empty(), false);
-                actual = sut.save(todo);
+        @DisplayName("未採番号の場合")
+        @Nested
+        class WhenNotNumbering {
+
+            @DisplayName("入力内容に不備がない")
+            @Nested
+            class ValueIsValid {
+
+                @BeforeEach
+                void setUp() {
+
+                    final Todo todo = new Todo(TodoId.notNumberingValue(), new UserId(2000l), new Summary("test"),
+                            Memo.empty(), false);
+                    actual = sut.save(todo);
+                }
+
+                @DisplayName("入力エラーはない")
+                @Test
+                void assertErrors() {
+
+                    assertFalse(actual.getErrors().hasError());
+                }
+
+                @DisplayName("保存結果に新しいTODOのIDが発行される")
+                @Test
+                void assertId() {
+
+                    assertEquals((Long) expectedTodoIdVal, actual.getSavedTodoId().getValue());
+                }
+
+                @DisplayName("TODOが保存される")
+                @Test
+                void assertSaved() {
+
+                    assertTrue(mockRepository.getResult(expectedTodoIdVal).isPresent());
+                }
             }
 
-            @Test
-            public void 入力エラーはない() {
+            @DisplayName("入力内容に不備がある")
+            @Nested
+            class ValueIsInvalid {
 
-                assertThat(actual.getErrors().hasError(), is(false));
-            }
+                @BeforeEach
+                void setUp() {
+                    final Todo todo = new Todo(TodoId.notNumberingValue(), new UserId(2000l), Summary.empty(),
+                            Memo.empty(), false);
+                    actual = sut.save(todo);
+                }
 
-            @Test
-            public void 保存結果に新しいTODOのIDが発行される() {
+                @DisplayName("入力エラーがある")
+                @Test
+                void assertErrors() {
 
-                assertThat(actual.getSavedTodoId().getValue(), is(expectedTodoIdVal));
-            }
+                    assertTrue(actual.getErrors().hasError());
+                }
 
-            @Test
-            public void TODOが保存される() {
+                @DisplayName("保存結果に新しいTODOのIDは発行されない")
+                @Test
+                void assertId() {
 
-                assertThat(mockRepository.getResult(expectedTodoIdVal).isPresent(), is(true));
+                    assertFalse(actual.getSavedTodoId().isSetValue());
+                }
+
+                @DisplayName("TODOが保存されない")
+                @Test
+                void assertSaved() {
+
+                    assertFalse(mockRepository.getResult(expectedTodoIdVal).isPresent());
+                }
             }
         }
 
-        public static class 入力内容に不備がある_未採番のTODOの場合 {
+        @DisplayName("採番済みのTODOの場合")
+        @Nested
+        class WhenNumbering {
 
-            private SaveTodo sut = null;
+            @BeforeEach
+            void setUp() {
 
-            private TodoRepositoryMock mockRepository = null;
-
-            private Result actual = null;
-            private final long expectedTodoIdVal = 1000;
-
-            @Before
-            public void setUp() {
-
-                mockRepository = new TodoRepositoryMock();
-                sut = new SaveTodo(mockRepository);
-
-                mockRepository.setSequence(expectedTodoIdVal);
-                final Todo todo = new Todo(TodoId.notNumberingValue(), new UserId(2000l), Summary.empty(),
-                        Memo.empty(), false);
-                actual = sut.save(todo);
-            }
-
-            @Test
-            public void 入力エラーがある() {
-
-                assertThat(actual.getErrors().hasError(), is(true));
-            }
-
-            @Test
-            public void 保存結果に新しいTODOのIDは発行されない() {
-
-                assertThat(actual.getSavedTodoId().isSetValue(), is(false));
-            }
-
-            @Test
-            public void TODOが保存されない() {
-
-                assertThat(mockRepository.getResult(expectedTodoIdVal).isPresent(), is(false));
-            }
-        }
-
-        public static class 入力内容に不備がない_採番済みのTODOの場合 {
-
-            private SaveTodo sut = null;
-
-            private TodoRepositoryMock mockRepository = null;
-
-            private Result actual = null;
-            private final long expectedTodoIdVal = 1000;
-
-            @Before
-            public void setUp() {
-
-                mockRepository = new TodoRepositoryMock();
                 final Todo beforeTodo = new Todo(new TodoId(expectedTodoIdVal), new UserId(2000l),
                         new Summary("before"), new Memo("メモ"), true);
                 mockRepository.addTestData(beforeTodo);
@@ -122,67 +128,80 @@ public class SaveTodoTest {
                 sut = new SaveTodo(mockRepository);
 
                 mockRepository.setSequence(9999);
-                final Todo todo = new Todo(new TodoId(expectedTodoIdVal), new UserId(2000l), new Summary("test"),
-                        Memo.empty(), false);
-                actual = sut.save(todo);
+            }
+            
+
+            @DisplayName("入力内容に不備がない")
+            @Nested
+            class ValueIsValid {
+
+                @BeforeEach
+                void setUp() {
+
+                    final Todo todo = new Todo(new TodoId(expectedTodoIdVal), new UserId(2000l), new Summary("test"),
+                            Memo.empty(), false);
+                    actual = sut.save(todo);
+                }
+
+                @DisplayName("入力エラーはない")
+                @Test
+                void assertErrors() {
+
+                    assertFalse(actual.getErrors().hasError());
+                }
+
+
+                @DisplayName("保存結果に既存のTODOのIDが設定される")
+                @Test
+                void assertId() {
+
+                    assertEquals((Long) expectedTodoIdVal, actual.getSavedTodoId().getValue());
+                }
+
+                @DisplayName("TODOが保存される")
+                @Test
+                void assertSaved() {
+
+                    final Optional<Todo> actualOpt = mockRepository.getResult(expectedTodoIdVal);
+                    assertTrue(actualOpt.isPresent());
+                    assertEquals("test", actualOpt.get().getSummary().getValue());
+                }
             }
 
-            @Test
-            public void 入力エラーはない() {
+            @DisplayName("入力内容に不備がある")
+            @Nested
+            class ValueIsInvalid {
 
-                assertThat(actual.getErrors().hasError(), is(false));
-            }
+                @BeforeEach
+                void setUp() {
 
-            @Test
-            public void 保存結果に既存のTODOのIDが設定される() {
+                    final Todo todo = new Todo(new TodoId(1000l), new UserId(2000l), Summary.empty(),
+                            Memo.empty(), false);
+                    actual = sut.save(todo);
+                }
 
-                assertThat(actual.getSavedTodoId().getValue(), is(expectedTodoIdVal));
-            }
+                @DisplayName("入力エラーがある")
+                @Test
+                void assertErrors() {
 
-            @Test
-            public void TODOが保存される() {
+                    assertTrue(actual.getErrors().hasError());
+                }
 
-                assertThat(mockRepository.getResult(expectedTodoIdVal).isPresent(), is(true));
-            }
-        }
+                @DisplayName("保存結果に新しいTODOのIDは発行されない")
+                @Test
+                void assertId() {
 
-        public static class 入力内容に不備がある_採番のTODOの場合 {
+                    assertFalse(actual.getSavedTodoId().isSetValue());
+                }
 
-            private SaveTodo sut = null;
+                @DisplayName("TODOは保存されない")
+                @Test
+                void assertSaved() {
 
-            private TodoRepositoryMock mockRepository = null;
-
-            private Result actual = null;
-            private final long expectedTodoIdVal = 1000;
-
-            @Before
-            public void setUp() {
-
-                mockRepository = new TodoRepositoryMock();
-                sut = new SaveTodo(mockRepository);
-
-                mockRepository.setSequence(expectedTodoIdVal);
-                final Todo todo = new Todo(new TodoId(1000l), new UserId(2000l), Summary.empty(),
-                        Memo.empty(), false);
-                actual = sut.save(todo);
-            }
-
-            @Test
-            public void 入力エラーがある() {
-
-                assertThat(actual.getErrors().hasError(), is(true));
-            }
-
-            @Test
-            public void 保存結果に新しいTODOのIDは発行されない() {
-
-                assertThat(actual.getSavedTodoId().isSetValue(), is(false));
-            }
-
-            @Test
-            public void TODOが保存されない() {
-
-                assertThat(mockRepository.getResult(expectedTodoIdVal).isPresent(), is(false));
+                    final Optional<Todo> actualOpt = mockRepository.getResult(expectedTodoIdVal);
+                    assertTrue(actualOpt.isPresent());
+                    assertEquals("before", actualOpt.get().getSummary().getValue());
+                }
             }
         }
     }

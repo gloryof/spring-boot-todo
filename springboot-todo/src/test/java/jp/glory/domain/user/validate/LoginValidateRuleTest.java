@@ -1,14 +1,13 @@
 package jp.glory.domain.user.validate;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Description;
 
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
@@ -19,18 +18,19 @@ import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserId;
 import jp.glory.domain.user.value.UserName;
-import jp.glory.test.validate.ValidateErrorsHelper;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class LoginValidateRuleTest {
+class LoginValidateRuleTest {
 
-    public static class 全ての値が正常に設定されている場合 {
+    private LoginValidateRule sut = null;
+    private ValidateErrors actualErrors = null;
 
-        private LoginValidateRule sut = null;
-        private ValidateErrors actualErrors = null;
+    @DisplayName("全ての値が正常に設定されている場合")
+    @Nested
+    class WhenAllValueIsValid {
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final LoginId loginId = new LoginId("test-user");
             final Password password = new Password("test-password");
@@ -41,20 +41,20 @@ public class LoginValidateRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("hasErrorはfalse")
         @Test
-        public void validateを実行しても入力チェックエラーにならない() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 全ての項目が未設定の場合 {
+    @DisplayName("全ての項目が未設定の場合")
+    @Nested
+    class WhenAllValueIsNotSet {
 
-        private LoginValidateRule sut = null;
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final LoginId loginId = new LoginId("");
             final Password password = new Password("");
@@ -63,28 +63,33 @@ public class LoginValidateRuleTest {
             actualErrors = sut.validate();
         }
 
+        @DisplayName("hasErrorはtrue")
         @Test
-        public void validateを実行したら入力チェックエラーになる() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(true));
+            assertTrue(actualErrors.hasError());
+        }
 
-            final List<ValidateError> errorList = new ArrayList<>();
+        @Description("エラー情報が設定される")
+        @Test
+        void assertErrors() {
 
-            errorList.add(new ValidateError(ErrorInfo.Required, LoginId.LABEL));
-            errorList.add(new ValidateError(ErrorInfo.Required, Password.LABEL));
+            final ValidateErrors expectedErrors = new ValidateErrors();
 
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErrors);
-            helper.assertErrors(errorList);
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, LoginId.LABEL));
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, Password.LABEL));
+
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);
+            validate.assertAll();
         }
     }
 
-    public static class ログインIDとパスワードが一致していない場合 {
+    @DisplayName("ログインIDとパスワードが一致していない場合")
+    @Nested
+    class WhenLoginInfoMismatch {
 
-        private LoginValidateRule sut = null;
-        private ValidateErrors actualErrors = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final LoginId loginId = new LoginId("test-user");
             final Password password = new Password("test-password");
@@ -95,17 +100,23 @@ public class LoginValidateRuleTest {
             actualErrors = sut.validate();
         }
 
+
+        @DisplayName("hasErrorはtrue")
         @Test
-        public void validateを実行したら入力チェックエラーになる() {
+        void testHasError() {
 
-            Assert.assertThat(actualErrors.hasError(), CoreMatchers.is(true));
-
-            final List<ValidateError> errorList = new ArrayList<>();
-
-            errorList.add(new ValidateError(ErrorInfo.LoginFailed));
-
-            final ValidateErrorsHelper helper = new ValidateErrorsHelper(actualErrors);
-            helper.assertErrors(errorList);
+            assertTrue(actualErrors.hasError());
         }
-    }
+
+        @Description("認証エラーが設定される")
+        @Test
+        void assertErrors() {
+
+            final ValidateErrors expectedErrors = new ValidateErrors();
+            expectedErrors.add(new ValidateError(ErrorInfo.LoginFailed));
+
+            final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);
+            validate.assertAll();
+        }
+   }
 }

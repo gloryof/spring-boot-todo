@@ -1,114 +1,128 @@
 package jp.glory.domain.todo.value;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.common.error.ErrorInfo;
 import jp.glory.domain.common.error.ValidateError;
 import jp.glory.domain.common.error.ValidateErrors;
 import jp.glory.test.util.TestUtil;
-import jp.glory.test.validate.ValidateMatcher;
+import jp.glory.test.validate.ValidateAssert;
 
-@RunWith(Enclosed.class)
-public class MemoTest {
+class MemoTest {
 
-    public static class emptyのテスト {
+    private Memo sut = null;
+    private ValidateErrors actualErrors = null;
 
+    @DisplayName("emptyのテスト")
+    @Nested
+    class TestEmpty {
+
+        @DisplayName("ブランクが返る")
         @Test
-        public void ブランクが返却される() {
+        void returnBlank() {
 
-            final Memo actual = Memo.empty();
+            sut = Memo.empty();
 
-            assertThat(actual.getValue(), is(""));
+            assertEquals("", sut.getValue());
         }
     }
 
-    public static class 正常な値が設定されている場合 {
+    @DisplayName("正常な値が設定されている場合")
+    @Nested
+    class WhenValidValue {
 
-        private Memo sut = null;
-
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Memo("テスト");
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行っても入力チェックエラーにならない")
         @Test
-        public void validateを行っても入力チェックエラーにならない() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 値が未設定の場合 {
+    @DisplayName("値が未設定の場合")
+    @Nested
+    class WhenValueIsNotSet {
 
         private Memo sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Memo("");
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行っても入力チェックエラーにならない")
         @Test
-        public void validateを行うと必須チェックエラーにならない() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 値が1000文字の場合 {
+    @DisplayName("値が1000文字の場合")
+    @Nested
+    class WhenLengthMax {
 
         private Memo sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Memo(TestUtil.repeat("a", 1000));
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行っても入力チェックエラーにならない")
         @Test
-        public void validateを行っても入力チェックエラーにならない() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
-
-            assertThat(actualErrors.hasError(), is(false));
+            assertFalse(actualErrors.hasError());
         }
     }
 
-    public static class 値が1001文字以上の場合 {
+    @DisplayName("値が1001文字以上の場合")
+    @Nested
+    class WhenLengthMaxOver {
 
         private Memo sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Memo(TestUtil.repeat("a", 1001));
+            actualErrors = sut.validate();
         }
 
+        @DisplayName("validateを行うと入力チェックエラーになる")
         @Test
-        public void validateを行うと文字数オーバーエラーになる() {
+        void tetHasError() {
 
-            final ValidateErrors actualErrors = sut.validate();
+            assertTrue(actualErrors.hasError());
+        }
 
-            assertThat(actualErrors.hasError(), is(true));
-
-            final List<ValidateError> actualList = actualErrors.toList();
+        @DisplayName("文字数オーバーエラーになる")
+        @Test
+        void assertErrors() {
 
             final ValidateError expectedError = new ValidateError(ErrorInfo.MaxLengthOver, Memo.LABEL, "1,000");
-            assertThat(actualList.size(), is(1));
-            assertThat(actualList.get(0), is(ValidateMatcher.validatedBy(expectedError)));
+
+            final ValidateAssert validate = new ValidateAssert(expectedError, actualErrors);
+            validate.assertAll();
         }
     }
 }

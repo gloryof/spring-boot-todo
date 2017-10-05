@@ -1,16 +1,17 @@
 package jp.glory.domain.todo.entity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.todo.entity.Todos.Statistics;
 import jp.glory.domain.todo.value.Memo;
@@ -18,107 +19,143 @@ import jp.glory.domain.todo.value.Summary;
 import jp.glory.domain.todo.value.TodoId;
 import jp.glory.domain.user.value.UserId;
 
-@RunWith(Enclosed.class)
-public class TodosTest {
+class TodosTest {
 
-    public static class コンストラクタにNullが渡された場合 {
+    private Todos sut = null;
 
-        private Todos sut = null;
+    @DisplayName("コンストラクタにNullが渡された場合")
+    @Nested
+    class WhenConstructerParamNull {
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Todos(null);
         }
 
+        @DisplayName("未実行TODOはない")
         @Test
-        public void 未実行TODOはない() {
+        void testHasUnexecuted() {
 
-            assertThat(sut.hasUnexecuted(), is(false));
+            assertFalse(sut.hasUnexecuted());
         }
 
+        @DisplayName("asListで空のListが返される")
         @Test
-        public void トータル件数は0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getTotal(), is(0));
-        }
-
-        @Test
-        public void 実行済みは0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getExecuted(), is(0));
-        }
-
-        @Test
-        public void 未実行は0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getUnexecuted(), is(0));
-        }
-
-        @Test
-        public void asListで空のListが返される() {
+        void testIsEmpty() {
 
             final List<Todo> actual = sut.asList();
 
-            assertThat(actual.isEmpty(), is(true));
+            assertTrue(actual.isEmpty());
+        }
+
+        @DisplayName("Statisticsのに関するテスト")
+        @Nested
+        class TestStatistics {
+
+            private Statistics actualStatistics = null;
+
+            @BeforeEach
+            void setUp() {
+
+                actualStatistics = sut.getStatistics();
+            }
+
+            @DisplayName("トータル件数は0件")
+            @Test
+            void testGetTotal() {
+
+                assertEquals(0, actualStatistics.getTotal());
+            }
+
+            @DisplayName("実行済みは0件")
+            @Test
+            void testGetExecuted() {
+
+                assertEquals(0, actualStatistics.getExecuted());
+            }
+
+            @DisplayName("未実行は0件")
+            @Test
+            void testGetUnexecuted() {
+
+                assertEquals(0, actualStatistics.getUnexecuted());
+            }
         }
     }
 
-    public static class Todoが0件の場合 {
+    @DisplayName("Todoが0件の場合")
+    @Nested
+    class WhenTodoCountIsZero {
 
         private Todos sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             sut = new Todos(new ArrayList<>());
         }
 
+        @DisplayName("未実行TODOはない")
         @Test
-        public void 未実行TODOはない() {
+        void testHasUnexecuted() {
 
-            assertThat(sut.hasUnexecuted(), is(false));
+            assertFalse(sut.hasUnexecuted());
         }
 
+        @DisplayName("asListで空のListが返される")
         @Test
-        public void トータル件数は0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getTotal(), is(0));
-        }
-
-        @Test
-        public void 実行済みは0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getExecuted(), is(0));
-        }
-
-        @Test
-        public void 未実行は0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getUnexecuted(), is(0));
-        }
-
-        @Test
-        public void asListで空のListが返される() {
+        void testAsList() {
 
             final List<Todo> actual = sut.asList();
 
-            assertThat(actual.isEmpty(), is(true));
+            assertTrue(actual.isEmpty());
+        }
+
+        @DisplayName("Statisticsのに関するテスト")
+        @Nested
+        class TestStatistics {
+
+            private Statistics actualStatistics = null;
+
+            @BeforeEach
+            void setUp() {
+
+                actualStatistics = sut.getStatistics();
+            }
+
+            @DisplayName("トータル件数は0件")
+            @Test
+            void testGetTotal() {
+
+                assertEquals(0, actualStatistics.getTotal());
+            }
+
+            @DisplayName("実行済みは0件")
+            @Test
+            void testGetExecuted() {
+
+                assertEquals(0, actualStatistics.getExecuted());
+            }
+
+            @DisplayName("未実行は0件")
+            @Test
+            void testGetUnexecuted() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(0, actualStatistics.getUnexecuted());
+            }
         }
     }
 
-    public static class 未実行Todoが1件の場合 {
+    @DisplayName("未実行Todoが1件の場合")
+    @Nested
+    class WhenTodoUnexecutedCountIsOne {
 
         private Todos sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final List<Todo> list = new ArrayList<>();
             list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), false));
@@ -126,48 +163,67 @@ public class TodosTest {
             sut = new Todos(list);
         }
 
+        @DisplayName("未実行TODOはある")
         @Test
-        public void 未実行TODOはある() {
+        void testHasUnexecuted() {
 
-            assertThat(sut.hasUnexecuted(), is(true));
+            assertTrue(sut.hasUnexecuted());
         }
 
+        @DisplayName("asListで1件のListが返される")
         @Test
-        public void トータル件数は1件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getTotal(), is(1));
-        }
-
-        @Test
-        public void 実行済みは0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getExecuted(), is(0));
-        }
-
-        @Test
-        public void 未実行は1件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getUnexecuted(), is(1));
-        }
-
-        @Test
-        public void asListで1件のListが返される() {
+        void testAsList() {
 
             final List<Todo> actual = sut.asList();
 
-            assertThat(actual.size(), is(1));
+            assertEquals(1, actual.size());
+        }
+
+        @DisplayName("Statisticsのに関するテスト")
+        @Nested
+        class TestStatistics {
+
+            private Statistics actualStatistics = null;
+
+            @BeforeEach
+            void setUp() {
+
+                actualStatistics = sut.getStatistics();
+            }
+
+            @DisplayName("トータル件数は1件")
+            @Test
+            void testGetTotal() {
+
+                assertEquals(1, actualStatistics.getTotal());
+            }
+
+            @DisplayName("実行済みは0件")
+            @Test
+            void testGetExecuted() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(0, actualStatistics.getExecuted());
+            }
+
+            @DisplayName("未実行は1件")
+            @Test
+            void testGetUnexecuted() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(1, actualStatistics.getUnexecuted());
+            }
         }
     }
 
-    public static class 実行済Todoが1件の場合 {
+    @DisplayName("実行済Todoが1件の場合")
+    @Nested
+    class WhenTodoExecutedCountIsOne {
 
         private Todos sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final List<Todo> list = new ArrayList<>();
             list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), true));
@@ -175,48 +231,65 @@ public class TodosTest {
             sut = new Todos(list);
         }
 
+        @DisplayName("未実行TODOはない")
         @Test
-        public void 未実行TODOはない() {
+        void testHasUnexecuted() {
 
-            assertThat(sut.hasUnexecuted(), is(false));
+            assertFalse(sut.hasUnexecuted());
         }
 
+        @DisplayName("asListで1件のListが返される")
         @Test
-        public void トータル件数は1件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getTotal(), is(1));
-        }
-
-        @Test
-        public void 実行済みは1件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getExecuted(), is(1));
-        }
-
-        @Test
-        public void 未実行は0件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getUnexecuted(), is(0));
-        }
-
-        @Test
-        public void asListで1件のListが返される() {
+        void testAsList() {
 
             final List<Todo> actual = sut.asList();
 
-            assertThat(actual.size(), is(1));
+            assertEquals(1, actual.size());
+        }
+
+        @DisplayName("Statisticsのに関するテスト")
+        @Nested
+        class TestStatistics {
+
+            private Statistics actualStatistics = null;
+
+            @BeforeEach
+            void setUp() {
+
+                actualStatistics = sut.getStatistics();
+            }
+
+            @DisplayName("トータル件数は1件")
+            @Test
+            void testGetTotal() {
+
+                assertEquals(1, actualStatistics.getTotal());
+            }
+
+            @DisplayName("実行済みは1件")
+            @Test
+            void testGetExecuted() {
+
+                assertEquals(1, actualStatistics.getExecuted());
+            }
+
+            @DisplayName("未実行は0件")
+            @Test
+            void testGetUnexecuted() {
+
+                assertEquals(0, actualStatistics.getUnexecuted());
+            }
         }
     }
 
-    public static class 未実行3件_実行済み2件の合わせて5件の場合 {
+    @DisplayName("(未実行 : 3件) + (実行済み : 2件) = (合計 : 5件）")
+    @Nested
+    class MultipleCase {
 
         private Todos sut = null;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
 
             final List<Todo> list = new ArrayList<>();
 
@@ -229,39 +302,49 @@ public class TodosTest {
             sut = new Todos(list);
         }
 
+        @DisplayName("未実行TODOはある")
         @Test
-        public void 未実行TODOはある() {
+        void testHasUnexecuted() {
 
-            assertThat(sut.hasUnexecuted(), is(true));
+            assertTrue(sut.hasUnexecuted());
         }
 
+        @DisplayName("asListで5件のListが返される")
         @Test
-        public void トータル件数は実行済_未実行を合計した数() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getTotal(), is(5));
-        }
-
-        @Test
-        public void 実行済みは2件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getExecuted(), is(2));
-        }
-
-        @Test
-        public void 未実行は3件() {
-
-            final Statistics actualStatistics = sut.getStatistics();
-            assertThat(actualStatistics.getUnexecuted(), is(3));
-        }
-
-        @Test
-        public void asListで5件のListが返される() {
+        void testAsList() {
 
             final List<Todo> actual = sut.asList();
 
-            assertThat(actual.size(), is(5));
+            assertEquals(5, actual.size());
+        }
+
+        @DisplayName("Statisticsのに関するテスト")
+        @Nested
+        class TestStatistics {
+
+            @DisplayName("トータル件数は実行済_未実行を合計した数")
+            @Test
+            void testGetTotal() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(5, actualStatistics.getTotal());
+            }
+
+            @DisplayName("実行済みは2件")
+            @Test
+            void testGetExecuted() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(2, actualStatistics.getExecuted());
+            }
+
+            @DisplayName("未実行は3件")
+            @Test
+            void testGetUnexecuted() {
+
+                final Statistics actualStatistics = sut.getStatistics();
+                assertEquals(3, actualStatistics.getUnexecuted());
+            }
         }
     }
 }

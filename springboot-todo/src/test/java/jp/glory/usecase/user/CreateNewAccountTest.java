@@ -1,14 +1,14 @@
 package jp.glory.usecase.user;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import jp.glory.domain.user.entity.User;
 import jp.glory.domain.user.repository.UserRepositoryMock;
@@ -16,72 +16,77 @@ import jp.glory.domain.user.value.LoginId;
 import jp.glory.domain.user.value.Password;
 import jp.glory.domain.user.value.UserName;
 
-@RunWith(Enclosed.class)
-public class CreateNewAccountTest {
+class CreateNewAccountTest {
 
-    @RunWith(Enclosed.class)
-    public static class create {
+    private CreateNewAccount sut = null;
+    private UserRepositoryMock mock = null;
+    private LoginId inputLoginId = null;
+    private CreateNewAccount.Result actual = null;
 
-        public static class 入力内容に不備がない場合 {
+    @BeforeEach
+    void setUp() {
 
-            private CreateNewAccount sut = null;
-            private UserRepositoryMock mock = null;
-            private LoginId inputLoginId = null;
-            private CreateNewAccount.Result actual = null;
+        mock = new UserRepositoryMock();
+        sut = new CreateNewAccount(mock);
 
-            @Before
-            public void setUp() {
+        inputLoginId = new LoginId("test-user");
+    }
 
-                mock = new UserRepositoryMock();
-                sut = new CreateNewAccount(mock);
+    @DisplayName("createのテスト")
+    @Nested
+    class Create {
 
-                inputLoginId = new LoginId("test-user");
+        @DisplayName("入力内容に不備がない場合")
+        @Nested
+        class WhenValueIsValid {
+
+            @BeforeEach
+            void setUp() {
+
                 actual = sut.create(inputLoginId, new UserName("ユーザー"), new Password("password"));
             }
 
+            @DisplayName("入力エラーはない")
             @Test
-            public void 入力エラーはない() {
+            void assertNotError() {
 
-                assertThat(actual.getErrors().hasError(), is(false));
+                assertFalse(actual.getErrors().hasError());
             }
 
+            @DisplayName("対象のユーザが登録されている")
             @Test
-            public void 対象のユーザが登録されている() {
+            void assertRegistered () {
 
                 final Optional<User> actualOpt = mock.findBy(inputLoginId);
-                assertThat(actualOpt.isPresent(), is(true));
+                assertTrue(actualOpt.isPresent());
             }
         }
-    }
 
-    public static class 入力内容に不備がある場合 {
+        @DisplayName("入力内容に不備がある場合")
+        @Nested
+        class WhenValueIsInvalid {
 
-        private CreateNewAccount sut = null;
-        private UserRepositoryMock mock = null;
-        private LoginId inputLoginId = null;
-        private CreateNewAccount.Result actual = null;
+            @BeforeEach
+            void setUp() {
 
-        @Before
-        public void setUp() {
+                actual = sut.create(inputLoginId, new UserName(""), new Password("password"));
+            }
 
-            mock = new UserRepositoryMock();
-            sut = new CreateNewAccount(mock);
+            @DisplayName("入力エラーがある")
+            @Test
+            void assertHasError() {
 
-            inputLoginId = new LoginId("test-user");
-            actual = sut.create(inputLoginId, new UserName(""), new Password("password"));
+                assertTrue(actual.getErrors().hasError());
+            }
+
+            @DisplayName("対象のユーザが登録されていない")
+            @Test
+            void assertNotRegistered() {
+
+                final Optional<User> actualOpt = mock.findBy(inputLoginId);
+                assertFalse(actualOpt.isPresent());
+            }
         }
 
-        @Test
-        public void 入力エラーがある() {
-
-            assertThat(actual.getErrors().hasError(), is(true));
-        }
-
-        @Test
-        public void 対象のユーザが登録されていない() {
-
-            final Optional<User> actualOpt = mock.findBy(inputLoginId);
-            assertThat(actualOpt.isPresent(), is(false));
-        }
     }
 }
