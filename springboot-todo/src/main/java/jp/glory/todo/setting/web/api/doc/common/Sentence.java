@@ -1,4 +1,4 @@
-package jp.glory.todo.setting.doc.api.common;
+package jp.glory.todo.setting.web.api.doc.common;
 
 /**
  * フォーマットされる文の一つの塊.

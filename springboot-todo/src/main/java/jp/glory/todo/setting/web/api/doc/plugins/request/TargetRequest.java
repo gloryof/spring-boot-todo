@@ -1,8 +1,8 @@
-package jp.glory.todo.setting.doc.api.plugins.request;
+package jp.glory.todo.setting.web.api.doc.plugins.request;
 
 import java.util.Arrays;
 
-import jp.glory.todo.setting.doc.api.common.SummaryFormatter;
+import jp.glory.todo.setting.web.api.doc.common.SummaryFormatter;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.service.Parameter;
 

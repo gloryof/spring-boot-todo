@@ -1,4 +1,4 @@
-package jp.glory.todo.setting.doc.api.plugins.operation;
+package jp.glory.todo.setting.web.api.doc.plugins.operation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

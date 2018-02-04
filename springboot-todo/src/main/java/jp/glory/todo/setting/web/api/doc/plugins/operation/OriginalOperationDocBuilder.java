@@ -1,9 +1,9 @@
-package jp.glory.todo.setting.doc.api.plugins.operation;
+package jp.glory.todo.setting.web.api.doc.plugins.operation;
 
 import java.util.Arrays;
 
 import jp.glory.todo.context.base.web.api.OriginalOperationDoc;
-import jp.glory.todo.setting.doc.api.common.SummaryFormatter;
+import jp.glory.todo.setting.web.api.doc.common.SummaryFormatter;
 import springfox.documentation.builders.OperationBuilder;
 
 public class OriginalOperationDocBuilder {

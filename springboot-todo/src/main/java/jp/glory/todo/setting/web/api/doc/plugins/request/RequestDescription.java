@@ -1,4 +1,4 @@
-package jp.glory.todo.setting.doc.api.plugins.request;
+package jp.glory.todo.setting.web.api.doc.plugins.request;
 
 import java.util.Optional;
 

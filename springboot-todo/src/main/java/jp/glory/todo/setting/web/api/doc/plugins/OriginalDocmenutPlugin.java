@@ -1,12 +1,12 @@
-package jp.glory.todo.setting.doc.api.plugins;
+package jp.glory.todo.setting.web.api.doc.plugins;
 
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
 import jp.glory.todo.context.base.web.api.OriginalOperationDoc;
-import jp.glory.todo.setting.doc.api.plugins.operation.OriginalOperationDocBuilder;
-import jp.glory.todo.setting.doc.api.plugins.request.OriginalRequestDocBuilder;
+import jp.glory.todo.setting.web.api.doc.plugins.operation.OriginalOperationDocBuilder;
+import jp.glory.todo.setting.web.api.doc.plugins.request.OriginalRequestDocBuilder;
 import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;

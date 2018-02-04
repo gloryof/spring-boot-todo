@@ -1,4 +1,4 @@
-package jp.glory.todo.setting.doc.api;
+package jp.glory.todo.setting.web.api.doc;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
