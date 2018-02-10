@@ -22,6 +22,7 @@ import jp.glory.todo.context.base.domain.error.ErrorInfo;
 import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.base.web.UserInfo;
+import jp.glory.todo.context.base.web.exception.InvalidRequestException;
 import jp.glory.todo.context.todo.domain.entity.Todo;
 import jp.glory.todo.context.todo.domain.entity.Todos;
 import jp.glory.todo.context.todo.domain.value.Memo;
@@ -35,7 +36,6 @@ import jp.glory.todo.context.todo.web.api.response.TodoCreateSuccessResponse;
 import jp.glory.todo.context.todo.web.api.response.TodoListResponse;
 import jp.glory.todo.context.todo.web.api.response.TodoStatistics;
 import jp.glory.todo.context.user.domain.value.UserIdArgMatcher;
-import jp.glory.todo.context.user.web.exception.InvalidRequestException;
 import jp.glory.todo.test.util.TestUserUtil;
 
 class TodoListTest {

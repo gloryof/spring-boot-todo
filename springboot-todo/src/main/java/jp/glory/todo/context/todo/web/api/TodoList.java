@@ -17,6 +17,7 @@ import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.base.web.UserInfo;
 import jp.glory.todo.context.base.web.api.ApiPaths;
 import jp.glory.todo.context.base.web.api.OriginalOperationDoc;
+import jp.glory.todo.context.base.web.exception.InvalidRequestException;
 import jp.glory.todo.context.todo.domain.entity.Todo;
 import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
@@ -26,7 +27,6 @@ import jp.glory.todo.context.todo.usecase.SearchTodo;
 import jp.glory.todo.context.todo.web.api.request.TodoCreateRequest;
 import jp.glory.todo.context.todo.web.api.response.TodoCreateSuccessResponse;
 import jp.glory.todo.context.todo.web.api.response.TodoListResponse;
-import jp.glory.todo.context.user.web.exception.InvalidRequestException;
 
 /**
  * TODO一覧API.

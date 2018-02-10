@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import jp.glory.todo.context.base.web.api.response.InvalidErrorResponse;
-import jp.glory.todo.context.user.web.exception.InvalidRequestException;
+import jp.glory.todo.context.base.web.exception.InvalidRequestException;
 
 /**
  * 例外ハンドリング.

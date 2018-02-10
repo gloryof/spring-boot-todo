@@ -1,4 +1,4 @@
-package jp.glory.todo.context.user.web.exception;
+package jp.glory.todo.context.base.web.exception;
 
 import java.util.stream.Collectors;
 
