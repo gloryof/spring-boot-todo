@@ -54,6 +54,7 @@ public class Account {
      * 
      * @param createNewAccount
      *            新アカウント作成ユースケース
+     * @param encryption 暗号化アルゴリズム
      */
     @Autowired
     public Account(final CreateNewAccount createNewAccount, final Encryption encryption) {

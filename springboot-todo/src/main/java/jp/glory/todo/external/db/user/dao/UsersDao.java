@@ -30,7 +30,7 @@ public interface UsersDao {
 
     /**
      * ログインIDをキーに取得する.
-     * @param userId ログインID
+     * @param loginId ログインID
      * @return ユーザ
      */
     @Select

@@ -31,6 +31,7 @@ public @interface OriginalRequestlDoc {
      * 必須フラグ.<br>
      * 基本的にはドメインオブジェクト入力制約に準拠させるべきだが、<br>
      * プリミティブ型などの場合は設定ができた否めこのフラグを使用する.
+     * @return 必須の場合：true、必須ではない場合：false
      */
     boolean requied() default false;
 

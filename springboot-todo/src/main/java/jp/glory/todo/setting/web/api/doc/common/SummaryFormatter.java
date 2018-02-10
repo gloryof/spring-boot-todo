@@ -19,7 +19,7 @@ public class SummaryFormatter {
     /**
      * 通常のテキストとして追加する.
      * @param value 値
-     * @return 
+     * @return 文章
      */
     public Sentence text(final String value) {
 
@@ -42,6 +42,7 @@ public class SummaryFormatter {
     /**
      * リストとして追加する.
      * @param value 文字列
+     * @return 文章
      */
     public Sentence list(final String value) {
 
@@ -54,6 +55,7 @@ public class SummaryFormatter {
     /**
      * 太文字にする.
      * @param value 文字列
+     * @return 文章
      */
     public Sentence bold(final String value) {
 

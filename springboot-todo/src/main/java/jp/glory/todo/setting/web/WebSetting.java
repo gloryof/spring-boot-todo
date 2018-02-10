@@ -19,7 +19,7 @@ public class WebSetting {
 
     /**
      * Redisキャッシュ設定.
-     * @param redisOperations 
+     * @param redisOperations Redisのオプション
      * @return キャッシュマネージャー
      */
     @Bean

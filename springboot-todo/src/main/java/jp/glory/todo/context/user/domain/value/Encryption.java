@@ -1,7 +1,7 @@
 package jp.glory.todo.context.user.domain.value;
 
 /**
- * 暗号化インターフェイス.
+ * 暗号化アルゴリズム.
  *
  * @author Junki Yamada
  */

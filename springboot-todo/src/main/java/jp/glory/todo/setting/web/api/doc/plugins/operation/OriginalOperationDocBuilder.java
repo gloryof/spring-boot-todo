@@ -15,7 +15,7 @@ public class OriginalOperationDocBuilder {
 
     /**
      * コンストラクタ.
-     * @param context リクエストマッピングコンテキスト
+     * @param doc リクエストマッピングコンテキスト
      */
     public OriginalOperationDocBuilder(final OriginalOperationDoc doc) {
 

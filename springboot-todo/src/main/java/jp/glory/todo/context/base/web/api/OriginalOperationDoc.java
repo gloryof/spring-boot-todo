@@ -41,7 +41,6 @@ public @interface OriginalOperationDoc {
     /**
      * 事後条件リスト.
      * @return 事後条件リスト
-     * @return
      */
     String[] postcondition();
 }

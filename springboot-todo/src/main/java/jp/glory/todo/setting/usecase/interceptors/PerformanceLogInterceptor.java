@@ -37,7 +37,7 @@ public class PerformanceLogInterceptor {
      * パフォーマンスログを出力する.
      * @param joinPoint ジョインポイント
      * @return 戻り値
-     * @throws Throwable
+     * @throws Throwable ジョインポイントで例外が発生した場合
      */
     @Around("pointCutUseCase()")
     public Object logging(final ProceedingJoinPoint joinPoint) throws Throwable {

@@ -29,7 +29,7 @@ public class TodoSaveUpdateValidteRule implements ValidateRule {
     /**
      * コンストラクタ.
      * 
-     * @param respositroy TODOリポジトリ
+     * @param repository TODOリポジトリ
      * @param saveTodo 保存対象のTODO
      */
     public TodoSaveUpdateValidteRule(final TodoRepository repository, final Todo saveTodo) {

@@ -61,7 +61,7 @@ public class Todo {
      * 
      * @param id
      *            TODOのID
-     * @param userid
+     * @param userId
      *            ユーザID
      * @param summary
      *            概要
@@ -109,7 +109,6 @@ public class Todo {
     /**
      * バージョンを設定したエンティティを作成する.
      * @param version バージョン
-     * @return エンティティ
      */
     public void version(long version) {
 
