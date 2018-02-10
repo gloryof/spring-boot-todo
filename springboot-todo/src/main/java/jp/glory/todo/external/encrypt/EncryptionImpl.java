@@ -3,8 +3,8 @@ package jp.glory.todo.external.encrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import jp.glory.todo.context.user.domain.value.Encryption;
 import jp.glory.todo.context.user.domain.value.Password;
-import jp.glory.todo.context.user.infra.Encryption;
 
 /**
  * 暗号化クラス.

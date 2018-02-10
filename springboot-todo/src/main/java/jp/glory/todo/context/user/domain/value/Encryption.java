@@ -1,6 +1,4 @@
-package jp.glory.todo.context.user.infra;
-
-import jp.glory.todo.context.user.domain.value.Password;
+package jp.glory.todo.context.user.domain.value;
 
 /**
  * 暗号化インターフェイス.
