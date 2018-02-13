@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 
 import jp.glory.todo.context.user.domain.value.Password;
 
-public class PasswordArgMatcher extends ArgumentMatcher<Password> {
+public class PasswordArgMatcher implements ArgumentMatcher<Password> {
 
     private final Password value;
 
@@ -15,16 +15,11 @@ public class PasswordArgMatcher extends ArgumentMatcher<Password> {
     }
 
     @Override
-    public boolean matches(final Object argument) {
+    public boolean matches(final Password argument) {
 
-        if (argument instanceof Password) {
+        final Password compare = (Password) argument;
 
-            final Password compare = (Password) argument;
-
-            return value.getValue().equals(compare.getValue());
-        }
-
-        return false;
+        return value.getValue().equals(compare.getValue());
     }
 
     public static Password arg(final Password password) {

@@ -8,7 +8,6 @@ import jp.glory.todo.context.base.domain.type.InputText;
 
 /**
  * ログインID.
- * 
  * @author Junki Yamada
  */
 @Required(label = LoginId.LABEL)

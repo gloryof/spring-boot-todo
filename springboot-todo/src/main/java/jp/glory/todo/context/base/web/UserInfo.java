@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jp.glory.todo.context.user.domain.entity.User;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserId;
@@ -55,7 +55,7 @@ public class UserInfo implements UserDetails {
      * コンストラクタ.
      * @param user ユーザ
      */
-    public UserInfo(final User user) {
+    public UserInfo(final RegisteredUser user) {
 
         this.userId = user.getUserId();
         this.name = user.getUserName();
@@ -84,7 +84,7 @@ public class UserInfo implements UserDetails {
     /**
      * ログインIDを返す.<br>
      * Spring Security上では認証情報のキーとなるものをusernameとしているため、<br>
-     * ログインIDひ紐付けている。
+     * ログインIDを紐付けている。
      * {@link UserDetails#getUsername()}を参照。
      */
     @Override

@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.base.usecase.Usecase;
-import jp.glory.todo.context.user.domain.entity.User;
-import jp.glory.todo.context.user.domain.repository.UserRepository;
-import jp.glory.todo.context.user.domain.validate.UserModifyCommonValidateRule;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
+import jp.glory.todo.context.user.domain.repository.RegisteredUserRepository;
+import jp.glory.todo.context.user.domain.specification.UserInputSpec;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserId;
@@ -25,7 +25,7 @@ public class CreateNewAccount {
     /**
      * ユーザリポジトリ.
      */
-    private final UserRepository repository;
+    private final RegisteredUserRepository repository;
 
     /**
      * コンストラクタ.
@@ -34,7 +34,7 @@ public class CreateNewAccount {
      *            ユーザリポジトリ
      */
     @Autowired
-    public CreateNewAccount(final UserRepository repository) {
+    public CreateNewAccount(final RegisteredUserRepository repository) {
 
         this.repository = repository;
     }
@@ -52,8 +52,8 @@ public class CreateNewAccount {
      */
     public Result create(final LoginId loginId, final UserName userName, final Password password) {
 
-        final User user = new User(UserId.notNumberingValue(), loginId, userName, password);
-        final UserModifyCommonValidateRule rule = new UserModifyCommonValidateRule(user, repository);
+        final RegisteredUser user = new RegisteredUser(UserId.notNumberingValue(), loginId, userName, password);
+        final UserInputSpec rule = new UserInputSpec(user, repository);
 
         final ValidateErrors errors = rule.validate();
 
@@ -71,7 +71,7 @@ public class CreateNewAccount {
      * @author Junki Yamada
      *
      */
-    public static class Result {
+    public class Result {
 
         /**
          * 入力チェック結果.

@@ -3,9 +3,7 @@ package jp.glory.todo.context.todo.domain.value;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
-import jp.glory.todo.context.todo.domain.value.TodoId;
-
-public class TodoIdArgMatcher extends ArgumentMatcher<TodoId> {
+public class TodoIdArgMatcher implements ArgumentMatcher<TodoId> {
 
     private final TodoId value;
 
@@ -15,20 +13,14 @@ public class TodoIdArgMatcher extends ArgumentMatcher<TodoId> {
     }
 
     @Override
-    public boolean matches(final Object argument) {
+    public boolean matches(final TodoId argument) {
 
-        if (argument instanceof TodoId) {
-
-            final TodoId compare = (TodoId) argument;
-
-            return value.isSame(compare);
-        }
-
-        return false;
+        return value.isSame(argument);
     }
 
     public static TodoId arg(final long todoId) {
 
         return Mockito.argThat(new TodoIdArgMatcher(new TodoId(todoId)));
     }
+
 }

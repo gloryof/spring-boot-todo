@@ -1,4 +1,4 @@
-package jp.glory.todo.context.user.domain.validate;
+package jp.glory.todo.context.user.domain.specification;
 
 import java.util.Optional;
 
@@ -6,25 +6,27 @@ import jp.glory.todo.context.base.domain.error.ErrorInfo;
 import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.base.domain.validate.ValidateRule;
-import jp.glory.todo.context.user.domain.entity.User;
-import jp.glory.todo.context.user.domain.repository.UserRepository;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
+import jp.glory.todo.context.user.domain.repository.RegisteredUserRepository;
 import jp.glory.todo.context.user.domain.value.LoginId;
+import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserId;
+import jp.glory.todo.context.user.domain.value.UserName;
 
 /**
- * ユーザの編集に関する共通ルール.
+ * ユーザの入力値に関する仕様.
  *
  * @author Junki Yamada
  */
-public class UserModifyCommonValidateRule implements ValidateRule {
+public class UserInputSpec implements ValidateRule {
 
     /** チェック対象ユーザ. */
-    private final User user;
+    private final RegisteredUser user;
 
     /**
      * ユーザリポジトリ.
      */
-    private final UserRepository repository;
+    private final RegisteredUserRepository repository;
 
     /**
      * コンストラクタ.
@@ -34,14 +36,25 @@ public class UserModifyCommonValidateRule implements ValidateRule {
      * @param repository
      *            リポジトリ
      */
-    public UserModifyCommonValidateRule(final User user, final UserRepository repository) {
+    public UserInputSpec(final RegisteredUser user, final RegisteredUserRepository repository) {
 
         this.user = user;
         this.repository = repository;
     }
 
     /**
-     * 入力情報の検証を行う.
+     * 入力情報の検証を行う.<br>
+     * 入力仕様は下記。<br>
+     * <dl>
+     *  <dt>ログインID</dt>
+     *  <dd>{@link LoginId}の入力仕様を満たしていること</dd>
+     *  <dt>ユーザ名</dt>
+     *  <dd>{@link UserName}の入力仕様を満たしていること</dd>
+     *  <dt>パスワード</dt>
+     *  <dd>{@link Password}の入力仕様を満たしていること</dd>
+     *  <dt>重複チェック</dt>
+     *  <dd>{@link #isDuplicated()}のチェックを行い重複していないこと</dd>
+     * </dl>
      * 
      * @return 検証結果
      */
@@ -63,20 +76,21 @@ public class UserModifyCommonValidateRule implements ValidateRule {
     }
 
     /**
-     * 重複しているかを判定する.
+     * 重複しているかを判定する.<br>
+     * 異なるユーザIDでログインIDが同じ場合は重複として扱う。
      *
      * @return 重複している場合：true、重複していない場合：false
      */
     private boolean isDuplicated() {
 
-        final Optional<User> optUser = repository.findBy(user.getLoginId());
+        final Optional<RegisteredUser> optUser = repository.findBy(user.getLoginId());
 
         if (!optUser.isPresent()) {
 
             return false;
         }
 
-        final User savedUser = optUser.get();
+        final RegisteredUser savedUser = optUser.get();
         final UserId savedUserId = savedUser.getUserId();
 
         return !(savedUserId.isSame(user.getUserId()));

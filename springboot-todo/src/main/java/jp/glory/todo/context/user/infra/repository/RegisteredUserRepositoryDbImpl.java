@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jp.glory.todo.context.base.infra.repository.DbRepository;
-import jp.glory.todo.context.user.domain.entity.User;
-import jp.glory.todo.context.user.domain.repository.UserRepository;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
+import jp.glory.todo.context.user.domain.repository.RegisteredUserRepository;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserId;
@@ -17,13 +17,13 @@ import jp.glory.todo.external.db.user.dao.UsersDao;
 import jp.glory.todo.external.db.user.entity.UsersTable;
 
 /**
- * ユーザリポジトリ.
+ * 登録済みユーザリポジトリ.
  * 
  * @author Junki Yamada
  *
  */
 @DbRepository
-public class UserRepositoryDbImpl implements UserRepository {
+public class RegisteredUserRepositoryDbImpl implements RegisteredUserRepository {
 
     /**
      * usersテーブルDAO.
@@ -35,7 +35,7 @@ public class UserRepositoryDbImpl implements UserRepository {
      * @param dao usersテーブルDAO.
      */
     @Autowired
-    public UserRepositoryDbImpl(final UsersDao dao) {
+    public RegisteredUserRepositoryDbImpl(final UsersDao dao) {
 
         this.dao = dao;
     }
@@ -44,7 +44,7 @@ public class UserRepositoryDbImpl implements UserRepository {
      * {@inheritDoc}
      */
     @Override
-    public List<User> findAll() {
+    public List<RegisteredUser> findAll() {
 
         return dao.selectAll().stream()
                 .map(this::convertToEntity)
@@ -55,44 +55,29 @@ public class UserRepositoryDbImpl implements UserRepository {
      * {@inheritDoc}
      */
     @Override
-    public UserId save(final User user) {
+    public void save(final RegisteredUser user) {
 
-        final UserId savedUserId;
-        if (!user.isRegistered()) {
-
-            savedUserId = new UserId(dao.selectUserId());
-
-            dao.insert(convertToRecord(savedUserId, user));
-        } else {
-
-            savedUserId = user.getUserId();
-
-            dao.update(convertToRecord(savedUserId, user));
-        }
-
-        return savedUserId;
+        dao.update(convertToRecord(user));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<User> findBy(UserId userId) {
+    public Optional<RegisteredUser> findBy(UserId userId) {
 
         return dao.selectById(userId.getValue())
-            .map(v -> Optional.of(convertToEntity(v)))
-            .orElse(Optional.empty());
+                .map(this::convertToEntity);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<User> findBy(LoginId loginId) {
+    public Optional<RegisteredUser> findBy(LoginId loginId) {
 
         return dao.selectByLoginId(loginId.getValue())
-            .map(v -> Optional.of(convertToEntity(v)))
-            .orElse(Optional.empty());
+            .map(this::convertToEntity);
     }
 
     /**
@@ -100,23 +85,22 @@ public class UserRepositoryDbImpl implements UserRepository {
      * @param record usersテーブルレコード
      * @return エンティティ
      */
-    private User convertToEntity(final UsersTable record) {
+    private RegisteredUser convertToEntity(final UsersTable record) {
 
-        return new User(new UserId(record.getUserId()), new LoginId(record.getLoginId()),
+        return new RegisteredUser(new UserId(record.getUserId()), new LoginId(record.getLoginId()),
                 new UserName(record.getUserName()), new Password(record.getPassword()));
     }
 
     /**
      * エンティティからusersテーブルのレコードに変換する.
-     * @param newUserId 新しいユーザID
      * @param user ユーザ
      * @return usersテーブルレコード
      */
-    private UsersTable convertToRecord(final UserId newUserId, final User user) {
+    private UsersTable convertToRecord(final RegisteredUser user) {
 
         final UsersTable record = new UsersTable();
 
-        record.setUserId(newUserId.getValue());
+        record.setUserId(user.getUserId().getValue());
         record.setLoginId(user.getLoginId().getValue());
         record.setUserName(user.getUserName().getValue());
         record.setPassword(user.getPassword().getValue());

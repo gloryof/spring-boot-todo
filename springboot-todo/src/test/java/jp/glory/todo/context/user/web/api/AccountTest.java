@@ -2,6 +2,7 @@ package jp.glory.todo.context.user.web.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +24,6 @@ import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserName;
 import jp.glory.todo.context.user.usecase.CreateNewAccount;
 import jp.glory.todo.context.user.usecase.CreateNewAccount.Result;
-import jp.glory.todo.context.user.web.api.Account;
 import jp.glory.todo.context.user.web.api.request.NewAccountRequest;
 
 class AccountTest {
@@ -38,9 +38,9 @@ class AccountTest {
     @BeforeEach
     void setUp() {
 
-        mockCreateAccount = Mockito.mock(CreateNewAccount.class);
-        mockEncryption = Mockito.mock(Encryption.class);
-        mockUseCaseResult = Mockito.mock(CreateNewAccount.Result.class);
+        mockCreateAccount = mock(CreateNewAccount.class);
+        mockEncryption = mock(Encryption.class);
+        mockUseCaseResult = mock(CreateNewAccount.Result.class);
     }
 
     @DisplayName("createのテスト")
@@ -77,9 +77,9 @@ class AccountTest {
                         @Override
                         public Result answer(InvocationOnMock invocation) throws Throwable {
 
-                            actualLoginId = invocation.getArgumentAt(0, LoginId.class);
-                            actualUserName = invocation.getArgumentAt(1, UserName.class);
-                            actualPassword = invocation.getArgumentAt(2, Password.class);
+                            actualLoginId = (LoginId) invocation.getArgument(0);
+                            actualUserName = (UserName) invocation.getArgument(1);
+                            actualPassword = (Password) invocation.getArgument(2);
                             return mockUseCaseResult;
                         }
                     });

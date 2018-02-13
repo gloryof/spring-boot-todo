@@ -31,7 +31,7 @@ import jp.glory.todo.context.todo.usecase.SaveTodo.Result;
 import jp.glory.todo.context.todo.web.api.TodoDetail;
 import jp.glory.todo.context.todo.web.api.request.TodoDetailSaveRequest;
 import jp.glory.todo.context.todo.web.api.response.TodoDetailResponse;
-import jp.glory.todo.context.user.domain.entity.User;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.test.util.TestUserUtil;
 
@@ -131,7 +131,7 @@ class TodoDetailTest {
 
         private TodoDetailSaveRequest request = null;
         private SaveTodo.Result mockUseCaseResult = null;
-        private final User user = TestUserUtil.createDefault();
+        private final RegisteredUser user = TestUserUtil.createDefault();
 
         private ResponseEntity<Object> actual = null;
         private Todo actualTodo = null;
@@ -176,7 +176,7 @@ class TodoDetailTest {
                         @Override
                         public Result answer(InvocationOnMock invocation) throws Throwable {
 
-                            actualTodo = invocation.getArgumentAt(0, Todo.class);
+                            actualTodo = (Todo) invocation.getArgument(0);
                             return mockUseCaseResult;
                         }
                     });

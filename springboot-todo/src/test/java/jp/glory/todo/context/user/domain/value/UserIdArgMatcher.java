@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 
 import jp.glory.todo.context.user.domain.value.UserId;
 
-public class UserIdArgMatcher extends ArgumentMatcher<UserId> {
+public class UserIdArgMatcher implements ArgumentMatcher<UserId> {
 
     private final UserId value;
 
@@ -15,16 +15,9 @@ public class UserIdArgMatcher extends ArgumentMatcher<UserId> {
     }
 
     @Override
-    public boolean matches(final Object argument) {
+    public boolean matches(final UserId argument) {
 
-        if (argument instanceof UserId) {
-
-            final UserId compare = (UserId) argument;
-
-            return value.getValue().equals(compare.getValue());
-        }
-
-        return false;
+        return value.getValue().equals(argument.getValue());
     }
 
     public static UserId arg(final long loginIdValue) {

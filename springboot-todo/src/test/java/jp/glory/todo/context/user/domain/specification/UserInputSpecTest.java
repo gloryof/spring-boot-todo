@@ -1,7 +1,12 @@
-package jp.glory.todo.context.user.domain.validate;
+package jp.glory.todo.context.user.domain.specification;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,22 +16,26 @@ import org.junit.jupiter.api.Test;
 import jp.glory.todo.context.base.domain.error.ErrorInfo;
 import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
-import jp.glory.todo.context.user.domain.entity.User;
-import jp.glory.todo.context.user.domain.repository.UserRepositoryMock;
-import jp.glory.todo.context.user.domain.validate.UserModifyCommonValidateRule;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
+import jp.glory.todo.context.user.domain.repository.RegisteredUserRepository;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.context.user.domain.value.UserName;
 import jp.glory.todo.test.validate.ValidateAssert;
 
-class UserModifyCommonValidateRuleTest {
+class UserInputSpecTest {
 
 
-    private UserModifyCommonValidateRule sut = null;
+    private UserInputSpec sut = null;
     private  ValidateErrors actualErrors = null;
-    private UserRepositoryMock stub = null;
+    private RegisteredUserRepository mock = null;
 
+    @BeforeEach
+    void setUp() {
+
+        mock = mock(RegisteredUserRepository.class);
+    }
 
     @DisplayName("全ての値が正常に設定されている場合")
     @Nested
@@ -35,10 +44,10 @@ class UserModifyCommonValidateRuleTest {
         @BeforeEach
         void setUp() {
 
-            final User user = new User(new UserId(1L), new LoginId("test"), new UserName("テストユーザ"),
+            final RegisteredUser user = new RegisteredUser(new UserId(1L), new LoginId("test"), new UserName("テストユーザ"),
                     new Password("19CB2A070DDBE8157E17C5DDA0EA38E8AA16FAE1725C1F7AC22747D870368579"));
 
-            sut = new UserModifyCommonValidateRule(user, new UserRepositoryMock());
+            sut = new UserInputSpec(user, mock);
 
             actualErrors = sut.validate();
         }
@@ -58,9 +67,9 @@ class UserModifyCommonValidateRuleTest {
         @BeforeEach
         void setUp() {
 
-            sut = new UserModifyCommonValidateRule(
-                    new User(UserId.notNumberingValue(), LoginId.empty(), UserName.empty(), Password.empty()),
-                    new UserRepositoryMock());
+            sut = new UserInputSpec(
+                    new RegisteredUser(UserId.notNumberingValue(), LoginId.empty(), UserName.empty(), Password.empty()),
+                    mock);
             actualErrors = sut.validate();
         }
 
@@ -90,15 +99,15 @@ class UserModifyCommonValidateRuleTest {
     @Nested
     class WhenLoginIdAlreadyExists {
 
+        private RegisteredUser savedUser = null;
+
         @BeforeEach
         void setUp() {
 
-            stub = new UserRepositoryMock();
-
-            final User savedUser = new User(new UserId(1l), new LoginId("login-user"), new UserName("ログインユーザ"),
+            savedUser = new RegisteredUser(new UserId(1l), new LoginId("login-user"), new UserName("ログインユーザ"),
                     new Password("password"));
 
-            stub.save(savedUser);
+            when(mock.findBy(any(LoginId.class))).thenReturn(Optional.of(savedUser));
         }
 
         @DisplayName("別ユーザを同一ログインIDの場合")
@@ -108,12 +117,11 @@ class UserModifyCommonValidateRuleTest {
             @BeforeEach
             void setUp() {
 
-                final User savedUser = stub.findAll().get(0);
 
-                final User newUser = new User(new UserId(2l), savedUser.getLoginId(), new UserName("ログインユーザ2"),
+                final RegisteredUser newUser = new RegisteredUser(new UserId(2l), savedUser.getLoginId(), new UserName("ログインユーザ2"),
                         new Password("password2"));
 
-                sut = new UserModifyCommonValidateRule(newUser, stub);
+                sut = new UserInputSpec(newUser, mock);
                 actualErrors = sut.validate();
             }
 
@@ -145,11 +153,10 @@ class UserModifyCommonValidateRuleTest {
             @BeforeEach
             void setUp() {
 
-                final User savedUser = stub.findAll().get(0);
-                final User editUser = new User(savedUser.getUserId(), savedUser.getLoginId(), new UserName("ログインユーザ2"),
+                final RegisteredUser editUser = new RegisteredUser(savedUser.getUserId(), savedUser.getLoginId(), new UserName("ログインユーザ2"),
                         new Password("password2"));
 
-                sut = new UserModifyCommonValidateRule(editUser, stub);
+                sut = new UserInputSpec(editUser, mock);
                 actualErrors = sut.validate();
             }
 

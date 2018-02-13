@@ -17,7 +17,7 @@ import jp.glory.todo.context.todo.domain.validate.TodoSaveUpdateValidteRule;
 import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
-import jp.glory.todo.context.user.domain.entity.User;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.test.validate.ValidateAssert;
 
@@ -86,7 +86,7 @@ class TodoSaveUpdateValidteRuleTest {
             final ValidateErrors expectedErrors = new ValidateErrors();
 
             expectedErrors.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
-            expectedErrors.add(new ValidateError(ErrorInfo.Required, User.LABEL));
+            expectedErrors.add(new ValidateError(ErrorInfo.Required, RegisteredUser.LABEL));
             expectedErrors.add(new ValidateError(ErrorInfo.Required, Summary.LABEL));
 
             final ValidateAssert validate = new ValidateAssert(expectedErrors, actualErrors);

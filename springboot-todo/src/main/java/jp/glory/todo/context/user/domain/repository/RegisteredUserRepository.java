@@ -3,32 +3,30 @@ package jp.glory.todo.context.user.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
-import jp.glory.todo.context.user.domain.entity.User;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.UserId;
 
 /**
- * ユーザリポジトリ.
+ * 登録済みユーザリポジトリ.
  *
  * @author Junki Yamada
  */
-public interface UserRepository {
+public interface RegisteredUserRepository {
 
     /**
      * 全てのユーザを取得する.
      *
      * @return ユーザリスト
      */
-    List<User> findAll();
+    List<RegisteredUser> findAll();
 
     /**
      * ユーザを保存する.
      *
-     * @param user
-     *            ユーザ
-     * @return 保存したユーザID
+     * @param user ユーザ
      */
-    UserId save(final User user);
+    void save(final RegisteredUser user);
 
     /**
      * ユーザIDでユーザを探す.
@@ -37,7 +35,7 @@ public interface UserRepository {
      *            ユーザID
      * @return ユーザ
      */
-    Optional<User> findBy(final UserId userId);
+    Optional<RegisteredUser> findBy(final UserId userId);
 
     /**
      * ログインIDでユーザを探す.
@@ -46,5 +44,5 @@ public interface UserRepository {
      *            ログインID
      * @return ユーザ
      */
-    Optional<User> findBy(final LoginId loginId);
+    Optional<RegisteredUser> findBy(final LoginId loginId);
 }

@@ -2,6 +2,10 @@ package jp.glory.todo.context.user.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 
@@ -10,24 +14,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import jp.glory.todo.context.user.domain.entity.User;
-import jp.glory.todo.context.user.domain.repository.UserRepositoryMock;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
+import jp.glory.todo.context.user.domain.repository.RegisteredUserRepository;
 import jp.glory.todo.context.user.domain.value.LoginId;
 import jp.glory.todo.context.user.domain.value.Password;
 import jp.glory.todo.context.user.domain.value.UserName;
-import jp.glory.todo.context.user.usecase.CreateNewAccount;
 
 class CreateNewAccountTest {
 
     private CreateNewAccount sut = null;
-    private UserRepositoryMock mock = null;
+    private RegisteredUserRepository mock = null;
     private LoginId inputLoginId = null;
     private CreateNewAccount.Result actual = null;
 
     @BeforeEach
     void setUp() {
 
-        mock = new UserRepositoryMock();
+        mock = mock(RegisteredUserRepository.class);
         sut = new CreateNewAccount(mock);
 
         inputLoginId = new LoginId("test-user");
@@ -58,8 +61,7 @@ class CreateNewAccountTest {
             @Test
             void assertRegistered () {
 
-                final Optional<User> actualOpt = mock.findBy(inputLoginId);
-                assertTrue(actualOpt.isPresent());
+                verify(mock, times(1)).save(any(RegisteredUser.class));
             }
         }
 
@@ -84,7 +86,7 @@ class CreateNewAccountTest {
             @Test
             void assertNotRegistered() {
 
-                final Optional<User> actualOpt = mock.findBy(inputLoginId);
+                final Optional<RegisteredUser> actualOpt = mock.findBy(inputLoginId);
                 assertFalse(actualOpt.isPresent());
             }
         }

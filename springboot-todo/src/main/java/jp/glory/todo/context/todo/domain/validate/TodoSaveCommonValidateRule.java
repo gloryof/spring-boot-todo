@@ -5,7 +5,7 @@ import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.base.domain.validate.ValidateRule;
 import jp.glory.todo.context.todo.domain.entity.Todo;
-import jp.glory.todo.context.user.domain.entity.User;
+import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 
 /**
  * TODO保存の共通入力チェックルール.
@@ -35,7 +35,7 @@ public class TodoSaveCommonValidateRule implements ValidateRule {
 
         if (!this.todo.getUserId().isSetValue()) {
 
-            errors.add(new ValidateError(ErrorInfo.Required, User.LABEL));
+            errors.add(new ValidateError(ErrorInfo.Required, RegisteredUser.LABEL));
         }
 
         errors.addAll(todo.getSummary().validate());
