@@ -1,7 +1,12 @@
-package jp.glory.todo.context.todo.domain.validate;
+package jp.glory.todo.context.todo.domain.specification;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +17,7 @@ import jp.glory.todo.context.base.domain.error.ErrorInfo;
 import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.todo.domain.entity.Todo;
-import jp.glory.todo.context.todo.domain.repository.TodoRepositoryMock;
-import jp.glory.todo.context.todo.domain.validate.TodoSaveUpdateValidteRule;
+import jp.glory.todo.context.todo.domain.repository.TodoRepository;
 import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
@@ -21,12 +25,23 @@ import jp.glory.todo.context.user.domain.entity.RegisteredUser;
 import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.test.validate.ValidateAssert;
 
-class TodoSaveUpdateValidteRuleTest {
+class TodoUpdateSpecTest {
 
-    private TodoSaveUpdateValidteRule sut = null;
-    private TodoRepositoryMock repositoryMock = null;
+    private TodoUpdateSpec sut = null;
+    private TodoRepository mock = null;
     private ValidateErrors actualErrors = null;
     private Todo saveTodo = null;
+    private Todo beforeTodo = null;
+
+    @BeforeEach
+    void setUp() {
+
+        mock = mock(TodoRepository.class);
+
+        beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"));
+        beforeTodo.setMemo(new Memo("メモ"));
+        beforeTodo.unmarkFromComplete();
+    }
 
     @DisplayName("すべての値が正常に設定されている場合")
     @Nested
@@ -35,13 +50,13 @@ class TodoSaveUpdateValidteRuleTest {
         @BeforeEach
         void setUp() {
 
-            final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
-            saveTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("あたらいしタイトル"), new Memo("新しいメモ"), false);
+            saveTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("新しいタイトル"));
+            saveTodo.setMemo(new Memo("新しいメモ"));
+            saveTodo.markAsComplete();
 
-            repositoryMock = new TodoRepositoryMock();
-            repositoryMock.addTestData(beforeTodo);
+            when(mock.findBy(any(TodoId.class))).thenReturn(Optional.of(beforeTodo));
 
-            sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
+            sut =  new TodoUpdateSpec(mock, saveTodo);
 
             actualErrors = sut.validate();
         }
@@ -61,13 +76,13 @@ class TodoSaveUpdateValidteRuleTest {
         @BeforeEach
         void setUp() {
 
-            final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
-            saveTodo = new Todo(TodoId.notNumberingValue(), UserId.notNumberingValue(), Summary.empty(), Memo.empty(), false);
+            saveTodo = new Todo(TodoId.notNumberingValue(), UserId.notNumberingValue(), Summary.empty());
+            saveTodo.setMemo(Memo.empty());
+            saveTodo.unmarkFromComplete();
 
-            repositoryMock = new TodoRepositoryMock();
-            repositoryMock.addTestData(beforeTodo);
+            when(mock.findBy(any(TodoId.class))).thenReturn(Optional.of(beforeTodo));
 
-            sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
+            sut =  new TodoUpdateSpec(mock, saveTodo);
 
             actualErrors = sut.validate();
         }
@@ -101,10 +116,11 @@ class TodoSaveUpdateValidteRuleTest {
         @BeforeEach
         void setUp() {
 
-            saveTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), false);
+            saveTodo = new Todo(beforeTodo.getId(), beforeTodo.getUserId(), new Summary("新しいタイトル"));
+            saveTodo.setMemo(new Memo("新しいメモ"));
+            saveTodo.markAsComplete();
 
-            repositoryMock = new TodoRepositoryMock();
-            sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
+            sut =  new TodoUpdateSpec(mock, saveTodo);
 
             actualErrors = sut.validate();
         }
@@ -136,15 +152,13 @@ class TodoSaveUpdateValidteRuleTest {
         @BeforeEach
         void setUp() {
 
-            final Todo beforeTodo = new Todo(new TodoId(100l), new UserId(200l), new Summary("タイトル"), new Memo("メモ"), true);
-            saveTodo = new Todo(beforeTodo.getId(), new UserId(300l), beforeTodo.getSummary(), beforeTodo.getMemo(),
-                    beforeTodo.isCompleted());
+            saveTodo = new Todo(beforeTodo.getId(), new UserId(300l), new Summary("新しいタイトル"));
+            saveTodo.setMemo(new Memo("新しいメモ"));
+            saveTodo.markAsComplete();
 
-            repositoryMock = new TodoRepositoryMock();
-            repositoryMock.addTestData(beforeTodo);
+            when(mock.findBy(any(TodoId.class))).thenReturn(Optional.of(beforeTodo));
 
-            sut =  new TodoSaveUpdateValidteRule(repositoryMock, saveTodo);
-
+            sut =  new TodoUpdateSpec(mock, saveTodo);
             actualErrors = sut.validate();
         }
 

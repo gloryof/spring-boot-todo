@@ -26,7 +26,9 @@ class TodoTest {
         @BeforeEach
         void setUp() {
 
-            sut = new Todo(new TodoId(1000l), new UserId(1l), new Summary("概要テスト"), new Memo("新しいメモ"), false);
+            sut = new Todo(new TodoId(1000l), new UserId(1l), new Summary("概要テスト"));
+            sut.setMemo(new Memo("新しいメモ"));
+            sut.unmarkFromComplete();
         }
 
         @DisplayName("versionでバージョンが設定されたエンティティが返る")

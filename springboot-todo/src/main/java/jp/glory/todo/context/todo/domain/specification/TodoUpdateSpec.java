@@ -1,4 +1,4 @@
-package jp.glory.todo.context.todo.domain.validate;
+package jp.glory.todo.context.todo.domain.specification;
 
 import java.util.Optional;
 
@@ -10,11 +10,11 @@ import jp.glory.todo.context.todo.domain.entity.Todo;
 import jp.glory.todo.context.todo.domain.repository.TodoRepository;
 
 /**
- * TODOの更新の場合の入力チェックルール.
+ * TODOの更新時の仕様.
  * @author Junki Yamada
  *
  */
-public class TodoSaveUpdateValidteRule implements ValidateRule {
+public class TodoUpdateSpec implements ValidateRule {
 
     /**
      * TODOリポジトリ.
@@ -32,14 +32,21 @@ public class TodoSaveUpdateValidteRule implements ValidateRule {
      * @param repository TODOリポジトリ
      * @param saveTodo 保存対象のTODO
      */
-    public TodoSaveUpdateValidteRule(final TodoRepository repository, final Todo saveTodo) {
+    public TodoUpdateSpec(final TodoRepository repository, final Todo saveTodo) {
 
         this.repository = repository;
         this.saveTodo = saveTodo;
     }
 
     /**
-     * {@inheritDoc}
+     * TODOの更新時の入力検証を行う.<br>
+     * <br>
+     * <dl>
+     *  <dt>単項目チェック</dt>
+     *  <dd>{@link #validateSingleItems()}の仕様を満たしているかを検証する。</dd>
+     *  <dt>相関チェック</dt>
+     *  <dd>{@link #validateRelativeItems()}の仕様をみたいしているか検証する。</dd>
+     * </dl>
      */
     @Override
     public ValidateErrors validate() {
@@ -55,7 +62,14 @@ public class TodoSaveUpdateValidteRule implements ValidateRule {
     }
 
     /**
-     * 単項目チェック.
+     * 下記の検証を行う.<br>
+     * <br>
+     * <dl>
+     *  <dt>ID</dt>
+     *  <dd>設定されていること</dd>
+     *  <dt>上記以外の項目</dt>
+     *  <dd>{@link TodoInputSpec#validate()}の仕様を満たしていること</dd>
+     * </dl>
      * @return 入力チェックエラー
      */
     private ValidateErrors validateSingleItems() {
@@ -67,14 +81,27 @@ public class TodoSaveUpdateValidteRule implements ValidateRule {
             errors.add(new ValidateError(ErrorInfo.NotRegister, Todo.LABEL));
         }
 
-        final TodoSaveCommonValidateRule commonRule = new TodoSaveCommonValidateRule(saveTodo);
+        final TodoInputSpec commonRule = new TodoInputSpec(saveTodo);
         errors.addAll(commonRule.validate());
 
         return errors;
     }
 
     /**
-     * 相関チェック.
+     * 相関チェック.<br>
+     * <br>
+     * <dt>
+     *  <dt>ID存在チェック</dt>
+     *  <dd>
+     *    対象のTODOのIDが保存されているかを検証する。<br>
+     *    存在しない場合はエラーとして扱う。
+     *  </dd>
+     *  <dt>ユーザIDチェック</dt>
+     *  <dd>
+     *    保存するTODOが自分自身のものかを検証する。<br>
+     *    他のユーザのものだった場合はエラーとして扱う。
+     *  </dd>
+     * </dt>
      * @return 入力チェックエラー
      */
     private ValidateErrors validateRelativeItems() {

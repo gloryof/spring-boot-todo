@@ -134,7 +134,17 @@ public class TodoDetail {
     private ResponseEntity<Object> executeSaving(final long id, final TodoDetailSaveRequest request,  final UserInfo userInfo) {
 
         final Todo saveTargetTodo = new Todo(new TodoId(id), userInfo.getUserId(),
-                new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted());
+                new Summary(request.getSummary()));
+        saveTargetTodo.setMemo(new Memo(request.getMemo()));
+
+        if (request.isCompleted()) {
+
+            saveTargetTodo.markAsComplete();
+        } else {
+
+            saveTargetTodo.unmarkFromComplete();
+        }
+
         saveTargetTodo.version(request.getVersion());
         final SaveTodo.Result result = saveTodo.save(saveTargetTodo);
 

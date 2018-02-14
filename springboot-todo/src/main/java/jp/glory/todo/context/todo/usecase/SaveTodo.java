@@ -7,8 +7,8 @@ import jp.glory.todo.context.base.domain.validate.ValidateRule;
 import jp.glory.todo.context.base.usecase.Usecase;
 import jp.glory.todo.context.todo.domain.entity.Todo;
 import jp.glory.todo.context.todo.domain.repository.TodoRepository;
-import jp.glory.todo.context.todo.domain.validate.TodoSaveCommonValidateRule;
-import jp.glory.todo.context.todo.domain.validate.TodoSaveUpdateValidteRule;
+import jp.glory.todo.context.todo.domain.specification.TodoInputSpec;
+import jp.glory.todo.context.todo.domain.specification.TodoUpdateSpec;
 import jp.glory.todo.context.todo.domain.value.TodoId;
 import lombok.Getter;
 
@@ -64,10 +64,10 @@ public class SaveTodo {
         final ValidateRule rule;
         if (todo.isRegistered()) {
 
-            rule = new TodoSaveUpdateValidteRule(repository, todo);
+            rule = new TodoUpdateSpec(repository, todo);
         } else {
 
-            rule = new TodoSaveCommonValidateRule(todo);
+            rule = new TodoInputSpec(todo);
         }
 
         return rule.validate();

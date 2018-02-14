@@ -1,5 +1,7 @@
 package jp.glory.todo.context.todo.domain.entity;
 
+import java.util.Optional;
+
 import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
@@ -41,7 +43,7 @@ public class Todo {
      * メモ.
      */
     @Getter
-    private final Memo memo;
+    private Optional<Memo> memo = Optional.empty();
 
     /**
      * バージョン.
@@ -65,19 +67,12 @@ public class Todo {
      *            ユーザID
      * @param summary
      *            概要
-     * @param memo
-     *            メモ
-     * @param completed
-     *            完了フラグ
      */
-    // TODO memo - completedはエンティティを構成する上での必須パラメータではないのでコンストラクタから外したい
-    public Todo(final TodoId id, final UserId userId, final Summary summary, final Memo memo, final boolean completed) {
+    public Todo(final TodoId id, final UserId userId, final Summary summary) {
 
         this.id = id;
         this.userId = userId;
         this.summary = summary;
-        this.memo = memo;
-        this.completed = completed;
     }
 
     /**
@@ -113,5 +108,14 @@ public class Todo {
     public void version(long version) {
 
         this.entityVersion = version;
+    }
+
+    /**
+     * メモを設定する.
+     * @param memo メモ
+     */
+    public void setMemo(final Memo memo) {
+
+        this.memo = Optional.of(memo);
     }
 }

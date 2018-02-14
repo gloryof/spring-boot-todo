@@ -10,7 +10,6 @@ import jp.glory.todo.context.base.infra.repository.InMemoryRepository;
 import jp.glory.todo.context.todo.domain.entity.Todo;
 import jp.glory.todo.context.todo.domain.entity.Todos;
 import jp.glory.todo.context.todo.domain.repository.TodoRepository;
-import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
 import jp.glory.todo.context.user.domain.value.UserId;
@@ -69,8 +68,16 @@ public class TodoRepositoryInMemoryImpl implements TodoRepository {
         final Todo saveTodo;
         if (!todo.isRegistered()) {
 
-            saveTodo = new Todo(new TodoId(getSequence()), todo.getUserId(), todo.getSummary(), todo.getMemo(),
-                    todo.isCompleted());
+            saveTodo = new Todo(new TodoId(getSequence()), todo.getUserId(), todo.getSummary());
+            todo.getMemo().ifPresent(saveTodo::setMemo);
+
+            if (todo.isCompleted()) {
+
+                saveTodo.markAsComplete();
+            } else {
+
+                saveTodo.unmarkFromComplete();
+            }
             saveTodo.version(1l);
             incrementSequence();
 
@@ -98,9 +105,15 @@ public class TodoRepositoryInMemoryImpl implements TodoRepository {
         final Todo copied = new Todo(
                                 new TodoId(src.getId().getValue()),
                                 new UserId(src.getUserId().getValue()),
-                                new Summary(src.getSummary().getValue()),
-                                new Memo(src.getMemo().getValue()),
-                                src.isCompleted());
+                                new Summary(src.getSummary().getValue()));
+        src.getMemo().ifPresent(copied::setMemo);
+        if (src.isCompleted()) {
+
+            copied.markAsComplete();
+        } else {
+
+            copied.unmarkFromComplete();
+        }
 
         copied.version(src.getEntityVersion());
 

@@ -2,6 +2,7 @@ package jp.glory.todo.context.todo.web.api.response;
 
 import io.swagger.annotations.ApiModelProperty;
 import jp.glory.todo.context.todo.domain.entity.Todo;
+import jp.glory.todo.context.todo.domain.value.Memo;
 import lombok.Getter;
 
 /**
@@ -42,7 +43,7 @@ public class TodoDetailResponse {
 
         this.id = todo.getId().getValue();
         this.summary = todo.getSummary().getValue();
-        this.memo = todo.getMemo().getValue();
+        this.memo = todo.getMemo().map(Memo::getValue).orElse("");
         this.completed = todo.isCompleted();
         this.version = todo.getEntityVersion();
     }

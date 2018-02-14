@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -30,11 +31,11 @@ import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
 import jp.glory.todo.context.todo.usecase.SaveTodo;
 import jp.glory.todo.context.todo.usecase.SearchTodo;
-import jp.glory.todo.context.todo.web.api.TodoList;
 import jp.glory.todo.context.todo.web.api.request.TodoCreateRequest;
 import jp.glory.todo.context.todo.web.api.response.TodoCreateSuccessResponse;
 import jp.glory.todo.context.todo.web.api.response.TodoListResponse;
 import jp.glory.todo.context.todo.web.api.response.TodoStatistics;
+import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.context.user.domain.value.UserIdArgMatcher;
 import jp.glory.todo.test.util.TestUserUtil;
 
@@ -137,7 +138,8 @@ class TodoListTest {
             void setUp() {
 
                 final List<Todo> todoList = LongStream.rangeClosed(1, 1)
-                    .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), true))
+                    .mapToObj(TodoId::new)
+                    .map(createCompleteTodo(userInfo.getUserId()))
                     .collect(Collectors.toList());
 
                 Mockito
@@ -207,8 +209,9 @@ class TodoListTest {
             void setUp() {
 
                 final List<Todo> todoList = LongStream.rangeClosed(1, 1)
-                    .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), false))
-                    .collect(Collectors.toList());
+                                                .mapToObj(TodoId::new)
+                                                .map(createUncompleteTodo(userInfo.getUserId()))
+                                                .collect(Collectors.toList());
 
                 Mockito
                     .when(mockSearch.searchTodosByUser(UserIdArgMatcher.arg(userInfo.getUserId().getValue())))
@@ -277,11 +280,13 @@ class TodoListTest {
             void setUp() {
 
                 final List<Todo> executedList = LongStream.rangeClosed(1, 3)
-                        .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), true))
+                        .mapToObj(TodoId::new)
+                        .map(createCompleteTodo(userInfo.getUserId()))
                         .collect(Collectors.toList());
 
                 final List<Todo> unexcutedList = LongStream.rangeClosed(4, 5)
-                        .mapToObj(v -> new Todo(new TodoId(v), userInfo.getUserId(), Summary.empty(), Memo.empty(), false))
+                        .mapToObj(TodoId::new)
+                        .map(createUncompleteTodo(userInfo.getUserId()))
                         .collect(Collectors.toList());
 
                 final List<Todo> todoList = new ArrayList<>(executedList);
@@ -432,4 +437,25 @@ class TodoListTest {
         }
     }
 
+    private static Function<TodoId, Todo> createCompleteTodo(final UserId userId) {
+
+        return v -> {
+            final Todo todo = creatTodo(v, userId);
+            todo.markAsComplete();
+            return todo;
+        };
+    }
+    private static Function<TodoId, Todo> createUncompleteTodo(final UserId userId) {
+
+        return v -> {
+            final Todo todo = creatTodo(v, userId);
+            todo.unmarkFromComplete();
+            return todo;
+        };
+    }
+
+    private static Todo creatTodo(final TodoId id, final UserId userId) {
+
+        return new Todo(id, userId, Summary.empty());
+    }
 }

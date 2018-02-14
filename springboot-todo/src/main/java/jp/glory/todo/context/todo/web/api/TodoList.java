@@ -91,8 +91,18 @@ public class TodoList {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<TodoCreateSuccessResponse> save(final TodoCreateRequest request, @AuthenticationPrincipal final UserInfo userInfo) {
 
-        final SaveTodo.Result result = saveTodo.save(new Todo(TodoId.notNumberingValue(), userInfo.getUserId(),
-                new Summary(request.getSummary()), new Memo(request.getMemo()), request.isCompleted()));
+        final Todo newTodo = new Todo(TodoId.notNumberingValue(), userInfo.getUserId(), new Summary(request.getSummary()));
+        newTodo.setMemo(new Memo(request.getMemo()));
+
+        if (request.isCompleted()) {
+
+            newTodo.markAsComplete();
+        } else {
+
+            newTodo.unmarkFromComplete();
+        }
+
+        final SaveTodo.Result result = saveTodo.save(newTodo);
 
         final ValidateErrors errors = result.getErrors();
         if (errors.hasError()) {

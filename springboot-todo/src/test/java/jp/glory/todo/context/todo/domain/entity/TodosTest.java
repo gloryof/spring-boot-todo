@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.LongFunction;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import jp.glory.todo.context.todo.domain.entity.Todo;
-import jp.glory.todo.context.todo.domain.entity.Todos;
 import jp.glory.todo.context.todo.domain.entity.Todos.Statistics;
-import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
 import jp.glory.todo.context.user.domain.value.UserId;
@@ -160,7 +158,7 @@ class TodosTest {
         void setUp() {
 
             final List<Todo> list = new ArrayList<>();
-            list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), false));
+            list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty()));
 
             sut = new Todos(list);
         }
@@ -228,7 +226,10 @@ class TodosTest {
         void setUp() {
 
             final List<Todo> list = new ArrayList<>();
-            list.add(new Todo(new TodoId(1l), new UserId(10l), Summary.empty(), Memo.empty(), true));
+
+            final Todo todo = new Todo(new TodoId(1l), new UserId(10l), Summary.empty());
+            todo.markAsComplete();
+            list.add(todo);
 
             sut = new Todos(list);
         }
@@ -295,11 +296,19 @@ class TodosTest {
 
             final List<Todo> list = new ArrayList<>();
 
-            LongStream.rangeClosed(1, 3).forEach(
-                    v -> list.add(new Todo(new TodoId(v), new UserId(v), Summary.empty(), Memo.empty(), false)));
+            final LongFunction<Todo> nonCompleteTodo = v -> new Todo(new TodoId(v), new UserId(v), Summary.empty());
 
-            LongStream.rangeClosed(1, 2).forEach(
-                    v -> list.add(new Todo(new TodoId(v), new UserId(v), Summary.empty(), Memo.empty(), true)));
+            LongStream.rangeClosed(1, 3)
+                .mapToObj(nonCompleteTodo)
+                .forEach(list::add);
+
+            LongStream.rangeClosed(1, 2)
+                    .mapToObj(v -> { 
+                        final Todo todo = nonCompleteTodo.apply(v);
+                        todo.markAsComplete();
+                        return todo;
+                    })
+                    .forEach(list::add);
 
             sut = new Todos(list);
         }

@@ -1,4 +1,4 @@
-package jp.glory.todo.context.todo.domain.validate;
+package jp.glory.todo.context.todo.domain.specification;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,7 +12,7 @@ import jp.glory.todo.context.base.domain.error.ErrorInfo;
 import jp.glory.todo.context.base.domain.error.ValidateError;
 import jp.glory.todo.context.base.domain.error.ValidateErrors;
 import jp.glory.todo.context.todo.domain.entity.Todo;
-import jp.glory.todo.context.todo.domain.validate.TodoSaveCommonValidateRule;
+import jp.glory.todo.context.todo.domain.specification.TodoInputSpec;
 import jp.glory.todo.context.todo.domain.value.Memo;
 import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
@@ -21,19 +21,21 @@ import jp.glory.todo.context.user.domain.value.UserId;
 import jp.glory.todo.test.util.TestUtil;
 import jp.glory.todo.test.validate.ValidateAssert;
 
-class TodoSaveCommonValidateRuleTest {
+class TodoInputSpecTest {
 
     @DisplayName("正常な値が入力されている場合")
     @Nested
     class WhenValidValue {
 
-        private TodoSaveCommonValidateRule sut = null;
+        private TodoInputSpec sut = null;
 
         @BeforeEach
         void setUp() {
 
-            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"), new Memo("メモ"), false);
-            sut = new TodoSaveCommonValidateRule(todo);
+            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"));
+            todo.setMemo(new Memo("メモ"));
+            todo.unmarkFromComplete();
+            sut = new TodoInputSpec(todo);
         }
 
         @DisplayName("validateを実行しても入力チェックエラーにならない")
@@ -50,14 +52,15 @@ class TodoSaveCommonValidateRuleTest {
     @Nested
     class WhenUserIdNotSet {
 
-        private TodoSaveCommonValidateRule sut = null;
+        private TodoInputSpec sut = null;
 
         @BeforeEach
         void setUp() {
 
-            final Todo todo = new Todo(new TodoId(100l), UserId.notNumberingValue(), new Summary("概要"), new Memo("メモ"),
-                    false);
-            sut = new TodoSaveCommonValidateRule(todo);
+            final Todo todo = new Todo(new TodoId(100l), UserId.notNumberingValue(), new Summary("概要"));
+            todo.setMemo(new Memo("メモ"));
+            todo.unmarkFromComplete();
+            sut = new TodoInputSpec(todo);
         }
 
         @DisplayName("validateを実行すると入力チェックエラーになる")
@@ -81,13 +84,15 @@ class TodoSaveCommonValidateRuleTest {
     @Nested
     class WhenSummaryInvalid {
 
-        private TodoSaveCommonValidateRule sut = null;
+        private TodoInputSpec sut = null;
 
         @BeforeEach
         void setUp() {
 
-            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary(""), new Memo("メモ"), false);
-            sut = new TodoSaveCommonValidateRule(todo);
+            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary(""));
+            todo.setMemo(new Memo("メモ"));
+            todo.unmarkFromComplete();
+            sut = new TodoInputSpec(todo);
         }
 
         @DisplayName("validateを実行すると入力チェックエラーにる")
@@ -110,14 +115,15 @@ class TodoSaveCommonValidateRuleTest {
     @Nested
     class WhenMemoInvalid {
 
-        private TodoSaveCommonValidateRule sut = null;
+        private TodoInputSpec sut = null;
 
         @BeforeEach
         void setUp() {
 
-            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"),
-                    new Memo(TestUtil.repeat("a", 1001)), false);
-            sut = new TodoSaveCommonValidateRule(todo);
+            final Todo todo = new Todo(new TodoId(100l), new UserId(1000l), new Summary("概要"));
+            todo.setMemo(new Memo(TestUtil.repeat("a", 1001)));
+            todo.unmarkFromComplete();
+            sut = new TodoInputSpec(todo);
         }
 
         @DisplayName("validateを実行すると入力チェックエラーにる")

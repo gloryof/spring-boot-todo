@@ -2,6 +2,7 @@ package jp.glory.todo.context.todo.web.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
@@ -26,9 +27,8 @@ import jp.glory.todo.context.todo.domain.value.Summary;
 import jp.glory.todo.context.todo.domain.value.TodoId;
 import jp.glory.todo.context.todo.domain.value.TodoIdArgMatcher;
 import jp.glory.todo.context.todo.usecase.SaveTodo;
-import jp.glory.todo.context.todo.usecase.SearchTodo;
 import jp.glory.todo.context.todo.usecase.SaveTodo.Result;
-import jp.glory.todo.context.todo.web.api.TodoDetail;
+import jp.glory.todo.context.todo.usecase.SearchTodo;
 import jp.glory.todo.context.todo.web.api.request.TodoDetailSaveRequest;
 import jp.glory.todo.context.todo.web.api.response.TodoDetailResponse;
 import jp.glory.todo.context.user.domain.entity.RegisteredUser;
@@ -49,8 +49,8 @@ class TodoDetailTest {
     @BeforeEach
     void setUp() {
 
-        mockSearch = Mockito.mock(SearchTodo.class);
-        mockSave = Mockito.mock(SaveTodo.class);
+        mockSearch = mock(SearchTodo.class);
+        mockSave = mock(SaveTodo.class);
     }
 
     @DisplayName("viewのテスト")
@@ -66,7 +66,9 @@ class TodoDetailTest {
             @BeforeEach
             void setUp() {
 
-                expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"), new Memo("メモ"), true);
+                expectedTodo = new Todo(new TodoId(TARGET_ID), new UserId(200l), new Summary("タイトルー"));
+                expectedTodo.setMemo(new Memo("メモ"));
+                expectedTodo.markAsComplete();
                 expectedTodo.version(20l);
 
                 Mockito
@@ -93,7 +95,7 @@ class TodoDetailTest {
 
                 assertEquals(expectedTodo.getId().getValue().longValue(), actualResponse.getId());
                 assertEquals(expectedTodo.getSummary().getValue(), actualResponse.getSummary());
-                assertEquals(expectedTodo.getMemo().getValue(), actualResponse.getMemo());
+                assertEquals(expectedTodo.getMemo().get().getValue(), actualResponse.getMemo());
                 assertEquals(expectedTodo.isCompleted(), actualResponse.isCompleted());
                 assertEquals(expectedTodo.getEntityVersion(), actualResponse.getVersion());
             }
@@ -149,8 +151,9 @@ class TodoDetailTest {
             @BeforeEach
             void setUp() {
 
-                expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"), new Memo("メモ"),
-                        true);
+                expectedTodo = new Todo(new TodoId(TARGET_ID), user.getUserId(), new Summary("タイトルー"));
+                expectedTodo.setMemo(new Memo("メモ"));
+                expectedTodo.markAsComplete();
                 expectedTodo.version(10l);
 
                 Mockito
@@ -183,7 +186,7 @@ class TodoDetailTest {
 
                     request = new TodoDetailSaveRequest();
                     request.setSummary(expectedTodo.getSummary().getValue());
-                    request.setMemo(expectedTodo.getMemo().getValue());
+                    request.setMemo(expectedTodo.getMemo().get().getValue());
                     request.setCompleted(expectedTodo.isCompleted());
                     request.setVersion(expectedTodo.getEntityVersion());
 
@@ -203,7 +206,7 @@ class TodoDetailTest {
 
                     assertEquals(expectedTodo.getId().getValue(), actualTodo.getId().getValue());
                     assertEquals(expectedTodo.getSummary().getValue(), actualTodo.getSummary().getValue());
-                    assertEquals(expectedTodo.getMemo().getValue(), actualTodo.getMemo().getValue());
+                    assertEquals(expectedTodo.getMemo().get().getValue(), actualTodo.getMemo().get().getValue());
                     assertEquals(expectedTodo.isCompleted(), actualTodo.isCompleted());
                     assertEquals(expectedTodo.getEntityVersion(), actualTodo.getEntityVersion());
                 }

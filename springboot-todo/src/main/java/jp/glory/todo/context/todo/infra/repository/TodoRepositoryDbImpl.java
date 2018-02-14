@@ -105,10 +105,10 @@ public class TodoRepositoryDbImpl implements TodoRepository {
 
         todosDao.insert(convertToSummaryRecord(newTodoId, todo));
 
-        if (!todo.getMemo().getValue().isEmpty()) {
-
-            detailDao.insert(convertToDetailRecord(newTodoId, todo));
-        }
+        todo.getMemo()
+            .filter(v -> !v.getValue().isEmpty())
+            .map(v -> convertToDetailRecord(newTodoId, todo))
+            .ifPresent(detailDao::insert);
 
         return newTodoId;
     }
@@ -131,16 +131,14 @@ public class TodoRepositoryDbImpl implements TodoRepository {
 
         final TodosDetailTable record = convertToDetailRecord(todo.getId(), todo);
 
-        if (todo.getMemo().getValue().isEmpty()) {
-
-            detailDao.delete(record);
-            return;
-        }
+        todo.getMemo()
+            .filter(v -> v.getValue().isEmpty())
+            .ifPresent(v -> detailDao.delete(record));
 
         final Optional<TodosDetailTable> optDetail = detailDao.selectById(todo.getId().getValue());
 
         if (optDetail.isPresent()) {
-            
+
             detailDao.update(record);
             return;
         }
@@ -156,7 +154,16 @@ public class TodoRepositoryDbImpl implements TodoRepository {
     private Todo convertToEntity(final TodoInfo record) {
 
         final Todo todo = new Todo(new TodoId(record.getTodoId()), new UserId(record.getUserId()),
-                new Summary(record.getSummary()), new Memo(record.getMemo()), record.isCompleted());
+                new Summary(record.getSummary()));
+        todo.setMemo(new Memo(record.getMemo()));
+
+        if (record.isCompleted()) {
+
+            todo.markAsComplete();
+        } else {
+
+            todo.unmarkFromComplete();
+        }
         todo.version(record.getVersion());
 
         return todo;
@@ -192,7 +199,9 @@ public class TodoRepositoryDbImpl implements TodoRepository {
         final TodosDetailTable record = new TodosDetailTable();
 
         record.setTodoId(todoId.getValue());
-        record.setMemo(todo.getMemo().getValue());
+        todo.getMemo()
+            .map(Memo::getValue)
+            .ifPresent(record::setMemo);
 
         return record;
     }
