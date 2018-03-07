@@ -13,10 +13,11 @@ var Trace = Vue.extend({
 
 		var that = this;
 		window.superagent
-			.get("/monitor/trace")
+			.get("/monitor/httptrace")
+			.accept('application/json')
 			.end(function(err, res) {
 
-				that.$set("trace", res.body);
+				that.$set("trace", res.body.traces);
 			});
 	}
 });

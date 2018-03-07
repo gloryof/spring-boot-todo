@@ -12,47 +12,19 @@
             <thead>
               <tr>
                 <th>timestamp</th>
-                <th>row.info.remoteAddress</th>
-                <th>row.row.info.sessionId</th>
-                <th>info.path</th>
-                <th>info.method</th>
-                <th>row.info.contextPath</th>
-                <th>info.parameters</th>
-                <th>info.headers.requeset</th>
-                <th>info.headess.response</th>
+                <th>timeTaken</th>
+                <th>request.remoteAddress</th>
+                <th>request.uri</th>
+                <th>request.method</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="row in trace">
                 <td v-text="row.timestamp"></td>
-                <td v-text="row.info.remoteAddress"></td>
-                <td v-text="row.info.sessionId"></td>
-                <td v-text="row.info.path"></td>
-                <td v-text="row.info.method"></td>
-                <td v-text="row.info.contextPath">
-                  <dl v-for="(key, val)  in row.info.parameters">
-                    <dt v-text="key"></dt>
-                    <dd v-text="val"></dd>
-                  </dl>
-                </td>
-                <td>
-                  <dl v-for="(key, val)  in row.info.parameters">
-                    <dt v-text="key"></dt>
-                    <dd v-text="val"></dd>
-                  </dl>
-                </td>
-                <td>
-                  <dl v-for="(key, val)  in row.info.headers.request">
-                    <dt v-text="key"></dt>
-                    <dd v-text="val"></dd>
-                  </dl>
-                </td>
-                <td>
-                  <dl v-for="(key, val)  in row.info.headers.response">
-                    <dt v-text="key"></dt>
-                    <dd v-text="val"></dd>
-                  </dl>
-                </td>
+                <td v-text="row.timeTaken"></td>
+                <td v-text="row.request.remoteAddress"></td>
+                <td v-text="row.request.uri"></td>
+                <td v-text="row.request.method"></td>
               </tr>
             </tbody>
           </table>

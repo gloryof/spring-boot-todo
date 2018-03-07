@@ -17,9 +17,6 @@
           <li>
             <a href="" v-link="{ path: '/trace' }">Trace</a>
           </li>
-          <li>
-            <a href="" v-link="{ path: '/metrics' }">Metrics</a>
-          </li>
         </ul>
       </div>
       <router-view></router-view>
@@ -27,7 +24,6 @@
     <div class="common-libs-component" th:replace="common/fragments/libs :: libs"></div>
     <script th:src="@{/libs/common/component/props.js}"></script>
     <div class="console-libs-component" th:replace="console/fragments/trace :: trace"></div>
-    <div class="console-libs-component" th:replace="console/fragments/metrics :: metrics"></div>
     <script th:src="@{/libs/console/component/console-top.js}"></script>
   </body>
 </html>

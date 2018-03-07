@@ -8,6 +8,12 @@ doma:
   naming: snake-lower-case
 
 management:
-  context-path: /monitor
-  trace:
-    include: REQUEST_HEADERS,RESPONSE_HEADERS,ERRORS,PATH_INFO,PATH_TRANSLATED,CONTEXT_PATH,USER_PRINCIPAL,PARAMETERS,QUERY_STRING,AUTH_TYPE,REMOTE_ADDRESS,SESSION_ID,REMOTE_USER
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: httptrace, metrics
+
+spring:
+  session:
+    store-type: redis
