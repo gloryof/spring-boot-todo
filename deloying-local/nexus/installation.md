@@ -4,7 +4,7 @@
 # mkdir -p /var/lib/nexus/data
 # chown nexus:nexus /var/lib/nexus/data
 
-# install java-1.8.0-openjdk
+# yum install java-1.8.0-openjdk
 # curl -LO https://sonatype-download.global.ssl.fastly.net/nexus/3/latest-unix.tar.gz
 # mv nexus-${version}/ /opt/nexus/
 
