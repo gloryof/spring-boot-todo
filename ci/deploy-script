@@ -7,15 +7,21 @@ pipeline {
     stages {
 
         stage('Checkout') {
-            checkout scm
+            steps {
+                checkout scm
+            }
         }
 
         stage('Test') {
-            executeTest()
+            steps {
+                executeTest()
+            }
         }
 
         stage('Devloy') {
-            executeDeploy
+            steps {
+                executeDeploy()
+            }
         }
     }
 }
