@@ -27,9 +27,9 @@ pipeline {
 }
 
 def executeTest() {
-    sh 'mvn clean test'
+    sh 'mvn clean test -f springboot-todo/pom.xml'
 }
 
 def executeDeploy() {
-    sh 'mvn clean deploy'
+    sh 'mvn clean deploy -f springboot-todo/pom.xml'
 }
