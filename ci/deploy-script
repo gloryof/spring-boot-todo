@@ -1,3 +1,7 @@
+/***
+ *
+ * @requied JaCoCo
+ */
 pipeline {
     agent any
     tools {
@@ -28,6 +32,7 @@ pipeline {
 
 def executeTest() {
     sh 'mvn clean test -f springboot-todo/pom.xml'
+    jacoco()
 }
 
 def executeDeploy() {
