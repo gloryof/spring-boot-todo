@@ -17,23 +17,6 @@
 		<version>2.0.0.RELEASE</version>
 	</parent>
 
-
-	<!--  only local VM repository -->
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<name>Snapshot Release</name>
-			<id>snapshotRelease</id>
-			<url>http://192.168.1.100:8081/</url>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<name>Snapshot Release</name>
-			<id>snapshotRelease</id>
-			<url>http://192.168.1.100:8081/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>9</java.version>

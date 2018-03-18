@@ -1,6 +1,8 @@
 /***
  *
- * @requied JaCoCo
+ * Plugins
+ * @required JaCoCo
+ * @required Config File Provider
  */
 pipeline {
     agent any
@@ -22,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Devloy') {
+        stage('Deploy') {
             steps {
                 executeDeploy()
             }
@@ -36,5 +38,7 @@ def executeTest() {
 }
 
 def executeDeploy() {
-    sh 'mvn clean deploy -f springboot-todo/pom.xml'
+    configFileProvider([configFile('nexus-setting')]) {
+        sh 'mvn clean deploy -f springboot-todo/pom.xml'
+    }
 }
