@@ -17,3 +17,8 @@ management:
 spring:
   session:
     store-type: redis
+
+server:
+  error:
+    whitelabel:
+      enabled: false
