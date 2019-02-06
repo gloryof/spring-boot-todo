@@ -33,7 +33,7 @@ pipeline {
 }
 
 def executeTest() {
-    sh 'mvn clean test -f springboot-todo/pom.xml'
+    sh 'mvn clean test  jacoco:report -f springboot-todo/pom.xml'
     jacoco exclusionPattern: 'jp/glory/todo/external/db/**/dao/*.class,jp/glory/todo/external/db/**/entity/*.class'
 }
 
