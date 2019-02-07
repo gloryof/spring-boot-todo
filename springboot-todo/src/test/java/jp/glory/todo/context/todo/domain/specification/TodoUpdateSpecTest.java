@@ -1,5 +1,6 @@
 package jp.glory.todo.context.todo.domain.specification;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,7 +66,7 @@ class TodoUpdateSpecTest {
         @Test
         void testHasError() {
 
-            assertFalse(actualErrors.hasError());
+            assertThat(actualErrors.hasError()).isFalse();
         }
     }
 
@@ -91,7 +92,7 @@ class TodoUpdateSpecTest {
         @Test
         void testHasError() {
 
-            assertTrue(actualErrors.hasError());
+            assertThat(actualErrors.hasError()).isTrue();
         }
 
         @DisplayName("各エラー情報が設定される")
@@ -166,7 +167,7 @@ class TodoUpdateSpecTest {
         @Test
         void testHasError() {
 
-            assertTrue(actualErrors.hasError());
+            assertThat(actualErrors.hasError()).isTrue();
         }
 
         @DisplayName("各エラー情報が設定される")
