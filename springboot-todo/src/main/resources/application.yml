@@ -1,7 +1,3 @@
-security: 
-  basic:
-    enabled: false
-
 doma:
   dialect: postgres
   query-timeout: 60
