@@ -39,6 +39,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>12</java.version>
 		<maven.compiler.target>12</maven.compiler.target>
+		<archi.unit.version>0.10.2</archi.unit.version>
 	</properties>
 
 	<dependencies>
@@ -177,6 +178,18 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5-api</artifactId>
+			<version>${archi.unit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5-engine</artifactId>
+			<version>${archi.unit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
