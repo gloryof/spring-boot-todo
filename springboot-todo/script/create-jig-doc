@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -z "${JIG_PATH}" ]; then
+  echo "JIG_PATH変数にパスが設定されていません。"
+  exit 1 
+fi
+
+if [ ! -e "${JIG_PATH}" ]; then
+  echo "JIG_PATHにファイルが存在しません。"
+  exit 1 
+fi
+
+OPTIONS="--directory.classes=target/classes --directory.resources=src/main/resources --outputDirectory=target/jig --jig.model.pattern=.+\.domain\.(entity|values)\..+"
+
+
+java -jar ${JIG_PATH} ${OPTIONS}
